@@ -196,9 +196,6 @@ document.querySelectorAll('.input-toggle-pw').forEach(btn => {
       if (hint) hint.classList.toggle('show', !!on);
     });
   });
-  document.getElementById('passkey-login')?.addEventListener('click', () => {
-    notify('Passkey — demo, lanjut dengan email dulu');
-  });
   const remembered = (() => { try { return localStorage.getItem('khb_email') || ''; } catch (_) { return ''; } })();
   if (remembered) {
     const em = document.getElementById('login-email');
