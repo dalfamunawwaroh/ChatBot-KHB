@@ -130,7 +130,14 @@
     <span class="online-pill"><i></i> Widget aktif</span>
   </div>
 
-  <div class="panel" style="padding:22px;margin-bottom:18px">
+  <div class="embed-stepper">
+    <div class="embed-step done"><span>1</span>Salin kode</div>
+    <div class="embed-step-line"></div>
+    <div class="embed-step"><span>2</span>Pratinjau</div>
+    <div class="embed-step-line"></div>
+    <div class="embed-step"><span>3</span>Rilis</div>
+  </div>
+  <div class="panel card-clean" style="padding:26px;margin-bottom:18px">
     <h2 style="font-size:15px;margin-bottom:4px">Langkah 1 — salin kode ini</h2>
     <p class="subheading" style="margin-bottom:12px">Tempel tepat sebelum <code>&lt;/body&gt;</code> di source code halalbandung.com. Ganti <code>WIDGET_URL</code> dengan alamat file <code>widget/chat.html</code> hasil publish Anda.</p>
     <div class="embed-toolbar">
@@ -144,12 +151,12 @@
         </label>
         <label>Label <input type="text" id="embed-label" value="Tanya Halal KHB" maxlength="30" style="max-width:180px"></label>
       </div>
-      <button class="btn btn-primary btn-sm" id="embed-copy">Salin Kode</button>
+      <button class="btn btn-primary btn-sm btn-pill" id="embed-copy">Salin Kode</button>
     </div>
     <pre class="embed-code"><code id="embed-snippet"></code></pre>
   </div>
 
-  <div class="panel" style="padding:22px;margin-bottom:18px">
+  <div class="panel card-clean" style="padding:26px;margin-bottom:18px">
     <h2 style="font-size:15px;margin-bottom:4px">Langkah 2 — pratinjau langsung</h2>
     <p class="subheading" style="margin-bottom:12px">Simulasi halaman KHB + tombol + popup. Klik tombol hijau untuk membuka chat.</p>
     <div class="embed-preview" id="embed-preview">
@@ -167,7 +174,7 @@
     </div>
   </div>
 
-  <div class="panel" style="padding:22px">
+  <div class="panel card-clean" style="padding:26px">
     <h2 style="font-size:15px;margin-bottom:4px">Langkah 3 — ceklis rilis</h2>
     <ul class="embed-check">
       <li>✅ File <code>widget/chat.html</code> sudah di-hosting (HTTPS) di domain yang sama/terpercaya.</li>
