@@ -6,8 +6,7 @@
   var labelEl = document.getElementById('embed-label');
   var codeEl = document.getElementById('embed-snippet');
   function widgetUrl() {
-    var p = location.pathname.replace(/admin\/integrasi\.html$/, 'widget/chat.html');
-    return location.origin + location.pathname.replace(/\/[^/]*$/, '').replace(/\/admin$/, '') + '/widget/chat.html';
+    return location.origin + location.pathname.replace(/\/[^/]*$/, '') + '/widget/chat.html';
   }
   function snippet() {
     return '<!-- KHB Chatbot Widget — tempel sebelum </body> di halalbandung.com -->\n'
@@ -15,7 +14,7 @@
       + "    color: '" + colorEl.value + "',\n"
       + "    position: '" + posEl.value + "',\n"
       + "    label: '" + labelEl.value.replace(/'/g, "\\'") + "'\n  };\n</" + 'script>\n'
-      + '<script src="' + location.origin + location.pathname.replace(/\/[^/]*$/, '').replace(/\/admin$/, '') + '/widget/khb-chat.js" defer></' + 'script>';
+      + '<script src="' + location.origin + location.pathname.replace(/\/[^/]*$/, '') + '/widget/khb-chat.js" defer></' + 'script>';
   }
   function render() {
     codeEl.textContent = snippet();

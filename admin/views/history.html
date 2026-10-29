@@ -4,14 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#15803D">
-  <title>Knowledge Base · KHB Admin</title>
+  <title>Riwayat Chat · KHB Admin</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../assets/css/base.css">
-  <link rel="stylesheet" href="../assets/css/admin.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/admin.css">
 </head>
-<body data-page="knowledge">
+<body data-page="history">
 <div class="app-shell" id="app-shell">
 <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
@@ -118,80 +118,84 @@
         </div>
       </header>
 
-<!-- ─── KNOWLEDGE BASE VIEW ─── -->
-      <section class="view active" id="view-knowledge">
+<!-- ─── HISTORY VIEW ─── -->
+      <section class="view active" id="view-history">
         <div class="page-title-row">
           <div>
-            <div class="eyebrow"><span class="eyebrow-dot"></span> PENGELOLAAN DATA AI</div>
-            <h1>Knowledge Base</h1>
-            <p class="subheading">Kelola sumber informasi yang digunakan chatbot untuk menjawab.</p>
+            <div class="eyebrow"><span class="eyebrow-dot"></span> MONITORING PENGGUNA</div>
+            <h1>Riwayat Percakapan</h1>
+            <p class="subheading">Lihat pertanyaan pengguna dan aktivitas chatbot.</p>
           </div>
-          <button class="btn btn-primary" id="add-document">
-            <svg viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
-            Tambah Dokumen
+          <button class="btn btn-secondary" id="export-history">
+            <svg viewBox="0 0 20 20" fill="none"><path d="M10 3v10M6 9l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 15h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            Ekspor Data
           </button>
         </div>
-        <div class="knowledge-summary">
-          <div class="knowledge-stat">
-            <span class="knowledge-stat-icon green">
-              <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="2" width="14" height="16" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M7 7h6M7 10h6M7 13h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <div class="history-stats">
+          <div class="history-stat panel">
+            <span class="history-stat-icon">
+              <svg viewBox="0 0 20 20" fill="none"><path d="M3 4h14a1 1 0 011 1v8a1 1 0 01-1 1H6l-4 3V5a1 1 0 011-1z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
             </span>
-            <div><small>Total dokumen</small><strong>38</strong></div>
+            <div><small>Total percakapan</small><strong>1,284</strong><span class="history-trend">↗ 12.8% bulan ini</span></div>
           </div>
-          <div class="knowledge-stat">
-            <span class="knowledge-stat-icon blue">
-              <svg viewBox="0 0 20 20" fill="none"><path d="M5 10l4 4 6-7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <div class="history-stat panel">
+            <span class="history-stat-icon blue">
+              <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="7" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M3 17c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
             </span>
-            <div><small>Dokumen aktif</small><strong>34</strong></div>
+            <div><small>Pengguna unik</small><strong>847</strong><span class="history-trend">↗ 8.2% bulan ini</span></div>
           </div>
-          <div class="knowledge-stat">
-            <span class="knowledge-stat-icon orange">
+          <div class="history-stat panel">
+            <span class="history-stat-icon orange">
               <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5"/><path d="M10 6v4l2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
             </span>
-            <div><small>Menunggu proses</small><strong>2</strong></div>
+            <div><small>Rata-rata respons</small><strong>1.8 <small>detik</small></strong><span class="history-neutral">Stabil dari bulan lalu</span></div>
           </div>
-          <div class="knowledge-stat">
-            <span class="knowledge-stat-icon purple">
-              <svg viewBox="0 0 20 20" fill="none"><path d="M10 4v2M10 14v2M4 10H2M18 10h-2M5.4 5.4l1.4 1.4M13.2 13.2l1.4 1.4M5.4 14.6l1.4-1.4M13.2 6.8l1.4-1.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="10" cy="10" r="2.5" stroke="currentColor" stroke-width="1.5"/></svg>
+          <div class="history-stat panel">
+            <span class="history-stat-icon purple">
+              <svg viewBox="0 0 20 20" fill="none"><path d="M5 10l4 4 6-7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </span>
-            <div><small>Pembaruan terakhir</small><strong class="date-value">Hari ini, 09:42</strong></div>
+            <div><small>Resolusi otomatis</small><strong>94.6<span class="smaller-percent">%</span></strong><span class="history-trend">↗ 3.1% bulan ini</span></div>
           </div>
         </div>
-        <div class="panel document-panel">
-          <div class="document-toolbar">
-            <div class="filter-tabs">
-              <button class="filter-tab selected" data-filter="Semua">Semua <span>38</span></button>
-              <button class="filter-tab" data-filter="Regulasi">Regulasi</button>
-              <button class="filter-tab" data-filter="Panduan">Panduan</button>
-              <button class="filter-tab" data-filter="FAQ">FAQ</button>
+        <div class="panel history-panel">
+          <div class="history-toolbar">
+            <div>
+              <h2>Semua percakapan</h2>
+              <p>1.284 percakapan ditemukan</p>
             </div>
-            <label class="search-box">
-              <svg viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="5.5" stroke="currentColor" stroke-width="1.5"/><path d="M15 15l-2.5-2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-              <input id="doc-search" type="search" placeholder="Cari dokumen...">
-            </label>
+            <div class="history-filters">
+              <label class="search-box">
+                <svg viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="5.5" stroke="currentColor" stroke-width="1.5"/><path d="M15 15l-2.5-2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                <input type="search" id="history-search" placeholder="Cari pengguna atau pesan...">
+              </label>
+              <button class="select-btn">Semua status <svg viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+              <button class="select-btn">
+                <svg viewBox="0 0 20 20" fill="none"><path d="M3 5h14M6 10h8M9 15h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                Filter
+              </button>
+            </div>
           </div>
           <div class="table-wrap">
-            <table class="data-table">
-              <thead><tr><th>NAMA DOKUMEN</th><th>KATEGORI</th><th>SUMBER</th><th>STATUS</th><th>TERAKHIR DIPERBARUI</th><th></th></tr></thead>
-              <tbody id="document-rows"></tbody>
+            <table class="data-table history-table">
+              <thead><tr><th>PENGGUNA</th><th>PERTANYAAN</th><th>KATEGORI</th><th>WAKTU</th><th>STATUS</th><th></th></tr></thead>
+              <tbody id="history-rows"></tbody>
             </table>
-            <div class="empty-state hidden" id="doc-empty">Dokumen tidak ditemukan.</div>
+            <div class="empty-state hidden" id="history-empty">Tidak ada percakapan yang cocok.</div>
           </div>
           <div class="table-footer">
-            <span>Menampilkan <strong id="doc-count">6 dokumen</strong> dari 38</span>
+            <span>Menampilkan <strong>1–6</strong> dari 1.284 percakapan</span>
             <div class="pagination">
               <button disabled aria-label="Sebelumnya">←</button>
               <button class="current-page">1</button>
               <button>2</button>
               <button>3</button>
               <span>…</span>
-              <button>7</button>
+              <button>214</button>
               <button aria-label="Berikutnya">→</button>
             </div>
           </div>
         </div>
-        <p class="knowledge-note">ⓘ Knowledge base ini menggunakan data contoh. Unggah dokumen belum tersambung ke sistem backend.</p>
-        <input type="file" id="file-input" accept=".pdf,.doc,.docx,.txt" hidden>
+        <footer class="page-footer"><span>© 2025 Komunitas Halal Bandung</span><span>Data contoh untuk prototipe</span></footer>
       </section>
 
 <footer class="page-footer"><span>© 2025 Komunitas Halal Bandung</span><span>Chatbot edukasi halal <i>●</i> 1 role: Admin</span></footer>
@@ -199,6 +203,6 @@
 </div>
 <div class="sidebar-overlay hidden" id="sidebar-overlay"></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
-<script src="../assets/js/data.js"></script>
-<script src="../assets/js/core.js"></script>
-<script src="../assets/js/admin.js"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/core.js"></script>
+<script src="assets/js/admin.js"></script>

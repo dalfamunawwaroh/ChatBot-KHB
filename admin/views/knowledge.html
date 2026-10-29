@@ -4,15 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#15803D">
-  <title>Integrasi Web · KHB Admin</title>
+  <title>Knowledge Base · KHB Admin</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../assets/css/base.css">
-  <link rel="stylesheet" href="../assets/css/admin.css">
-  <link rel="stylesheet" href="../assets/css/embed.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/admin.css">
 </head>
-<body data-page="integrasi">
+<body data-page="knowledge">
 <div class="app-shell" id="app-shell">
 <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
@@ -119,71 +118,87 @@
         </div>
       </header>
 
-<!-- ─── INTEGRASI VIEW ─── -->
-<section class="view active" id="view-integrasi">
-  <div class="page-title-row">
-    <div>
-      <div class="eyebrow"><span class="eyebrow-dot"></span> PASANG DI HALALBANDUNG.COM</div>
-      <h1>Integrasi Web</h1>
-      <p class="subheading">Satu cuplikan kode untuk memunculkan tombol + popup chatbot di web KHB.</p>
-    </div>
-    <span class="online-pill"><i></i> Widget aktif</span>
-  </div>
-
-  <div class="panel" style="padding:22px;margin-bottom:18px">
-    <h2 style="font-size:15px;margin-bottom:4px">Langkah 1 — salin kode ini</h2>
-    <p class="subheading" style="margin-bottom:12px">Tempel tepat sebelum <code>&lt;/body&gt;</code> di source code halalbandung.com. Ganti <code>WIDGET_URL</code> dengan alamat file <code>widget/chat.html</code> hasil publish Anda.</p>
-    <div class="embed-toolbar">
-      <div class="embed-opts">
-        <label>Warna tombol <input type="color" id="embed-color" value="#16A34A"></label>
-        <label>Posisi
-          <select id="embed-pos" class="settings-select" style="max-width:170px">
-            <option value="bottom-right" selected>Kanan bawah</option>
-            <option value="bottom-left">Kiri bawah</option>
-          </select>
-        </label>
-        <label>Label <input type="text" id="embed-label" value="Tanya Halal KHB" maxlength="30" style="max-width:180px"></label>
-      </div>
-      <button class="btn btn-primary btn-sm" id="embed-copy">Salin Kode</button>
-    </div>
-    <pre class="embed-code"><code id="embed-snippet"></code></pre>
-  </div>
-
-  <div class="panel" style="padding:22px;margin-bottom:18px">
-    <h2 style="font-size:15px;margin-bottom:4px">Langkah 2 — pratinjau langsung</h2>
-    <p class="subheading" style="margin-bottom:12px">Simulasi halaman KHB + tombol + popup. Klik tombol hijau untuk membuka chat.</p>
-    <div class="embed-preview" id="embed-preview">
-      <div class="embed-preview-bar"><i></i><i></i><i></i><span>halalbandung.com — pratinjau</span></div>
-      <div class="embed-preview-hero">
-        <strong>KHB On Clinic: Business Growth</strong>
-        <p>Akselerasi UMKM Anda melalui konsultasi bisnis dan percepatan Sertifikasi Halal.</p>
-        <span class="embed-preview-cta">Konsultasi Sekarang</span>
-      </div>
-      <button class="khb-float" id="preview-float">💬 <span id="preview-label">Tanya Halal KHB</span></button>
-      <div class="khb-modal hidden" id="preview-modal" role="dialog" aria-label="Chatbot KHB">
-        <div class="khb-modal-head"><strong>Asisten Halal KHB</strong><span><i></i> Online</span><button id="preview-close" aria-label="Tutup">✕</button></div>
-        <iframe id="preview-frame" title="Chatbot KHB" src="../widget/chat.html"></iframe>
-      </div>
-    </div>
-  </div>
-
-  <div class="panel" style="padding:22px">
-    <h2 style="font-size:15px;margin-bottom:4px">Langkah 3 — ceklis rilis</h2>
-    <ul class="embed-check">
-      <li>✅ File <code>widget/chat.html</code> sudah di-hosting (HTTPS) di domain yang sama/terpercaya.</li>
-      <li>✅ Snippet ditempel sebelum <code>&lt;/body&gt;</code> di semua halaman KHB.</li>
-      <li>✅ Buka halalbandung.com → klik tombol → popup chat terbuka &lt; 2 detik.</li>
-      <li>ⓘ Jawaban widget bersifat edukatif (demo). Rilis resmi tetap rujuk BPJPH/SIHALAL.</li>
-    </ul>
-  </div>
-</section>
+<!-- ─── KNOWLEDGE BASE VIEW ─── -->
+      <section class="view active" id="view-knowledge">
+        <div class="page-title-row">
+          <div>
+            <div class="eyebrow"><span class="eyebrow-dot"></span> PENGELOLAAN DATA AI</div>
+            <h1>Knowledge Base</h1>
+            <p class="subheading">Kelola sumber informasi yang digunakan chatbot untuk menjawab.</p>
+          </div>
+          <button class="btn btn-primary" id="add-document">
+            <svg viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+            Tambah Dokumen
+          </button>
+        </div>
+        <div class="knowledge-summary">
+          <div class="knowledge-stat">
+            <span class="knowledge-stat-icon green">
+              <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="2" width="14" height="16" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M7 7h6M7 10h6M7 13h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+            </span>
+            <div><small>Total dokumen</small><strong>38</strong></div>
+          </div>
+          <div class="knowledge-stat">
+            <span class="knowledge-stat-icon blue">
+              <svg viewBox="0 0 20 20" fill="none"><path d="M5 10l4 4 6-7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <div><small>Dokumen aktif</small><strong>34</strong></div>
+          </div>
+          <div class="knowledge-stat">
+            <span class="knowledge-stat-icon orange">
+              <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5"/><path d="M10 6v4l2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </span>
+            <div><small>Menunggu proses</small><strong>2</strong></div>
+          </div>
+          <div class="knowledge-stat">
+            <span class="knowledge-stat-icon purple">
+              <svg viewBox="0 0 20 20" fill="none"><path d="M10 4v2M10 14v2M4 10H2M18 10h-2M5.4 5.4l1.4 1.4M13.2 13.2l1.4 1.4M5.4 14.6l1.4-1.4M13.2 6.8l1.4-1.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="10" cy="10" r="2.5" stroke="currentColor" stroke-width="1.5"/></svg>
+            </span>
+            <div><small>Pembaruan terakhir</small><strong class="date-value">Hari ini, 09:42</strong></div>
+          </div>
+        </div>
+        <div class="panel document-panel">
+          <div class="document-toolbar">
+            <div class="filter-tabs">
+              <button class="filter-tab selected" data-filter="Semua">Semua <span>38</span></button>
+              <button class="filter-tab" data-filter="Regulasi">Regulasi</button>
+              <button class="filter-tab" data-filter="Panduan">Panduan</button>
+              <button class="filter-tab" data-filter="FAQ">FAQ</button>
+            </div>
+            <label class="search-box">
+              <svg viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="5.5" stroke="currentColor" stroke-width="1.5"/><path d="M15 15l-2.5-2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              <input id="doc-search" type="search" placeholder="Cari dokumen...">
+            </label>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr><th>NAMA DOKUMEN</th><th>KATEGORI</th><th>SUMBER</th><th>STATUS</th><th>TERAKHIR DIPERBARUI</th><th></th></tr></thead>
+              <tbody id="document-rows"></tbody>
+            </table>
+            <div class="empty-state hidden" id="doc-empty">Dokumen tidak ditemukan.</div>
+          </div>
+          <div class="table-footer">
+            <span>Menampilkan <strong id="doc-count">6 dokumen</strong> dari 38</span>
+            <div class="pagination">
+              <button disabled aria-label="Sebelumnya">←</button>
+              <button class="current-page">1</button>
+              <button>2</button>
+              <button>3</button>
+              <span>…</span>
+              <button>7</button>
+              <button aria-label="Berikutnya">→</button>
+            </div>
+          </div>
+        </div>
+        <p class="knowledge-note">ⓘ Knowledge base ini menggunakan data contoh. Unggah dokumen belum tersambung ke sistem backend.</p>
+        <input type="file" id="file-input" accept=".pdf,.doc,.docx,.txt" hidden>
+      </section>
 
 <footer class="page-footer"><span>© 2025 Komunitas Halal Bandung</span><span>Chatbot edukasi halal <i>●</i> 1 role: Admin</span></footer>
 </main>
 </div>
 <div class="sidebar-overlay hidden" id="sidebar-overlay"></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
-<script src="../assets/js/data.js"></script>
-<script src="../assets/js/core.js"></script>
-<script src="../assets/js/admin.js"></script>
-<script src="../assets/js/integrasi.js"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/core.js"></script>
+<script src="assets/js/admin.js"></script>

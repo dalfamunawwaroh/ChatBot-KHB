@@ -1,6 +1,6 @@
 /* KHB admin — 1 role: admin knowledge (MPA pages + chat demo) */
 'use strict';
-function exitApp(){ window.location.href='../login.html'; }
+function exitApp(){ window.location.href='login.html'; }
 /* ══════════════════════════════════════════════
    MAIN APP NAVIGATION
 ══════════════════════════════════════════════ */
@@ -40,8 +40,8 @@ const _pg = document.body.dataset.page;
 document.querySelectorAll('[data-page]').forEach(elm => {
   elm.classList.toggle('active', elm.dataset.page === _pg);
 });
-document.getElementById('logout-btn')?.addEventListener('click', () => { window.location.href = '../login.html'; });
-document.getElementById('logout-btn-top')?.addEventListener('click', () => { window.location.href = '../login.html'; });
+document.getElementById('logout-btn')?.addEventListener('click', () => { window.location.href = 'login.html'; });
+document.getElementById('logout-btn-top')?.addEventListener('click', () => { window.location.href = 'login.html'; });
 document.querySelectorAll('[data-goto]').forEach(btn =>
   btn.addEventListener('click', () => { window.location.href = btn.dataset.goto + '.html'; })
 );

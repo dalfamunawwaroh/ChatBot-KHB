@@ -5,7 +5,7 @@
 ══════════════════════════════════════════════ */
 /* MPA: tiap halaman auth file sendiri; link antar-halaman href native. */
 function showAuthPage() {}
-function enterApp() { window.location.href = 'admin/dashboard.html'; }
+function enterApp() { window.location.href = 'dashboard.html'; }
 
 /* ─ Login form ─ */
 document.getElementById('login-form')?.addEventListener('submit', function(e) {

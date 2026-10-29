@@ -4,14 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#15803D">
-  <title>Edit Profil · KHB Admin</title>
+  <title>Notifikasi · KHB Admin</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../assets/css/base.css">
-  <link rel="stylesheet" href="../assets/css/admin.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/admin.css">
 </head>
-<body data-page="edit-profile">
+<body data-page="notifications">
 <div class="app-shell" id="app-shell">
 <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
@@ -118,97 +118,27 @@
         </div>
       </header>
 
-<!-- ─── EDIT PROFILE VIEW ─── -->
-      <section class="view active" id="view-edit-profile">
+<!-- ─── NOTIFICATIONS VIEW ─── -->
+      <section class="view active" id="view-notifications">
         <div class="page-title-row">
           <div>
-            <div class="eyebrow"><span class="eyebrow-dot"></span> PROFIL SAYA</div>
-            <h1>Edit Profil</h1>
-            <p class="subheading">Perbarui informasi pribadi dan foto profil Anda.</p>
+            <div class="eyebrow"><span class="eyebrow-dot"></span> PUSAT NOTIFIKASI</div>
+            <h1>Notifikasi</h1>
+            <p class="subheading">Pantau aktivitas terbaru dan pembaruan sistem.</p>
           </div>
+          <button class="btn btn-secondary" id="mark-all-read-btn">
+            <svg viewBox="0 0 20 20" fill="none"><path d="M3 10l5 5 9-9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Tandai Semua Dibaca
+          </button>
         </div>
-        <div class="profile-edit-layout">
-          <div class="profile-avatar-card panel">
-            <div class="profile-avatar-section">
-              <div class="profile-avatar-large" id="profile-avatar-large">A</div>
-              <div class="profile-avatar-actions">
-                <button class="btn btn-secondary btn-sm" id="change-avatar-btn">
-                  <svg viewBox="0 0 20 20" fill="none"><path d="M4 14l4-4 3 3 4-5 4 5H4z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><circle cx="14" cy="7" r="1.5" stroke="currentColor" stroke-width="1.4"/><rect x="2" y="3" width="16" height="14" rx="2" stroke="currentColor" stroke-width="1.4"/></svg>
-                  Ubah Foto
-                </button>
-                <p class="avatar-hint">JPG, PNG maks. 2MB</p>
-              </div>
-            </div>
-            <div class="profile-info-summary">
-              <strong id="profile-card-name">Admin KHB</strong>
-              <span id="profile-card-email">admin@khb.or.id</span>
-              <span class="role-badge" id="profile-card-role">Administrator</span>
-            </div>
-            <div class="profile-meta">
-              <div class="profile-meta-item">
-                <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.4"/><path d="M10 6v4l2 2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-                <span>Bergabung Jan 2024</span>
-              </div>
-              <div class="profile-meta-item">
-                <svg viewBox="0 0 20 20" fill="none"><path d="M10 2l7 3v6c0 4.8-3.2 7.6-7 9-3.8-1.4-7-4.2-7-9V5l7-3z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
-                <span>Admin terverifikasi</span>
-              </div>
-            </div>
-          </div>
-          <div class="profile-form-card panel">
-            <div class="settings-card-header"><h3>Informasi Pribadi</h3><p>Informasi ini ditampilkan di profil Anda</p></div>
-            <form id="edit-profile-form" novalidate>
-              <div class="form-row-two">
-                <div class="form-group">
-                  <label for="ep-firstname">Nama Depan</label>
-                  <div class="input-wrap">
-                    <span class="input-icon"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="7" r="3" stroke="currentColor" stroke-width="1.4"/><path d="M3 17c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></span>
-                    <input type="text" id="ep-firstname" value="Admin" placeholder="Nama depan">
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label for="ep-lastname">Nama Belakang</label>
-                  <div class="input-wrap">
-                    <span class="input-icon"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="7" r="3" stroke="currentColor" stroke-width="1.4"/><path d="M3 17c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></span>
-                    <input type="text" id="ep-lastname" value="KHB" placeholder="Nama belakang">
-                  </div>
-                </div>
-              </div>
-              <div class="form-group">
-                <label for="ep-email">Alamat Email</label>
-                <div class="input-wrap">
-                  <span class="input-icon"><svg viewBox="0 0 20 20" fill="none"><path d="M3 5h14a1 1 0 011 1v8a1 1 0 01-1 1H3a1 1 0 01-1-1V6a1 1 0 011-1z" stroke="currentColor" stroke-width="1.4"/><path d="m2 6 8 6 8-6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></span>
-                  <input type="email" id="ep-email" value="admin@khb.or.id" placeholder="Email">
-                </div>
-              </div>
-              <div class="form-group">
-                <label for="ep-phone">Nomor WhatsApp</label>
-                <div class="input-wrap">
-                  <span class="input-icon"><svg viewBox="0 0 20 20" fill="none"><rect x="4" y="2" width="12" height="16" rx="2" stroke="currentColor" stroke-width="1.4"/><circle cx="10" cy="15" r="1" fill="currentColor"/></svg></span>
-                  <input type="tel" id="ep-phone" value="+62 812-3456-7890" placeholder="Nomor WhatsApp">
-                </div>
-              </div>
-              <div class="form-group">
-                <label for="ep-org">Organisasi / Instansi</label>
-                <div class="input-wrap">
-                  <span class="input-icon"><svg viewBox="0 0 20 20" fill="none"><rect x="2" y="6" width="16" height="12" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M6 6V4a1 1 0 011-1h6a1 1 0 011 1v2" stroke="currentColor" stroke-width="1.4"/><path d="M9 11h2M9 14h2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></span>
-                  <input type="text" id="ep-org" value="Komunitas Halal Bandung" placeholder="Nama organisasi">
-                </div>
-              </div>
-              <div class="form-group">
-                <label for="ep-bio">Bio</label>
-                <textarea id="ep-bio" rows="3" class="settings-textarea" placeholder="Ceritakan sedikit tentang Anda...">Administrator Komunitas Halal Bandung. Mendukung UMKM dalam proses sertifikasi halal.</textarea>
-              </div>
-              <div class="settings-actions">
-                <button type="button" class="btn btn-secondary btn-sm">Batal</button>
-                <button type="submit" class="btn btn-primary btn-sm" id="save-profile-btn">
-                  <svg viewBox="0 0 20 20" fill="none"><path d="M5 10l4 4 6-7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                  Simpan Profil
-                </button>
-              </div>
-            </form>
-          </div>
+        <div class="notif-tabs">
+          <button class="notif-tab selected" data-notif-filter="all">Semua <span class="notif-tab-count" id="notif-tab-all">8</span></button>
+          <button class="notif-tab" data-notif-filter="unread">Belum dibaca <span class="notif-tab-count unread" id="notif-tab-unread">3</span></button>
+          <button class="notif-tab" data-notif-filter="system">Sistem</button>
+          <button class="notif-tab" data-notif-filter="chat">Chat</button>
         </div>
+        <div class="notif-list" id="notif-list"></div>
+        <footer class="page-footer"><span>© 2025 Komunitas Halal Bandung</span><span>Notifikasi diperbarui real-time</span></footer>
       </section>
 
 <footer class="page-footer"><span>© 2025 Komunitas Halal Bandung</span><span>Chatbot edukasi halal <i>●</i> 1 role: Admin</span></footer>
@@ -216,6 +146,6 @@
 </div>
 <div class="sidebar-overlay hidden" id="sidebar-overlay"></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
-<script src="../assets/js/data.js"></script>
-<script src="../assets/js/core.js"></script>
-<script src="../assets/js/admin.js"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/core.js"></script>
+<script src="assets/js/admin.js"></script>
