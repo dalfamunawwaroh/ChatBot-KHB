@@ -9,7 +9,24 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/base.css">
-  <link rel="stylesheet" href="assets/css/auth.css"></head>
+  <link rel="stylesheet" href="assets/css/auth.css">
+  <style>
+    .otp-row{display:flex;gap:10px;justify-content:center;margin:6px 0 4px}
+    .otp-box{width:48px;height:56px;text-align:center;font-size:22px;font-weight:800;font-family:var(--display);
+      border:1.5px solid var(--line);border-radius:16px;background:var(--canvas);color:var(--ink);
+      transition:var(--transition);outline:none}
+    .otp-box:focus{border-color:#16A34A;background:#fff;box-shadow:0 0 0 4px rgba(22,163,74,.14);transform:translateY(-2px)}
+    .otp-box.filled{border-color:#16A34A;background:#f0fdf4}
+    .otp-meta{display:flex;align-items:center;justify-content:space-between;font-size:12.5px;color:var(--muted);margin-top:6px}
+    .otp-resend{background:none;border:none;color:#16A34A;font-weight:700;font-size:12.5px;cursor:pointer;padding:0}
+    .otp-resend:disabled{color:var(--muted-2);cursor:default}
+    .stepper-mini{display:flex;align-items:center;gap:8px;margin-bottom:20px}
+    .step-mini{display:inline-flex;align-items:center;gap:7px;font-size:11.5px;font-weight:700;color:var(--muted-2)}
+    .step-mini i{width:22px;height:22px;border-radius:50%;background:var(--line-2);display:grid;place-items:center;font-style:normal;font-size:11px}
+    .step-mini.on{color:#15803d}
+    .step-mini.on i{background:linear-gradient(135deg,#16A34A,#0d9488);color:#fff}
+    .step-mini-bar{flex:1;height:2px;border-radius:2px;background:var(--line)}
+  </style></head>
 <body>
 <div class="auth-pages" id="auth-pages">
 <div class="auth-page active" id="page-reset">
@@ -23,9 +40,37 @@
               </a>
               <div><span class="auth-badge"><i></i>KATA SANDI BARU</span></div>
               <h1>Reset Kata Sandi</h1>
-              <p>Buat kata sandi baru yang kuat — min. 8 karakter, campur huruf & angka.</p>
+              <p id="reset-sub">Masukkan 6 digit kode OTP yang dikirim ke email Anda.</p>
             </div>
-            <form class="auth-form" id="reset-form" novalidate>
+            <div class="stepper-mini">
+              <span class="step-mini on" id="st-otp"><i>1</i>OTP</span>
+              <span class="step-mini-bar"></span>
+              <span class="step-mini" id="st-pw"><i>2</i>Sandi baru</span>
+            </div>
+            <!-- STEP 1: OTP -->
+            <form class="auth-form" id="otp-form" novalidate>
+              <div class="form-group">
+                <label>Kode OTP</label>
+                <div class="otp-row" id="otp-row">
+                  <input class="otp-box" inputmode="numeric" maxlength="1" aria-label="Digit 1">
+                  <input class="otp-box" inputmode="numeric" maxlength="1" aria-label="Digit 2">
+                  <input class="otp-box" inputmode="numeric" maxlength="1" aria-label="Digit 3">
+                  <input class="otp-box" inputmode="numeric" maxlength="1" aria-label="Digit 4">
+                  <input class="otp-box" inputmode="numeric" maxlength="1" aria-label="Digit 5">
+                  <input class="otp-box" inputmode="numeric" maxlength="1" aria-label="Digit 6">
+                </div>
+                <div class="otp-meta">
+                  <span id="otp-target">Dikirim ke email Anda</span>
+                  <button type="button" class="otp-resend" id="otp-resend" disabled>Kirim ulang (<span id="otp-timer">60</span>d)</button>
+                </div>
+              </div>
+              <button type="submit" class="btn-auth">
+                <span class="btn-text">Verifikasi OTP</span>
+                <span class="btn-loader hidden"></span>
+              </button>
+            </form>
+            <!-- STEP 2: PASSWORD (hidden) -->
+            <form class="auth-form hidden" id="reset-form" novalidate>
               <div class="form-group">
                 <label for="reset-password">Kata Sandi Baru</label>
                 <div class="input-wrap">
@@ -51,6 +96,12 @@
                 <span class="btn-loader hidden"></span>
               </button>
             </form>
+            <div class="auth-card-footer" style="margin-top:18px">
+              <a href="login.html" class="auth-back-link">
+                <svg viewBox="0 0 20 20" fill="none"><path d="M13 5l-5 5 5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Kembali masuk
+              </a>
+            </div>
           </div>
         </div>
         <div class="auth-brand-panel">
@@ -72,9 +123,9 @@
             <h2 class="auth-panel-tagline">Satu langkah lagi kembali masuk.</h2>
             <p class="auth-panel-desc">Gunakan kombinasi huruf besar, angka & simbol agar akun tetap aman.</p>
             <div class="auth-stats-row">
-              <div class="auth-stat"><strong>8+</strong><span>Karakter min.</span></div>
+              <div class="auth-stat"><strong>6</strong><span>Digit OTP</span></div>
               <div class="auth-stat-div"></div>
-              <div class="auth-stat"><strong>2×</strong><span>Konfirmasi</span></div>
+              <div class="auth-stat"><strong>8+</strong><span>Karakter min.</span></div>
               <div class="auth-stat-div"></div>
               <div class="auth-stat"><strong>1 mnt</strong><span>Langsung masuk</span></div>
             </div>

@@ -53,23 +53,27 @@ document.getElementById('register-form')?.addEventListener('submit', function(e)
   }, 1100);
 });
 
-/* ─ Forgot password ─ */
+/* ─ Forgot password: email -> OTP (demo: kode apa pun 6 digit diterima) ─ */
 document.getElementById('forgot-form')?.addEventListener('submit', function(e) {
   e.preventDefault();
   const email = document.getElementById('forgot-email').value.trim();
-  if (!email) { notify('Masukkan alamat email'); return; }
+  if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { notify('Masukkan alamat email yang valid'); return; }
   const btn = this.querySelector('.btn-auth');
   setAuthLoading(btn, true);
   setTimeout(() => {
     setAuthLoading(btn, false);
-    notify('Tautan reset dikirim ke ' + email + ' ✉️');
-    setTimeout(() => window.location.href = 'reset.html', 1200);
-  }, 1000);
+    try { sessionStorage.setItem('khb_reset_email', email); } catch (_) {}
+    notify('Kode OTP dikirim ke ' + email + ' ✉️');
+    setTimeout(() => window.location.href = 'reset.html', 900);
+  }, 900);
 });
 
-/* ─ Reset password ─ */
+/* ─ Reset password (guard: OTP dulu) ─ */
 document.getElementById('reset-form')?.addEventListener('submit', function(e) {
   e.preventDefault();
+  let ok = false;
+  try { ok = sessionStorage.getItem('khb_otp_ok') === '1'; } catch (_) {}
+  if (!ok && document.getElementById('otp-form')) { notify('Verifikasi OTP dulu'); return; }
   const pw = document.getElementById('reset-password').value;
   const confirm = document.getElementById('reset-confirm').value;
   if (!pw || pw.length < 8) { notify('Kata sandi minimal 8 karakter'); return; }
@@ -79,9 +83,75 @@ document.getElementById('reset-form')?.addEventListener('submit', function(e) {
   setTimeout(() => {
     setAuthLoading(btn, false);
     notify('Kata sandi berhasil direset! ✅');
+    try { sessionStorage.removeItem('khb_otp_ok'); sessionStorage.removeItem('khb_reset_email'); } catch (_) {}
     setTimeout(() => window.location.href = 'login.html', 900);
   }, 900);
 });
+
+/* ─ OTP step (reset.html): 6 kotak + timer + guard ─ */
+(function initOtp() {
+  const row = document.getElementById('otp-row');
+  if (!row) return;
+  const boxes = Array.from(row.querySelectorAll('.otp-box'));
+  let email = '';
+  try { email = sessionStorage.getItem('khb_reset_email') || ''; } catch (_) {}
+  if (!email) {
+    notify('Isi email dulu di halaman lupa kata sandi');
+    setTimeout(() => window.location.href = 'forgot.html', 1200);
+    return;
+  }
+  document.getElementById('otp-target').textContent = 'Dikirim ke ' + email;
+  boxes.forEach((b, i) => {
+    b.addEventListener('input', () => {
+      b.value = b.value.replace(/\D/g, '').slice(0, 1);
+      b.classList.toggle('filled', !!b.value);
+      if (b.value && i < boxes.length - 1) boxes[i + 1].focus();
+    });
+    b.addEventListener('keydown', e => {
+      if (e.key === 'Backspace' && !b.value && i > 0) boxes[i - 1].focus();
+    });
+  });
+  row.addEventListener('paste', e => {
+    const t = (e.clipboardData.getData('text') || '').replace(/\D/g, '').slice(0, 6);
+    if (!t) return;
+    e.preventDefault();
+    t.split('').forEach((d, i) => { boxes[i].value = d; boxes[i].classList.add('filled'); });
+    boxes[Math.min(t.length, 5)].focus();
+  });
+  boxes[0].focus();
+  let sec = 60;
+  const btn = document.getElementById('otp-resend');
+  const tick = setInterval(() => {
+    sec -= 1;
+    if (sec <= 0) { clearInterval(tick); btn.disabled = false; btn.textContent = 'Kirim ulang kode'; return; }
+    document.getElementById('otp-timer').textContent = sec;
+  }, 1000);
+  btn.addEventListener('click', () => {
+    notify('Kode OTP baru dikirim ✉️');
+    btn.disabled = true;
+    sec = 60;
+    btn.innerHTML = 'Kirim ulang (<span id="otp-timer">' + sec + '</span>d)';
+  });
+  document.getElementById('otp-form')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const code = boxes.map(b => b.value).join('');
+    if (code.length < 6) { notify('Lengkapi 6 digit OTP'); return; }
+    const btn2 = this.querySelector('.btn-auth');
+    setAuthLoading(btn2, true);
+    setTimeout(() => {
+      setAuthLoading(btn2, false);
+      try { sessionStorage.setItem('khb_otp_ok', '1'); } catch (_) {}
+      document.getElementById('otp-form').classList.add('hidden');
+      document.getElementById('reset-form').classList.remove('hidden');
+      document.getElementById('st-otp').classList.remove('on');
+      const st = document.getElementById('st-pw'); st.classList.add('on');
+      st.querySelector('i').textContent = '✓';
+      document.getElementById('reset-sub').textContent = 'OTP terverifikasi. Buat kata sandi baru Anda.';
+      document.getElementById('reset-password').focus();
+      notify('OTP benar ✅ — buat kata sandi baru');
+    }, 800);
+  });
+})();
 
 function setAuthLoading(btn, loading) {
   const text = btn.querySelector('.btn-text');
