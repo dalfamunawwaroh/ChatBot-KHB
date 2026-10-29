@@ -186,3 +186,47 @@ document.querySelectorAll('.input-toggle-pw').forEach(btn => {
     input.type = input.type === 'password' ? 'text' : 'password';
   });
 });
+
+/* ── DALFA auth v2: segmented + caps + passkey + remember ── */
+(function initAuthV2() {
+  document.querySelectorAll('.auth-segment').forEach(seg => {
+    seg.addEventListener('click', e => {
+      const b = e.target.closest('button'); if (!b) return;
+      seg.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
+      try { sessionStorage.setItem('khb_role', b.dataset.role); } catch (_) {}
+      notify('Peran: ' + b.textContent.trim());
+    });
+  });
+  document.querySelectorAll('input[type="password"]').forEach(inp => {
+    inp.addEventListener('keyup', e => {
+      const on = e.getModifierState && e.getModifierState('CapsLock');
+      const hint = inp.closest('.form-group')?.querySelector('.caps-hint');
+      if (hint) hint.classList.toggle('show', !!on);
+    });
+  });
+  document.getElementById('passkey-login')?.addEventListener('click', () => {
+    notify('Passkey — demo, lanjut dengan email dulu');
+  });
+  const remembered = (() => { try { return localStorage.getItem('khb_email') || ''; } catch (_) { return ''; } })();
+  if (remembered) {
+    const em = document.getElementById('login-email');
+    if (em && !em.value) em.value = remembered;
+    const cb = document.getElementById('login-remember');
+    if (cb && remembered) cb.checked = true;
+  }
+  document.getElementById('login-form')?.addEventListener('submit', function() {
+    const em = document.getElementById('login-email');
+    const err = document.getElementById('err-login-email');
+    const bad = !em || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em.value.trim());
+    if (err) err.classList.toggle('show', bad);
+    em?.closest('.input-wrap')?.classList.toggle('invalid', bad);
+    if (bad) { em?.classList.add('shake'); setTimeout(() => em?.classList.remove('shake'), 350); }
+    else {
+      const cb = document.getElementById('login-remember');
+      try {
+        if (cb?.checked) localStorage.setItem('khb_email', em.value.trim());
+        else localStorage.removeItem('khb_email');
+      } catch (_) {}
+    }
+  }, true);
+})();
