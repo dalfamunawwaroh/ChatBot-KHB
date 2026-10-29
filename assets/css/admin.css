@@ -989,3 +989,17 @@ body.dark-theme .settings-select, body.dark-theme .settings-textarea { backgroun
   .theme-options { flex-wrap: wrap; }
 }
 
+
+/* ── TOPBAR POPUPS (notif + profile) ── */
+.topbar-pop-wrap{position:relative}
+.topbar-pop{position:absolute;right:0;top:calc(100% + 10px);width:320px;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow-lg);padding:8px;z-index:60}
+.topbar-pop-head{display:flex;align-items:center;justify-content:space-between;padding:8px 10px 10px;font-size:13px;border-bottom:1px solid var(--line);margin-bottom:4px}
+.topbar-pop-head a{font-size:12px;font-weight:600;color:var(--green)}
+.topbar-pop-item{display:flex;gap:10px;align-items:flex-start;padding:10px;border-radius:10px}
+.topbar-pop-item:hover{background:var(--line-2)}
+.topbar-pop-item.unread{background:var(--green-subtle)}
+.topbar-pop-item strong{display:block;font-size:12.5px}
+.topbar-pop-item small{color:var(--muted);font-size:11px}
+.notif-dot-mini{width:8px;height:8px;border-radius:50%;background:var(--muted-2);margin-top:5px;flex:none}
+.topbar-pop-item.unread .notif-dot-mini{background:var(--green-mid)}
+.topbar-pop .profile-dd-item{width:100%}

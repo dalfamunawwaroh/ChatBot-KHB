@@ -9,12 +9,26 @@
         </div>
         <div class="topbar-actions">
           <span class="prototype-badge"><i></i> PROTOTIPE</span>
-          <button class="icon-btn notification-btn" aria-label="Notifikasi" id="topbar-notif-btn" data-page="notifications">
-            <svg viewBox="0 0 20 20" fill="none"><path d="M10 2a6 6 0 016 6c0 3 .8 5 1.5 6H2.5C3.2 13 4 11 4 8a6 6 0 016-6z" stroke="currentColor" stroke-width="1.5"/><path d="M8 16a2 2 0 004 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-            <span class="notif-badge" id="notif-badge">3</span>
-          </button>
-          <button class="topbar-avatar-btn" id="topbar-avatar-btn" data-page="edit-profile">
-            <div class="avatar avatar-admin" id="topbar-avatar">A</div>
-          </button>
+          <div class="topbar-pop-wrap">
+            <button class="icon-btn notification-btn" aria-label="Notifikasi" id="topbar-notif-btn" aria-expanded="false">
+              <svg viewBox="0 0 20 20" fill="none"><path d="M10 2a6 6 0 016 6c0 3 .8 5 1.5 6H2.5C3.2 13 4 11 4 8a6 6 0 016-6z" stroke="currentColor" stroke-width="1.5"/><path d="M8 16a2 2 0 004 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              <span class="notif-badge" id="notif-badge">3</span>
+            </button>
+            <div class="topbar-pop hidden" id="notif-pop" role="menu" aria-label="Notifikasi terbaru">
+              <div class="topbar-pop-head"><strong>Notifikasi</strong><a href="notifications.html">Lihat semua</a></div>
+              <div id="notif-pop-list"></div>
+            </div>
+          </div>
+          <div class="topbar-pop-wrap">
+            <button class="topbar-avatar-btn" id="topbar-avatar-btn" aria-label="Menu profil" aria-expanded="false">
+              <div class="avatar avatar-admin" id="topbar-avatar">A</div>
+            </button>
+            <div class="topbar-pop hidden" id="profile-pop" role="menu" aria-label="Menu profil">
+              <button class="profile-dd-item" data-goto="edit-profile"><svg viewBox="0 0 20 20" fill="none"><path d="M13 3l4 4-9 9H4v-4L13 3z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>Edit Profil</button>
+              <button class="profile-dd-item" data-goto="settings"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="2.5" stroke="currentColor" stroke-width="1.4"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Pengaturan</button>
+              <div class="profile-dd-divider"></div>
+              <button class="profile-dd-item danger" id="logout-btn-top"><svg viewBox="0 0 20 20" fill="none"><path d="M8 3H4a1 1 0 00-1 1v12a1 1 0 001 1h4M13 14l4-4-4-4M17 10H7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Keluar</button>
+            </div>
+          </div>
         </div>
       </header>

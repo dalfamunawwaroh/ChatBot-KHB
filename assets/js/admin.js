@@ -35,13 +35,16 @@ function navigate(view) {
   if (view === 'edit-profile') syncProfileForm();
 }
 
-/* Wire nav buttons */
+/* Active nav (anchors navigate natively via href) */
 const _pg = document.body.dataset.page;
 document.querySelectorAll('[data-page]').forEach(elm => {
   elm.classList.toggle('active', elm.dataset.page === _pg);
-  if (!elm._mpa) { elm._mpa = true; elm.addEventListener('click', () => { window.location.href = elm.dataset.page + '.html'; }); }
 });
 document.getElementById('logout-btn')?.addEventListener('click', () => { window.location.href = '../login.html'; });
+document.getElementById('logout-btn-top')?.addEventListener('click', () => { window.location.href = '../login.html'; });
+document.querySelectorAll('[data-goto]').forEach(btn =>
+  btn.addEventListener('click', () => { window.location.href = btn.dataset.goto + '.html'; })
+);
 
 document.querySelectorAll('[data-go]').forEach(btn =>
   btn.addEventListener('click', () => location.href = btn.dataset.go + '.html')
@@ -61,30 +64,42 @@ overlay?.addEventListener('click', () => {
   overlay.classList.add('hidden');
 });
 
-/* ── Profile dropdown ── */
-const profileMenuBtn = document.getElementById('profile-menu-btn');
-const profileDropdown = document.getElementById('profile-dropdown');
-profileMenuBtn?.addEventListener('click', e => {
-  e.stopPropagation();
-  profileDropdown.classList.toggle('hidden');
-});
-document.addEventListener('click', () => profileDropdown.classList.add('hidden'));
-
-/* ── Logout ── */
-document.getElementById('logout-btn')?.addEventListener('click', () => {
-  window.location.href = '../login.html';
-});
+/* ── Topbar popups (notif preview + profile menu) ── */
+function initTopbarPops() {
+  if (document.body.dataset.popsWired) { if (typeof renderNotifPop === 'function') renderNotifPop(); return; }
+  document.body.dataset.popsWired = '1';
+  const pairs = [
+    ['topbar-notif-btn', 'notif-pop'],
+    ['topbar-avatar-btn', 'profile-pop']
+  ];
+  const closeAll = () => {
+    pairs.forEach(([bid, pid]) => {
+      document.getElementById(pid)?.classList.add('hidden');
+      document.getElementById(bid)?.setAttribute('aria-expanded', 'false');
+    });
+  };
+  pairs.forEach(([bid, pid]) => {
+    document.getElementById(bid)?.addEventListener('click', e => {
+      e.stopPropagation();
+      const pop = document.getElementById(pid);
+      if (!pop) return;
+      const willOpen = pop.classList.contains('hidden');
+      closeAll();
+      pop.classList.toggle('hidden', !willOpen);
+      document.getElementById(bid)?.setAttribute('aria-expanded', String(willOpen));
+    });
+  });
+  document.addEventListener('click', e => { if (!e.target.closest('.topbar-pop-wrap')) closeAll(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAll(); });
+  if (typeof renderNotifPop === 'function') renderNotifPop();
+}
 
 /* ── Floating chat ── */
 document.getElementById('floating-chat')?.addEventListener('click', () => {
   setTimeout(() => document.getElementById('chat-input').focus(), 80);
 });
 
-/* ── Topbar notification button ── */
-document.getElementById('topbar-notif-btn')?.addEventListener('click', () => window.location.href='notifications.html');
-
-/* ── Topbar avatar ── */
-document.getElementById('topbar-avatar-btn')?.addEventListener('click', () => window.location.href='edit-profile.html');
+/* notif bell & avatar handled by popups above; full pages stay reachable via popup links */
 /* ══════════════════════════════════════════════
    UPDATE USER UI
 ══════════════════════════════════════════════ */
@@ -254,6 +269,7 @@ function renderNotifications(filter) {
         notif.read = true;
         renderNotifications(notifFilter);
         updateNotifBadge();
+        if (typeof renderNotifPop === 'function') renderNotifPop();
 if (el('settings-account')) initSettings();
 if (el('edit-profile-form')) syncProfileForm();
       }
@@ -305,6 +321,7 @@ if (markAllBtn) {
     notifData.forEach(n => n.read = true);
     renderNotifications(notifFilter);
     updateNotifBadge();
+    if (typeof renderNotifPop === 'function') renderNotifPop();
 if (el('settings-account')) initSettings();
 if (el('edit-profile-form')) syncProfileForm();
     notify('Semua notifikasi ditandai sebagai dibaca ✅');
@@ -542,5 +559,18 @@ document.querySelectorAll('.pagination button:not(:disabled)').forEach(btn =>
 if (el('document-rows')) renderDocuments();
 if (el('history-rows')) renderHistory();
 updateNotifBadge();
+initTopbarPops();
 if (el('settings-account')) initSettings();
 if (el('edit-profile-form')) syncProfileForm();
+
+/* ── Notif header preview ── */
+function renderNotifPop() {
+  const box = document.getElementById('notif-pop-list');
+  if (!box || typeof notifData === 'undefined') return;
+  const top = notifData.slice(0, 4);
+  box.innerHTML = top.map(n => `
+    <div class="topbar-pop-item ${n.read ? '' : 'unread'}">
+      <span class="notif-dot-mini"></span>
+      <div><strong>${escapeHtml(n.title)}</strong><small>${escapeHtml(n.time)}</small></div>
+    </div>`).join('');
+}
