@@ -189,14 +189,6 @@ document.querySelectorAll('.input-toggle-pw').forEach(btn => {
 
 /* ── DALFA auth v2: segmented + caps + passkey + remember ── */
 (function initAuthV2() {
-  document.querySelectorAll('.auth-segment').forEach(seg => {
-    seg.addEventListener('click', e => {
-      const b = e.target.closest('button'); if (!b) return;
-      seg.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
-      try { sessionStorage.setItem('khb_role', b.dataset.role); } catch (_) {}
-      notify('Peran: ' + b.textContent.trim());
-    });
-  });
   document.querySelectorAll('input[type="password"]').forEach(inp => {
     inp.addEventListener('keyup', e => {
       const on = e.getModifierState && e.getModifierState('CapsLock');
