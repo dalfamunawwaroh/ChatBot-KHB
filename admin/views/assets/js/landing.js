@@ -157,3 +157,28 @@ initLandingPage();
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
 })();
+
+/* ── DALFA v4: hero glow mouse + typing ── */
+(function initHeroFx() {
+  const hero = document.querySelector('.lp-hero');
+  if (hero) hero.addEventListener('mousemove', e => {
+    const r = hero.getBoundingClientRect();
+    hero.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100) + '%');
+    hero.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100) + '%');
+  });
+  const words = ['Lebih Mudah', 'Lebih Cepat', 'Lebih Pasti'];
+  const elm = document.getElementById('lp-typing');
+  if (!elm) return;
+  let w = 0, i = words[0].length, del = true, hold = 0;
+  setInterval(() => {
+    if (hold > 0) { hold -= 1; return; }
+    if (del) {
+      i -= 1;
+      if (i <= 0) { i = 0; w = (w + 1) % words.length; del = false; }
+    } else {
+      i += 1;
+      if (i >= words[w].length) { i = words[w].length; del = true; hold = 12; }
+    }
+    elm.textContent = words[w].slice(0, i);
+  }, 110);
+})();

@@ -68,6 +68,7 @@
         <div class="lp-hero-orb lp-orb-3"></div>
         <div class="lp-grid-overlay"></div>
       </div>
+      <div class="lp-hero-glow" id="lp-hero-glow"></div>
       <div class="lp-container">
         <div class="lp-hero-content">
           <div class="lp-hero-badge">
@@ -76,14 +77,14 @@
           </div>
           <h1 class="lp-hero-title">
             Sertifikasi Halal <br>
-            <span class="lp-title-gradient">Lebih Mudah</span> <br>
+            <span class="lp-title-gradient" id="lp-typing">Lebih Mudah</span><span class="lp-typing-caret"></span> <br>
             dengan AI
           </h1>
           <p class="lp-hero-desc">
             Asisten cerdas berbasis knowledge base resmi BPJPH. Tanya apa saja seputar halal dan dapatkan jawaban akurat secara instan — gratis untuk semua UMKM.
           </p>
           <div class="lp-hero-cta">
-            <button class="lp-btn-hero-primary" id="lp-hero-cta-main">
+            <button class="lp-btn-hero-primary lp-btn-glow" id="lp-hero-cta-main">
               <svg viewBox="0 0 20 20" fill="none"><path d="M3 4h14a1 1 0 011 1v8a1 1 0 01-1 1H6l-4 3V5a1 1 0 011-1z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
               Mulai Chat Sekarang — Gratis
             </button>
@@ -197,6 +198,7 @@
           <span>✦ Sertifikasi Halal</span><span>✦ Self Declare Gratis</span><span>✦ 38 Dokumen BPJPH</span><span>✦ 1.284+ Percakapan</span><span>✦ 847 UMKM Terbantu</span><span>✦ Respons &lt; 2 Detik</span>
         </div>
       </div>
+      <div class="lp-hero-fade"></div>
     </section>
 
     <!-- FEATURES SECTION -->
@@ -209,7 +211,7 @@
         </div>
         <div class="lp-features-grid">
           <div class="lp-feature-card lp-feature-main">
-            <div class="lp-feature-icon lp-fi-green">
+            <div class="lp-feature-icon grad lp-fi-grad-green">
               <svg viewBox="0 0 24 24" fill="none"><path d="M3 5h18a1 1 0 011 1v10a1 1 0 01-1 1H7l-5 3V6a1 1 0 011-1z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
             </div>
             <h3>AI Chat Edukasi Halal</h3>
@@ -220,15 +222,15 @@
               <li>Respons cepat kurang dari 2 detik</li>
             </ul>
           </div>
-          <div class="lp-feature-card">
-            <div class="lp-feature-icon lp-fi-blue">
+          <div class="lp-feature-card lp-feature-wide">
+            <div class="lp-feature-icon grad lp-fi-grad-blue">
               <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.8"/><path d="M8 9h8M8 13h8M8 17h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
             </div>
             <h3>Knowledge Base Terkurasi</h3>
             <p>38+ dokumen resmi dari BPJPH, regulasi Jaminan Produk Halal, dan panduan KHB selalu diperbarui.</p>
           </div>
           <div class="lp-feature-card">
-            <div class="lp-feature-icon lp-fi-orange">
+            <div class="lp-feature-icon grad lp-fi-grad-amber">
               <svg viewBox="0 0 24 24" fill="none"><path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7l3-7z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
             </div>
             <h3>Panduan Self Declare</h3>
@@ -242,7 +244,7 @@
             <p>Pantau semua percakapan, analitik pengguna, dan performa chatbot dalam satu dashboard terintegrasi.</p>
           </div>
           <div class="lp-feature-card">
-            <div class="lp-feature-icon lp-fi-teal">
+            <div class="lp-feature-icon grad lp-fi-grad-lime">
               <svg viewBox="0 0 24 24" fill="none"><path d="M12 2l7 3v7c0 5.8-3.8 9.1-7 10.8C8.8 21.1 5 17.8 5 12V5l7-3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M8 12l3 3 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </div>
             <h3>Verifikasi Dokumen Halal</h3>
@@ -304,15 +306,16 @@
       </div>
     </section>
 
-    <!-- TESTIMONIALS -->
-    <section class="lp-section" id="testimoni">
+    <!-- TESTIMONIALS v4 -->
+    <section class="lp-section lp-testi-section" id="testimoni">
       <div class="lp-container">
         <div class="lp-section-header">
           <div class="lp-section-badge">TESTIMONI</div>
           <h2 class="lp-section-title">Dipercaya pelaku UMKM halal</h2>
           <p class="lp-section-desc">Ribuan pelaku usaha telah terbantu dalam proses sertifikasi halal mereka.</p>
         </div>
-        <div class="lp-testimonials">
+        <div class="lp-testi-marquee"><div class="lp-testi-track">
+        <div class="lp-testimonials" style="display:contents">
           <div class="lp-testimonial-card featured">
             <div class="lp-stars">★★★★★</div>
             <p class="lp-testi-text">"Berkat KHB, saya berhasil memahami proses self declare dan mendapatkan sertifikat halal untuk usaha keripik pisang saya dalam waktu 2 minggu. Asisten AI-nya sangat mudah dipahami!"</p>
@@ -357,7 +360,40 @@
               </div>
             </div>
           </div>
+          <div class="lp-testimonial-card" aria-hidden="true">
+            <div class="lp-stars">★★★★★</div>
+            <p class="lp-testi-text">"Berkat KHB, saya berhasil memahami proses self declare dan mendapatkan sertifikat halal untuk usaha keripik pisang saya dalam waktu 2 minggu. Asisten AI-nya sangat mudah dipahami!"</p>
+            <div class="lp-testi-author">
+              <div class="lp-testi-avatar" style="background:linear-gradient(135deg,#86efac,#4ade80);color:#15803d">RA</div>
+              <div><strong>Rina Amelia</strong><span>Pelaku UMKM Keripik Pisang · Bandung</span></div>
+            </div>
+          </div>
+          <div class="lp-testimonial-card" aria-hidden="true">
+            <div class="lp-stars">★★★★★</div>
+            <p class="lp-testi-text">"Sebelumnya saya bingung dokumen apa saja yang perlu disiapkan. Setelah tanya ke chatbot KHB, semuanya jadi jelas dan terstruktur."</p>
+            <div class="lp-testi-author">
+              <div class="lp-testi-avatar" style="background:linear-gradient(135deg,#93c5fd,#60a5fa);color:#1d4ed8">DP</div>
+              <div><strong>Dimas Pratama</strong><span>Produsen Sambal UMKM · Cimahi</span></div>
+            </div>
+          </div>
+          <div class="lp-testimonial-card" aria-hidden="true">
+            <div class="lp-stars">★★★★★</div>
+            <p class="lp-testi-text">"Aplikasi ini sangat membantu! Saya bisa tanya kapan saja tentang bahan kritis dan langsung dapat penjelasan yang mudah dimengerti."</p>
+            <div class="lp-testi-author">
+              <div class="lp-testi-avatar" style="background:linear-gradient(135deg,#fca5a5,#f87171);color:#dc2626">SW</div>
+              <div><strong>Siti Wulandari</strong><span>Pengusaha Katering Halal · Garut</span></div>
+            </div>
+          </div>
+          <div class="lp-testimonial-card" aria-hidden="true">
+            <div class="lp-stars">★★★★☆</div>
+            <p class="lp-testi-text">"Dashboard monitoring-nya sangat berguna untuk memantau perkembangan pengetahuan halal tim saya. Fitur riwayat chat juga membantu evaluasi."</p>
+            <div class="lp-testi-author">
+              <div class="lp-testi-avatar" style="background:linear-gradient(135deg,#c4b5fd,#a78bfa);color:#7c3aed">FN</div>
+              <div><strong>Fajar Nugraha</strong><span>Manager Produksi · UMKM Bandung</span></div>
+            </div>
+          </div>
         </div>
+        </div></div>
       </div>
     </section>
 
@@ -433,7 +469,7 @@
           <h2 class="lp-cta-title">Siap memulai perjalanan halal Anda?</h2>
           <p class="lp-cta-desc">Bergabung dengan 847+ pelaku UMKM yang sudah terbantu. Gratis, mudah, dan terpercaya.</p>
           <div class="lp-cta-actions">
-            <button class="lp-btn-cta-primary" id="lp-cta-register">
+            <button class="lp-btn-cta-primary lp-btn-glow-cta" id="lp-cta-register">
               Daftar Gratis Sekarang
               <svg viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </button>
@@ -450,6 +486,7 @@
 
     <!-- FOOTER -->
     <footer class="lp-footer">
+      <svg class="lp-footer-wave" viewBox="0 0 1440 90" preserveAspectRatio="none"><path d="M0,45 C240,90 480,0 720,45 C960,90 1200,0 1440,45 L1440,90 L0,90 Z" fill="rgba(255,255,255,.10)"/><path d="M0,55 C200,85 400,15 600,55 C800,95 1000,25 1200,55 C1350,80 1400,65 1440,68 L1440,90 L0,90 Z" fill="rgba(255,255,255,.06)"/></svg>
       <div class="lp-container">
         <div class="lp-footer-grid">
           <div class="lp-footer-brand">
