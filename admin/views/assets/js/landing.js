@@ -166,7 +166,7 @@ initLandingPage();
     hero.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100) + '%');
     hero.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100) + '%');
   });
-  const words = ['Lebih Mudah', 'Lebih Cepat', 'Lebih Pasti'];
+  const words = ['self declare', 'dokumen halal', 'bahan kritis', 'biaya gratis', 'status SIHALAL'];
   const elm = document.getElementById('lp-typing');
   if (!elm) return;
   let w = 0, i = words[0].length, del = true, hold = 0;
