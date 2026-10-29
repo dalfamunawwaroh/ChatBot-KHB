@@ -3,19 +3,9 @@
 /* ══════════════════════════════════════════════
    AUTH PAGES NAVIGATION
 ══════════════════════════════════════════════ */
-function showAuthPage(id) {
-  document.querySelectorAll('.auth-page').forEach(p => p.classList.remove('active'));
-  const target = document.getElementById('page-' + id);
-  if (target) target.classList.add('active');
-}
-
-function enterApp() { window.location.href = 'admin/'; }
-
-/* Wiring auth links */
-document.getElementById('go-register')?.addEventListener('click', e => { e.preventDefault(); showAuthPage('register'); });
-document.getElementById('go-login')?.addEventListener('click', e => { e.preventDefault(); showAuthPage('login'); });
-document.getElementById('go-forgot')?.addEventListener('click', e => { e.preventDefault(); showAuthPage('forgot'); });
-document.getElementById('go-back-login')?.addEventListener('click', e => { e.preventDefault(); showAuthPage('login'); });
+/* MPA: tiap halaman auth file sendiri; link antar-halaman href native. */
+function showAuthPage() {}
+function enterApp() { window.location.href = 'admin/dashboard.html'; }
 
 /* ─ Login form ─ */
 document.getElementById('login-form')?.addEventListener('submit', function(e) {

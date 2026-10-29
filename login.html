@@ -11,9 +11,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/base.css">
   <link rel="stylesheet" href="assets/css/auth.css"></head>
-<body onload="showAuthPage('login')">
+<body>
 <div class="auth-pages" id="auth-pages">
-<div class="auth-page" id="page-login">
+<div class="auth-page active" id="page-login">
       <div class="auth-split">
         <div class="auth-brand-panel">
           <div class="auth-brand-inner">
@@ -49,7 +49,7 @@
           <div class="auth-form-inner">
             <div class="auth-form-header">
               <h1>Masuk ke akun Anda</h1>
-              <p>Belum punya akun? <a href="#" id="go-register" class="auth-link">Daftar sekarang</a></p>
+              <p>Belum punya akun? <a href="register.html" id="go-register" class="auth-link">Daftar sekarang</a></p>
             </div>
             <form class="auth-form" id="login-form" novalidate>
               <div class="form-group">
@@ -64,7 +64,7 @@
               <div class="form-group">
                 <label for="login-password">
                   <span>Kata Sandi</span>
-                  <a href="#" id="go-forgot" class="auth-link-small">Lupa kata sandi?</a>
+                  <a href="forgot.html" id="go-forgot" class="auth-link-small">Lupa kata sandi?</a>
                 </label>
                 <div class="input-wrap">
                   <span class="input-icon">
