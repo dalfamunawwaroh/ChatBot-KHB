@@ -1,0 +1,58 @@
+<!-- ─── INTEGRASI VIEW ─── -->
+<section class="view active" id="view-integrasi">
+  <div class="page-title-row">
+    <div>
+      <div class="eyebrow"><span class="eyebrow-dot"></span> PASANG DI HALALBANDUNG.COM</div>
+      <h1>Integrasi Web</h1>
+      <p class="subheading">Satu cuplikan kode untuk memunculkan tombol + popup chatbot di web KHB.</p>
+    </div>
+    <span class="online-pill"><i></i> Widget aktif</span>
+  </div>
+
+  <div class="panel" style="padding:22px;margin-bottom:18px">
+    <h2 style="font-size:15px;margin-bottom:4px">Langkah 1 — salin kode ini</h2>
+    <p class="subheading" style="margin-bottom:12px">Tempel tepat sebelum <code>&lt;/body&gt;</code> di source code halalbandung.com. Ganti <code>WIDGET_URL</code> dengan alamat file <code>widget/chat.html</code> hasil publish Anda.</p>
+    <div class="embed-toolbar">
+      <div class="embed-opts">
+        <label>Warna tombol <input type="color" id="embed-color" value="#16A34A"></label>
+        <label>Posisi
+          <select id="embed-pos" class="settings-select" style="max-width:170px">
+            <option value="bottom-right" selected>Kanan bawah</option>
+            <option value="bottom-left">Kiri bawah</option>
+          </select>
+        </label>
+        <label>Label <input type="text" id="embed-label" value="Tanya Halal KHB" maxlength="30" style="max-width:180px"></label>
+      </div>
+      <button class="btn btn-primary btn-sm" id="embed-copy">Salin Kode</button>
+    </div>
+    <pre class="embed-code"><code id="embed-snippet"></code></pre>
+  </div>
+
+  <div class="panel" style="padding:22px;margin-bottom:18px">
+    <h2 style="font-size:15px;margin-bottom:4px">Langkah 2 — pratinjau langsung</h2>
+    <p class="subheading" style="margin-bottom:12px">Simulasi halaman KHB + tombol + popup. Klik tombol hijau untuk membuka chat.</p>
+    <div class="embed-preview" id="embed-preview">
+      <div class="embed-preview-bar"><i></i><i></i><i></i><span>halalbandung.com — pratinjau</span></div>
+      <div class="embed-preview-hero">
+        <strong>KHB On Clinic: Business Growth</strong>
+        <p>Akselerasi UMKM Anda melalui konsultasi bisnis dan percepatan Sertifikasi Halal.</p>
+        <span class="embed-preview-cta">Konsultasi Sekarang</span>
+      </div>
+      <button class="khb-float" id="preview-float">💬 <span id="preview-label">Tanya Halal KHB</span></button>
+      <div class="khb-modal hidden" id="preview-modal" role="dialog" aria-label="Chatbot KHB">
+        <div class="khb-modal-head"><strong>Asisten Halal KHB</strong><span><i></i> Online</span><button id="preview-close" aria-label="Tutup">✕</button></div>
+        <iframe id="preview-frame" title="Chatbot KHB" src="../widget/chat.html"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" style="padding:22px">
+    <h2 style="font-size:15px;margin-bottom:4px">Langkah 3 — ceklis rilis</h2>
+    <ul class="embed-check">
+      <li>✅ File <code>widget/chat.html</code> sudah di-hosting (HTTPS) di domain yang sama/terpercaya.</li>
+      <li>✅ Snippet ditempel sebelum <code>&lt;/body&gt;</code> di semua halaman KHB.</li>
+      <li>✅ Buka halalbandung.com → klik tombol → popup chat terbuka &lt; 2 detik.</li>
+      <li>ⓘ Jawaban widget bersifat edukatif (demo). Rilis resmi tetap rujuk BPJPH/SIHALAL.</li>
+    </ul>
+  </div>
+</section>

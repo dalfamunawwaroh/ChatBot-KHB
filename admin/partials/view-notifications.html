@@ -1,0 +1,22 @@
+<!-- ─── NOTIFICATIONS VIEW ─── -->
+      <section class="view" id="view-notifications">
+        <div class="page-title-row">
+          <div>
+            <div class="eyebrow"><span class="eyebrow-dot"></span> PUSAT NOTIFIKASI</div>
+            <h1>Notifikasi</h1>
+            <p class="subheading">Pantau aktivitas terbaru dan pembaruan sistem.</p>
+          </div>
+          <button class="btn btn-secondary" id="mark-all-read-btn">
+            <svg viewBox="0 0 20 20" fill="none"><path d="M3 10l5 5 9-9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Tandai Semua Dibaca
+          </button>
+        </div>
+        <div class="notif-tabs">
+          <button class="notif-tab selected" data-notif-filter="all">Semua <span class="notif-tab-count" id="notif-tab-all">8</span></button>
+          <button class="notif-tab" data-notif-filter="unread">Belum dibaca <span class="notif-tab-count unread" id="notif-tab-unread">3</span></button>
+          <button class="notif-tab" data-notif-filter="system">Sistem</button>
+          <button class="notif-tab" data-notif-filter="chat">Chat</button>
+        </div>
+        <div class="notif-list" id="notif-list"></div>
+        <footer class="page-footer"><span>© 2025 Komunitas Halal Bandung</span><span>Notifikasi diperbarui real-time</span></footer>
+      </section>

@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat Halal KHB</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <link rel="stylesheet" href="../assets/css/admin.css">
+  <style>
+    body{background:#f9fafb;padding:0}
+    .wchat{display:flex;flex-direction:column;height:100vh;max-height:100vh}
+    .wchat .messages{flex:1;overflow:auto;padding:16px}
+    .wchat .chat-input-row{margin:0 12px 4px}
+  </style>
+</head>
+<body>
+  <div class="wchat">
+    <div class="messages" id="messages">
+      <div class="day-divider"><span>Hari ini</span></div>
+      <div class="message-row bot-row">
+        <div class="message-avatar"><svg viewBox="0 0 20 20" fill="none"><path d="M10 2a6 6 0 016 6c0 3 .8 5 1.5 6H2.5C3.2 13 4 11 4 8a6 6 0 016-6z" stroke="currentColor" stroke-width="1.5"/><path d="M8 16a2 2 0 004 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        <div class="message-content">
+          <span class="sender-name">Asisten Halal KHB</span>
+          <div class="message-bubble">Assalamu'alaikum! 👋<br><br>Saya asisten edukasi halal Komunitas Halal Bandung. Tanya seputar <strong>sertifikasi halal, self declare, dokumen,</strong> dan proses BPJPH.<br><br>Ada yang bisa saya bantu?</div>
+          <span class="message-time">Sekarang</span>
+        </div>
+      </div>
+    </div>
+    <div class="suggested-prompts">
+      <button data-prompt="Bagaimana cara mengajukan sertifikasi halal untuk UMKM?">Cara sertifikasi</button>
+      <button data-prompt="Apa itu sertifikat halal self declare?">Self declare</button>
+      <button data-prompt="Berapa biaya sertifikasi halal?">Biaya</button>
+    </div>
+    <form class="chat-input-row" id="chat-form">
+      <textarea id="chat-input" rows="1" placeholder="Tulis pertanyaan seputar halal..." aria-label="Tulis pesan"></textarea>
+      <button class="send-button" type="submit" aria-label="Kirim pesan"><svg viewBox="0 0 20 20" fill="none"><path d="M4 10l12-6-6 12V10H4z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></button>
+    </form>
+    <div class="input-footnote">AI dapat membuat kesalahan. Rujuk BPJPH untuk info resmi.</div>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="../assets/js/core.js"></script>
+  <script src="widget-app.js"></script>
+</body>
+</html>

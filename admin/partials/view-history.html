@@ -1,0 +1,79 @@
+<!-- ─── HISTORY VIEW ─── -->
+      <section class="view" id="view-history">
+        <div class="page-title-row">
+          <div>
+            <div class="eyebrow"><span class="eyebrow-dot"></span> MONITORING PENGGUNA</div>
+            <h1>Riwayat Percakapan</h1>
+            <p class="subheading">Lihat pertanyaan pengguna dan aktivitas chatbot.</p>
+          </div>
+          <button class="btn btn-secondary" id="export-history">
+            <svg viewBox="0 0 20 20" fill="none"><path d="M10 3v10M6 9l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 15h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            Ekspor Data
+          </button>
+        </div>
+        <div class="history-stats">
+          <div class="history-stat panel">
+            <span class="history-stat-icon">
+              <svg viewBox="0 0 20 20" fill="none"><path d="M3 4h14a1 1 0 011 1v8a1 1 0 01-1 1H6l-4 3V5a1 1 0 011-1z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            </span>
+            <div><small>Total percakapan</small><strong>1,284</strong><span class="history-trend">↗ 12.8% bulan ini</span></div>
+          </div>
+          <div class="history-stat panel">
+            <span class="history-stat-icon blue">
+              <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="7" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M3 17c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </span>
+            <div><small>Pengguna unik</small><strong>847</strong><span class="history-trend">↗ 8.2% bulan ini</span></div>
+          </div>
+          <div class="history-stat panel">
+            <span class="history-stat-icon orange">
+              <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5"/><path d="M10 6v4l2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </span>
+            <div><small>Rata-rata respons</small><strong>1.8 <small>detik</small></strong><span class="history-neutral">Stabil dari bulan lalu</span></div>
+          </div>
+          <div class="history-stat panel">
+            <span class="history-stat-icon purple">
+              <svg viewBox="0 0 20 20" fill="none"><path d="M5 10l4 4 6-7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <div><small>Resolusi otomatis</small><strong>94.6<span class="smaller-percent">%</span></strong><span class="history-trend">↗ 3.1% bulan ini</span></div>
+          </div>
+        </div>
+        <div class="panel history-panel">
+          <div class="history-toolbar">
+            <div>
+              <h2>Semua percakapan</h2>
+              <p>1.284 percakapan ditemukan</p>
+            </div>
+            <div class="history-filters">
+              <label class="search-box">
+                <svg viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="5.5" stroke="currentColor" stroke-width="1.5"/><path d="M15 15l-2.5-2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                <input type="search" id="history-search" placeholder="Cari pengguna atau pesan...">
+              </label>
+              <button class="select-btn">Semua status <svg viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+              <button class="select-btn">
+                <svg viewBox="0 0 20 20" fill="none"><path d="M3 5h14M6 10h8M9 15h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                Filter
+              </button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table history-table">
+              <thead><tr><th>PENGGUNA</th><th>PERTANYAAN</th><th>KATEGORI</th><th>WAKTU</th><th>STATUS</th><th></th></tr></thead>
+              <tbody id="history-rows"></tbody>
+            </table>
+            <div class="empty-state hidden" id="history-empty">Tidak ada percakapan yang cocok.</div>
+          </div>
+          <div class="table-footer">
+            <span>Menampilkan <strong>1–6</strong> dari 1.284 percakapan</span>
+            <div class="pagination">
+              <button disabled aria-label="Sebelumnya">←</button>
+              <button class="current-page">1</button>
+              <button>2</button>
+              <button>3</button>
+              <span>…</span>
+              <button>214</button>
+              <button aria-label="Berikutnya">→</button>
+            </div>
+          </div>
+        </div>
+        <footer class="page-footer"><span>© 2025 Komunitas Halal Bandung</span><span>Data contoh untuk prototipe</span></footer>
+      </section>

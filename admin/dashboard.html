@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#15803D">
+  <title>Ringkasan · KHB Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <link rel="stylesheet" href="../assets/css/admin.css">
+</head>
+<body data-page="dashboard">
+<div class="app-shell" id="app-shell">
+<!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="#dashboard" aria-label="KHB Beranda" data-page="dashboard">
+        <div class="brand-mark">
+          <svg viewBox="0 0 44 44" fill="none" aria-hidden="true">
+            <path d="M22 4 36 9.5v11C36 29.8 30 35.3 22 38.8 14 35.3 8 29.8 8 20.5v-11L22 4Z" fill="currentColor" opacity=".2"/>
+            <path d="m13.5 22 5.2 5.1 11-11" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="brand-copy">
+          <strong>komunitas<span>halal</span></strong>
+          <small>BANDUNG · AI</small>
+        </div>
+      </a>
+
+      <div class="sidebar-section-label">UTAMA</div>
+      <nav class="main-nav" aria-label="Menu utama">
+        <button class="nav-item active" data-page="dashboard" id="nav-dashboard">
+          <span class="nav-icon">
+            <svg viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="11" y="2" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="2" y="11" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="11" y="11" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/></svg>
+          </span>
+          <span>Ringkasan</span>
+        </button>
+        <button class="nav-item" data-page="chat" id="nav-chat">
+          <span class="nav-icon">
+            <svg viewBox="0 0 20 20" fill="none"><path d="M3 4h14a1 1 0 011 1v8a1 1 0 01-1 1H6l-4 3V5a1 1 0 011-1z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+          </span>
+          <span>Chat Edukasi</span>
+          <span class="nav-badge">AI</span>
+        </button>
+        <button class="nav-item" data-page="knowledge" id="nav-knowledge">
+          <span class="nav-icon">
+            <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="2" width="14" height="16" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M7 7h6M7 10h6M7 13h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          </span>
+          <span>Knowledge Base</span>
+        </button>
+        <button class="nav-item" data-page="integrasi" id="nav-integrasi">
+          <span class="nav-icon">
+            <svg viewBox="0 0 20 20" fill="none"><path d="M7 8a4 4 0 015.7-.4l2 2a4 4 0 01-5.6 5.6l-1.1-1.1M9 12a4 4 0 01-5.7.4l-2-2a4 4 0 015.6-5.6l1.1 1.1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </span>
+          <span>Integrasi Web</span>
+          <span class="nav-badge">BARU</span>
+        </button>
+        <button class="nav-item" data-page="history" id="nav-history">
+          <span class="nav-icon">
+            <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5"/><path d="M10 6v4l3 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </span>
+          <span>Riwayat Chat</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-section-label" style="margin-top:10px">AKUN</div>
+      <nav class="main-nav" aria-label="Menu akun">
+        <button class="nav-item" data-page="notifications" id="nav-notifications">
+          <span class="nav-icon">
+            <svg viewBox="0 0 20 20" fill="none"><path d="M10 2a6 6 0 016 6c0 3 .8 5 1.5 6H2.5C3.2 13 4 11 4 8a6 6 0 016-6z" stroke="currentColor" stroke-width="1.5"/><path d="M8 16a2 2 0 004 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </span>
+          <span>Notifikasi</span>
+          <span class="nav-notif-dot" id="nav-notif-dot"></span>
+        </button>
+        <button class="nav-item" data-page="settings" id="nav-settings">
+          <span class="nav-icon">
+            <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.1 4.1l1.5 1.5M14.4 14.4l1.5 1.5M4.1 15.9l1.5-1.5M14.4 5.6l1.5-1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </span>
+          <span>Pengaturan</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-spacer"></div>
+
+      <div class="help-card">
+        <div class="help-icon">✦</div>
+        <strong>Butuh bantuan?</strong>
+        <p>Tim KHB siap membantu Anda.</p>
+        <a href="https://halalbandung.com/" target="_blank" rel="noreferrer">Kunjungi KHB <span>↗</span></a>
+      </div>
+
+      <div class="profile" id="profile-trigger">
+        <div class="avatar avatar-admin" id="sidebar-avatar">A</div>
+        <div class="profile-info">
+          <strong id="sidebar-name">Admin KHB</strong>
+          <small id="sidebar-role">Administrator</small>
+        </div>
+        <button class="icon-btn profile-menu-btn" aria-label="Opsi profil" id="profile-menu-btn">
+          <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="5" r="1.2" fill="currentColor"/><circle cx="10" cy="10" r="1.2" fill="currentColor"/><circle cx="10" cy="15" r="1.2" fill="currentColor"/></svg>
+        </button>
+      </div>
+      <!-- Profile dropdown -->
+      <div class="profile-dropdown hidden" id="profile-dropdown">
+        <button class="profile-dd-item" data-page="edit-profile">
+          <svg viewBox="0 0 20 20" fill="none"><path d="M13 3l4 4-9 9H4v-4L13 3z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+          Edit Profil
+        </button>
+        <button class="profile-dd-item" data-page="settings">
+          <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="2.5" stroke="currentColor" stroke-width="1.4"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          Pengaturan
+        </button>
+        <div class="profile-dd-divider"></div>
+        <button class="profile-dd-item danger" id="logout-btn">
+          <svg viewBox="0 0 20 20" fill="none"><path d="M8 3H4a1 1 0 00-1 1v12a1 1 0 001 1h4M13 14l4-4-4-4M17 10H7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Keluar
+        </button>
+      </div>
+    </aside>
+
+<main class="main-area">
+<header class="topbar">
+        <button class="mobile-menu icon-btn" id="mobile-menu" aria-label="Buka menu">
+          <svg viewBox="0 0 20 20" fill="none"><path d="M3 6h14M3 10h14M3 14h14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        </button>
+        <div class="breadcrumb">
+          <span>Workspace</span>
+          <span class="crumb-slash">/</span>
+          <strong id="breadcrumb-current">Ringkasan</strong>
+        </div>
+        <div class="topbar-actions">
+          <span class="prototype-badge"><i></i> PROTOTIPE</span>
+          <button class="icon-btn notification-btn" aria-label="Notifikasi" id="topbar-notif-btn" data-page="notifications">
+            <svg viewBox="0 0 20 20" fill="none"><path d="M10 2a6 6 0 016 6c0 3 .8 5 1.5 6H2.5C3.2 13 4 11 4 8a6 6 0 016-6z" stroke="currentColor" stroke-width="1.5"/><path d="M8 16a2 2 0 004 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <span class="notif-badge" id="notif-badge">3</span>
+          </button>
+          <button class="topbar-avatar-btn" id="topbar-avatar-btn" data-page="edit-profile">
+            <div class="avatar avatar-admin" id="topbar-avatar">A</div>
+          </button>
+        </div>
+      </header>
+
+<!-- ─── DASHBOARD VIEW ─── -->
+      <section class="view active" id="view-dashboard">
+        <div class="welcome-row">
+          <div>
+            <div class="eyebrow"><span class="eyebrow-dot"></span> KOMUNITAS HALAL BANDUNG</div>
+            <h1>Halo, <span id="welcome-name">Admin</span> 👋</h1>
+            <p class="subheading">Pantau edukasi halal dan aktivitas chatbot Anda hari ini.</p>
+          </div>
+          <button class="btn btn-primary" data-go="chat">
+            <svg viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+            Mulai Percakapan
+          </button>
+        </div>
+
+        <div class="notice-banner">
+          <div class="notice-icon">
+            <svg viewBox="0 0 20 20" fill="none"><path d="M10 2a6 6 0 016 6c0 3 .8 5 1.5 6H2.5C3.2 13 4 11 4 8a6 6 0 016-6z" stroke="currentColor" stroke-width="1.5"/><path d="M8 16a2 2 0 004 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </div>
+          <div>
+            <strong>Asisten edukasi halal Anda siap membantu</strong>
+            <p>Jawaban chatbot bersumber dari basis pengetahuan yang dikelola oleh tim KHB.</p>
+          </div>
+          <button data-go="chat" class="text-link">Coba chatbot <span>→</span></button>
+        </div>
+
+        <div class="section-heading">
+          <div>
+            <h2>Ringkasan aktivitas</h2>
+            <p>Performa chatbot dalam 30 hari terakhir</p>
+          </div>
+          <button class="select-btn">30 hari terakhir <svg viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+        </div>
+
+        <div class="stats-grid">
+          <article class="stat-card">
+            <div class="stat-top">
+              <span>Total percakapan</span>
+              <span class="stat-icon green">
+                <svg viewBox="0 0 20 20" fill="none"><path d="M3 4h14a1 1 0 011 1v8a1 1 0 01-1 1H6l-4 3V5a1 1 0 011-1z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+              </span>
+            </div>
+            <div class="stat-value">1,284</div>
+            <div class="stat-foot">
+              <span class="trend up">↗ 12.8%</span>
+              <span>dari bulan lalu</span>
+            </div>
+            <div class="sparkline spark-green">
+              <i style="height:28%"></i><i style="height:43%"></i><i style="height:34%"></i><i style="height:57%"></i><i style="height:48%"></i><i style="height:68%"></i><i style="height:55%"></i><i style="height:78%"></i><i style="height:63%"></i><i style="height:93%"></i><i style="height:73%"></i><i style="height:100%"></i>
+            </div>
+          </article>
+          <article class="stat-card">
+            <div class="stat-top">
+              <span>Pertanyaan terjawab</span>
+              <span class="stat-icon blue">
+                <svg viewBox="0 0 20 20" fill="none"><path d="M5 10l4 4 6-7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+            </div>
+            <div class="stat-value">96.4<span class="stat-unit">%</span></div>
+            <div class="stat-foot"><span class="trend up">↗ 2.4%</span><span>tingkat respons</span></div>
+            <div class="progress-track"><span style="width:96.4%"></span></div>
+            <small class="progress-caption">Target respons 90%</small>
+          </article>
+          <article class="stat-card">
+            <div class="stat-top">
+              <span>Sumber pengetahuan</span>
+              <span class="stat-icon orange">
+                <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="2" width="14" height="16" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M7 7h6M7 10h6M7 13h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+              </span>
+            </div>
+            <div class="stat-value">38</div>
+            <div class="stat-foot">
+              <span class="stat-muted">Dokumen aktif</span>
+              <span class="status-active"><i></i> Sinkron</span>
+            </div>
+            <div class="source-chips">
+              <span>Regulasi <b>12</b></span>
+              <span>Panduan <b>18</b></span>
+              <span>FAQ <b>8</b></span>
+            </div>
+          </article>
+          <article class="stat-card">
+            <div class="stat-top">
+              <span>Pengguna aktif</span>
+              <span class="stat-icon purple">
+                <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="7" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M3 17c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              </span>
+            </div>
+            <div class="stat-value">847</div>
+            <div class="stat-foot"><span class="trend up">↗ 8.2%</span><span>pengguna unik</span></div>
+            <div class="user-dots">
+              <i></i><i></i><i></i><i></i><i></i>
+              <span>+842 lainnya</span>
+            </div>
+          </article>
+        </div>
+
+        <div class="dashboard-lower">
+          <article class="panel activity-panel">
+            <div class="panel-heading">
+              <div>
+                <h2>Aktivitas percakapan</h2>
+                <p>Jumlah percakapan harian</p>
+              </div>
+              <button class="dots-btn" aria-label="Opsi">···</button>
+            </div>
+            <div class="chart-legend">
+              <span><i></i>Percakapan</span>
+              <span class="chart-total">1,284 <small>total</small></span>
+            </div>
+            <div class="chart-wrap">
+              <div class="y-labels"><span>200</span><span>150</span><span>100</span><span>50</span><span>0</span></div>
+              <div class="chart">
+                <div class="grid-lines"><i></i><i></i><i></i><i></i><i></i></div>
+                <svg viewBox="0 0 720 170" preserveAspectRatio="none" role="img" aria-label="Grafik percakapan meningkat">
+                  <defs>
+                    <linearGradient id="chartFill" x1="0" x2="0" y1="0" y2="1">
+                      <stop offset="0" stop-color="#16a364" stop-opacity=".22"/>
+                      <stop offset="1" stop-color="#16a364" stop-opacity="0"/>
+                    </linearGradient>
+                  </defs>
+                  <path class="chart-area" d="M0,133 C35,120 37,116 66,124 S102,105 132,112 S168,88 198,101 S236,91 264,94 S302,68 330,83 S369,70 396,75 S434,52 462,65 S500,43 528,56 S565,35 594,49 S630,27 660,37 S692,18 720,22 V170 H0Z"/>
+                  <path class="chart-line" d="M0,133 C35,120 37,116 66,124 S102,105 132,112 S168,88 198,101 S236,91 264,94 S302,68 330,83 S369,70 396,75 S434,52 462,65 S500,43 528,56 S565,35 594,49 S630,27 660,37 S692,18 720,22"/>
+                </svg>
+                <div class="x-labels"><span>1 Jun</span><span>5 Jun</span><span>10 Jun</span><span>15 Jun</span><span>20 Jun</span><span>25 Jun</span><span>30 Jun</span></div>
+              </div>
+            </div>
+          </article>
+          <article class="panel recent-panel">
+            <div class="panel-heading">
+              <div>
+                <h2>Percakapan terbaru</h2>
+                <p>Aktivitas pengguna terkini</p>
+              </div>
+              <button class="text-link" data-go="history">Lihat semua <span>→</span></button>
+            </div>
+            <div class="recent-list">
+              <div class="recent-item">
+                <div class="avatar avatar-soft-green">RA</div>
+                <div class="recent-copy">
+                  <strong>Rina Amelia</strong>
+                  <p>Bagaimana cara daftar sertifikat halal?</p>
+                </div>
+                <span class="recent-time">2 mnt</span>
+              </div>
+              <div class="recent-item">
+                <div class="avatar avatar-soft-blue">DP</div>
+                <div class="recent-copy">
+                  <strong>Dimas Pratama</strong>
+                  <p>Apa perbedaan self declare dan reguler?</p>
+                </div>
+                <span class="recent-time">18 mnt</span>
+              </div>
+              <div class="recent-item">
+                <div class="avatar avatar-soft-peach">SW</div>
+                <div class="recent-copy">
+                  <strong>Siti Wulandari</strong>
+                  <p>Dokumen apa yang perlu dipersiapkan?</p>
+                </div>
+                <span class="recent-time">42 mnt</span>
+              </div>
+            </div>
+            <button class="view-all-btn" data-go="history">Lihat semua riwayat <span>→</span></button>
+          </article>
+        </div>
+        <footer class="page-footer"><span>© 2025 Komunitas Halal Bandung</span><span>Chatbot edukasi halal <i>●</i> Versi prototipe</span></footer>
+      </section>
+
+<footer class="page-footer"><span>© 2025 Komunitas Halal Bandung</span><span>Chatbot edukasi halal <i>●</i> 1 role: Admin</span></footer>
+</main>
+</div>
+<div class="sidebar-overlay hidden" id="sidebar-overlay"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="../assets/js/data.js"></script>
+<script src="../assets/js/core.js"></script>
+<script src="../assets/js/admin.js"></script>
+</body>
+</html>

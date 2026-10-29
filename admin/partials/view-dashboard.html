@@ -1,0 +1,166 @@
+<!-- ─── DASHBOARD VIEW ─── -->
+      <section class="view active" id="view-dashboard">
+        <div class="welcome-row">
+          <div>
+            <div class="eyebrow"><span class="eyebrow-dot"></span> KOMUNITAS HALAL BANDUNG</div>
+            <h1>Halo, <span id="welcome-name">Admin</span> 👋</h1>
+            <p class="subheading">Pantau edukasi halal dan aktivitas chatbot Anda hari ini.</p>
+          </div>
+          <button class="btn btn-primary" data-go="chat">
+            <svg viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+            Mulai Percakapan
+          </button>
+        </div>
+
+        <div class="notice-banner">
+          <div class="notice-icon">
+            <svg viewBox="0 0 20 20" fill="none"><path d="M10 2a6 6 0 016 6c0 3 .8 5 1.5 6H2.5C3.2 13 4 11 4 8a6 6 0 016-6z" stroke="currentColor" stroke-width="1.5"/><path d="M8 16a2 2 0 004 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </div>
+          <div>
+            <strong>Asisten edukasi halal Anda siap membantu</strong>
+            <p>Jawaban chatbot bersumber dari basis pengetahuan yang dikelola oleh tim KHB.</p>
+          </div>
+          <button data-go="chat" class="text-link">Coba chatbot <span>→</span></button>
+        </div>
+
+        <div class="section-heading">
+          <div>
+            <h2>Ringkasan aktivitas</h2>
+            <p>Performa chatbot dalam 30 hari terakhir</p>
+          </div>
+          <button class="select-btn">30 hari terakhir <svg viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+        </div>
+
+        <div class="stats-grid">
+          <article class="stat-card">
+            <div class="stat-top">
+              <span>Total percakapan</span>
+              <span class="stat-icon green">
+                <svg viewBox="0 0 20 20" fill="none"><path d="M3 4h14a1 1 0 011 1v8a1 1 0 01-1 1H6l-4 3V5a1 1 0 011-1z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+              </span>
+            </div>
+            <div class="stat-value">1,284</div>
+            <div class="stat-foot">
+              <span class="trend up">↗ 12.8%</span>
+              <span>dari bulan lalu</span>
+            </div>
+            <div class="sparkline spark-green">
+              <i style="height:28%"></i><i style="height:43%"></i><i style="height:34%"></i><i style="height:57%"></i><i style="height:48%"></i><i style="height:68%"></i><i style="height:55%"></i><i style="height:78%"></i><i style="height:63%"></i><i style="height:93%"></i><i style="height:73%"></i><i style="height:100%"></i>
+            </div>
+          </article>
+          <article class="stat-card">
+            <div class="stat-top">
+              <span>Pertanyaan terjawab</span>
+              <span class="stat-icon blue">
+                <svg viewBox="0 0 20 20" fill="none"><path d="M5 10l4 4 6-7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+            </div>
+            <div class="stat-value">96.4<span class="stat-unit">%</span></div>
+            <div class="stat-foot"><span class="trend up">↗ 2.4%</span><span>tingkat respons</span></div>
+            <div class="progress-track"><span style="width:96.4%"></span></div>
+            <small class="progress-caption">Target respons 90%</small>
+          </article>
+          <article class="stat-card">
+            <div class="stat-top">
+              <span>Sumber pengetahuan</span>
+              <span class="stat-icon orange">
+                <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="2" width="14" height="16" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M7 7h6M7 10h6M7 13h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+              </span>
+            </div>
+            <div class="stat-value">38</div>
+            <div class="stat-foot">
+              <span class="stat-muted">Dokumen aktif</span>
+              <span class="status-active"><i></i> Sinkron</span>
+            </div>
+            <div class="source-chips">
+              <span>Regulasi <b>12</b></span>
+              <span>Panduan <b>18</b></span>
+              <span>FAQ <b>8</b></span>
+            </div>
+          </article>
+          <article class="stat-card">
+            <div class="stat-top">
+              <span>Pengguna aktif</span>
+              <span class="stat-icon purple">
+                <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="7" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M3 17c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              </span>
+            </div>
+            <div class="stat-value">847</div>
+            <div class="stat-foot"><span class="trend up">↗ 8.2%</span><span>pengguna unik</span></div>
+            <div class="user-dots">
+              <i></i><i></i><i></i><i></i><i></i>
+              <span>+842 lainnya</span>
+            </div>
+          </article>
+        </div>
+
+        <div class="dashboard-lower">
+          <article class="panel activity-panel">
+            <div class="panel-heading">
+              <div>
+                <h2>Aktivitas percakapan</h2>
+                <p>Jumlah percakapan harian</p>
+              </div>
+              <button class="dots-btn" aria-label="Opsi">···</button>
+            </div>
+            <div class="chart-legend">
+              <span><i></i>Percakapan</span>
+              <span class="chart-total">1,284 <small>total</small></span>
+            </div>
+            <div class="chart-wrap">
+              <div class="y-labels"><span>200</span><span>150</span><span>100</span><span>50</span><span>0</span></div>
+              <div class="chart">
+                <div class="grid-lines"><i></i><i></i><i></i><i></i><i></i></div>
+                <svg viewBox="0 0 720 170" preserveAspectRatio="none" role="img" aria-label="Grafik percakapan meningkat">
+                  <defs>
+                    <linearGradient id="chartFill" x1="0" x2="0" y1="0" y2="1">
+                      <stop offset="0" stop-color="#16a364" stop-opacity=".22"/>
+                      <stop offset="1" stop-color="#16a364" stop-opacity="0"/>
+                    </linearGradient>
+                  </defs>
+                  <path class="chart-area" d="M0,133 C35,120 37,116 66,124 S102,105 132,112 S168,88 198,101 S236,91 264,94 S302,68 330,83 S369,70 396,75 S434,52 462,65 S500,43 528,56 S565,35 594,49 S630,27 660,37 S692,18 720,22 V170 H0Z"/>
+                  <path class="chart-line" d="M0,133 C35,120 37,116 66,124 S102,105 132,112 S168,88 198,101 S236,91 264,94 S302,68 330,83 S369,70 396,75 S434,52 462,65 S500,43 528,56 S565,35 594,49 S630,27 660,37 S692,18 720,22"/>
+                </svg>
+                <div class="x-labels"><span>1 Jun</span><span>5 Jun</span><span>10 Jun</span><span>15 Jun</span><span>20 Jun</span><span>25 Jun</span><span>30 Jun</span></div>
+              </div>
+            </div>
+          </article>
+          <article class="panel recent-panel">
+            <div class="panel-heading">
+              <div>
+                <h2>Percakapan terbaru</h2>
+                <p>Aktivitas pengguna terkini</p>
+              </div>
+              <button class="text-link" data-go="history">Lihat semua <span>→</span></button>
+            </div>
+            <div class="recent-list">
+              <div class="recent-item">
+                <div class="avatar avatar-soft-green">RA</div>
+                <div class="recent-copy">
+                  <strong>Rina Amelia</strong>
+                  <p>Bagaimana cara daftar sertifikat halal?</p>
+                </div>
+                <span class="recent-time">2 mnt</span>
+              </div>
+              <div class="recent-item">
+                <div class="avatar avatar-soft-blue">DP</div>
+                <div class="recent-copy">
+                  <strong>Dimas Pratama</strong>
+                  <p>Apa perbedaan self declare dan reguler?</p>
+                </div>
+                <span class="recent-time">18 mnt</span>
+              </div>
+              <div class="recent-item">
+                <div class="avatar avatar-soft-peach">SW</div>
+                <div class="recent-copy">
+                  <strong>Siti Wulandari</strong>
+                  <p>Dokumen apa yang perlu dipersiapkan?</p>
+                </div>
+                <span class="recent-time">42 mnt</span>
+              </div>
+            </div>
+            <button class="view-all-btn" data-go="history">Lihat semua riwayat <span>→</span></button>
+          </article>
+        </div>
+        <footer class="page-footer"><span>© 2025 Komunitas Halal Bandung</span><span>Chatbot edukasi halal <i>●</i> Versi prototipe</span></footer>
+      </section>

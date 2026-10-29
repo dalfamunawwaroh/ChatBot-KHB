@@ -1,0 +1,242 @@
+<!-- ─── SETTINGS VIEW ─── -->
+      <section class="view" id="view-settings">
+        <div class="page-title-row">
+          <div>
+            <div class="eyebrow"><span class="eyebrow-dot"></span> KONFIGURASI SISTEM</div>
+            <h1>Pengaturan</h1>
+            <p class="subheading">Sesuaikan preferensi dan konfigurasi akun Anda.</p>
+          </div>
+        </div>
+        <div class="settings-layout">
+          <div class="settings-nav-wrap">
+            <nav class="settings-nav panel">
+              <button class="settings-nav-item active" data-settings="account">
+                <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="7" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M3 17c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                Akun
+              </button>
+              <button class="settings-nav-item" data-settings="appearance">
+                <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5"/><path d="M10 3v2M10 15v2M3 10h2M15 10h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                Tampilan
+              </button>
+              <button class="settings-nav-item" data-settings="notifications-settings">
+                <svg viewBox="0 0 20 20" fill="none"><path d="M10 2a6 6 0 016 6c0 3 .8 5 1.5 6H2.5C3.2 13 4 11 4 8a6 6 0 016-6z" stroke="currentColor" stroke-width="1.5"/><path d="M8 16a2 2 0 004 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                Notifikasi
+              </button>
+              <button class="settings-nav-item" data-settings="security">
+                <svg viewBox="0 0 20 20" fill="none"><path d="M10 2l7 3v6c0 4.8-3.2 7.6-7 9-3.8-1.4-7-4.2-7-9V5l7-3z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M7 10l2.5 2.5 3.5-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Keamanan
+              </button>
+              <button class="settings-nav-item" data-settings="chatbot">
+                <svg viewBox="0 0 20 20" fill="none"><path d="M3 4h14a1 1 0 011 1v8a1 1 0 01-1 1H6l-4 3V5a1 1 0 011-1z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+                Chatbot AI
+              </button>
+            </nav>
+          </div>
+          <div class="settings-content">
+            <!-- Account Settings -->
+            <div class="settings-section active" id="settings-account">
+              <div class="settings-card panel">
+                <div class="settings-card-header"><h3>Informasi Akun</h3><p>Detail dasar akun Anda</p></div>
+                <div class="settings-field-row">
+                  <div class="settings-field"><label>Nama Lengkap</label><div class="settings-value">Admin KHB</div></div>
+                  <button class="btn btn-secondary btn-sm" data-view="edit-profile">Edit Profil</button>
+                </div>
+                <div class="settings-field"><label>Email</label><div class="settings-value">admin@khb.or.id</div></div>
+                <div class="settings-field"><label>Peran</label><div class="settings-value"><span class="role-badge">Administrator</span></div></div>
+                <div class="settings-field"><label>Bergabung sejak</label><div class="settings-value">1 Januari 2024</div></div>
+              </div>
+              <div class="settings-card panel">
+                <div class="settings-card-header"><h3>Zona Waktu & Bahasa</h3><p>Sesuaikan regional Anda</p></div>
+                <div class="settings-field">
+                  <label>Zona waktu</label>
+                  <select class="settings-select">
+                    <option selected>Asia/Jakarta (WIB, GMT+7)</option>
+                    <option>Asia/Makassar (WITA, GMT+8)</option>
+                    <option>Asia/Jayapura (WIT, GMT+9)</option>
+                  </select>
+                </div>
+                <div class="settings-field">
+                  <label>Bahasa antarmuka</label>
+                  <select class="settings-select">
+                    <option selected>Bahasa Indonesia</option>
+                    <option>English</option>
+                  </select>
+                </div>
+                <div class="settings-actions"><button class="btn btn-primary btn-sm">Simpan Perubahan</button></div>
+              </div>
+            </div>
+
+            <!-- Appearance Settings -->
+            <div class="settings-section" id="settings-appearance">
+              <div class="settings-card panel">
+                <div class="settings-card-header"><h3>Tema Antarmuka</h3><p>Pilih tampilan yang nyaman</p></div>
+                <div class="theme-options">
+                  <label class="theme-option selected" id="theme-light-label">
+                    <input type="radio" name="theme" value="light" id="theme-light" checked>
+                    <div class="theme-preview theme-preview-light">
+                      <div class="tp-sidebar"></div>
+                      <div class="tp-content"><div class="tp-bar"></div><div class="tp-card"></div></div>
+                    </div>
+                    <span>Terang</span>
+                  </label>
+                  <label class="theme-option" id="theme-dark-label">
+                    <input type="radio" name="theme" value="dark" id="theme-dark">
+                    <div class="theme-preview theme-preview-dark">
+                      <div class="tp-sidebar"></div>
+                      <div class="tp-content"><div class="tp-bar"></div><div class="tp-card"></div></div>
+                    </div>
+                    <span>Gelap</span>
+                  </label>
+                  <label class="theme-option" id="theme-system-label">
+                    <input type="radio" name="theme" value="system" id="theme-system">
+                    <div class="theme-preview theme-preview-system">
+                      <div class="tp-sidebar"></div>
+                      <div class="tp-content"><div class="tp-bar"></div><div class="tp-card"></div></div>
+                    </div>
+                    <span>Ikuti sistem</span>
+                  </label>
+                </div>
+              </div>
+              <div class="settings-card panel">
+                <div class="settings-card-header"><h3>Ukuran Teks</h3><p>Sesuaikan keterbacaan</p></div>
+                <div class="font-size-options">
+                  <button class="font-size-opt">Kecil</button>
+                  <button class="font-size-opt active">Sedang</button>
+                  <button class="font-size-opt">Besar</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Notification Settings -->
+            <div class="settings-section" id="settings-notifications-settings">
+              <div class="settings-card panel">
+                <div class="settings-card-header"><h3>Preferensi Notifikasi</h3><p>Atur kapan Anda ingin diberitahu</p></div>
+                <div class="settings-toggle-list">
+                  <div class="settings-toggle-item">
+                    <div><strong>Pesan chat baru</strong><small>Notifikasi saat ada pertanyaan masuk</small></div>
+                    <label class="toggle-switch">
+                      <input type="checkbox" checked>
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </div>
+                  <div class="settings-toggle-item">
+                    <div><strong>Pembaruan dokumen</strong><small>Notifikasi saat dokumen diperbarui</small></div>
+                    <label class="toggle-switch">
+                      <input type="checkbox" checked>
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </div>
+                  <div class="settings-toggle-item">
+                    <div><strong>Laporan mingguan</strong><small>Ringkasan aktivitas setiap Senin</small></div>
+                    <label class="toggle-switch">
+                      <input type="checkbox">
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </div>
+                  <div class="settings-toggle-item">
+                    <div><strong>Peringatan sistem</strong><small>Notifikasi kritis tentang status sistem</small></div>
+                    <label class="toggle-switch">
+                      <input type="checkbox" checked>
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </div>
+                  <div class="settings-toggle-item">
+                    <div><strong>Notifikasi email</strong><small>Kirim notifikasi ke email terdaftar</small></div>
+                    <label class="toggle-switch">
+                      <input type="checkbox">
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Security Settings -->
+            <div class="settings-section" id="settings-security">
+              <div class="settings-card panel">
+                <div class="settings-card-header"><h3>Kata Sandi</h3><p>Perbarui kata sandi secara berkala</p></div>
+                <div class="form-group">
+                  <label for="sec-current-pw">Kata Sandi Saat Ini</label>
+                  <div class="input-wrap">
+                    <span class="input-icon"><svg viewBox="0 0 20 20" fill="none"><rect x="3" y="9" width="14" height="9" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M7 9V6a3 3 0 016 0v3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></span>
+                    <input type="password" id="sec-current-pw" placeholder="Kata sandi saat ini">
+                    <button type="button" class="input-toggle-pw" data-target="sec-current-pw" aria-label="Tampilkan"><svg viewBox="0 0 20 20" fill="none"><path d="M2 10s3-6 8-6 8 6 8 6-3 6-8 6-8-6-8-6z" stroke="currentColor" stroke-width="1.4"/><circle cx="10" cy="10" r="2.5" stroke="currentColor" stroke-width="1.4"/></svg></button>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="sec-new-pw">Kata Sandi Baru</label>
+                  <div class="input-wrap">
+                    <span class="input-icon"><svg viewBox="0 0 20 20" fill="none"><rect x="3" y="9" width="14" height="9" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M7 9V6a3 3 0 016 0v3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></span>
+                    <input type="password" id="sec-new-pw" placeholder="Min. 8 karakter">
+                    <button type="button" class="input-toggle-pw" data-target="sec-new-pw" aria-label="Tampilkan"><svg viewBox="0 0 20 20" fill="none"><path d="M2 10s3-6 8-6 8 6 8 6-3 6-8 6-8-6-8-6z" stroke="currentColor" stroke-width="1.4"/><circle cx="10" cy="10" r="2.5" stroke="currentColor" stroke-width="1.4"/></svg></button>
+                  </div>
+                </div>
+                <div class="settings-actions"><button class="btn btn-primary btn-sm" id="change-pw-btn">Ubah Kata Sandi</button></div>
+              </div>
+              <div class="settings-card panel">
+                <div class="settings-card-header"><h3>Sesi Aktif</h3><p>Kelola perangkat yang masuk</p></div>
+                <div class="session-item">
+                  <div class="session-icon">
+                    <svg viewBox="0 0 20 20" fill="none"><rect x="2" y="4" width="16" height="11" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M7 17h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="10" cy="9.5" r="1" fill="currentColor"/></svg>
+                  </div>
+                  <div class="session-info">
+                    <strong>Windows · Chrome</strong>
+                    <small>Bandung, Indonesia · Sekarang (Sesi ini)</small>
+                  </div>
+                  <span class="session-badge current">Aktif</span>
+                </div>
+                <div class="session-item">
+                  <div class="session-icon">
+                    <svg viewBox="0 0 20 20" fill="none"><rect x="5" y="2" width="10" height="16" rx="2" stroke="currentColor" stroke-width="1.4"/><circle cx="10" cy="15" r="1" fill="currentColor"/></svg>
+                  </div>
+                  <div class="session-info">
+                    <strong>Android · Chrome</strong>
+                    <small>Bandung, Indonesia · 2 hari lalu</small>
+                  </div>
+                  <button class="btn btn-danger-outline btn-sm">Hapus</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Chatbot Settings -->
+            <div class="settings-section" id="settings-chatbot">
+              <div class="settings-card panel">
+                <div class="settings-card-header"><h3>Konfigurasi Asisten AI</h3><p>Atur perilaku chatbot Anda</p></div>
+                <div class="form-group">
+                  <label>Bahasa respons chatbot</label>
+                  <select class="settings-select">
+                    <option selected>Bahasa Indonesia</option>
+                    <option>English</option>
+                    <option>Bilingual (ID/EN)</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Gaya respons</label>
+                  <select class="settings-select">
+                    <option selected>Formal & informatif</option>
+                    <option>Santai & ramah</option>
+                    <option>Singkat & padat</option>
+                  </select>
+                </div>
+                <div class="settings-toggle-list">
+                  <div class="settings-toggle-item">
+                    <div><strong>Tampilkan sumber referensi</strong><small>Cantumkan sumber dokumen dalam jawaban</small></div>
+                    <label class="toggle-switch">
+                      <input type="checkbox" checked>
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </div>
+                  <div class="settings-toggle-item">
+                    <div><strong>Mode saran otomatis</strong><small>Tampilkan pertanyaan terkait setelah respons</small></div>
+                    <label class="toggle-switch">
+                      <input type="checkbox" checked>
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </div>
+                </div>
+                <div class="settings-actions"><button class="btn btn-primary btn-sm">Simpan Konfigurasi</button></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
