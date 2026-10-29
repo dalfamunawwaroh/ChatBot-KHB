@@ -146,3 +146,14 @@ function initLandingPage() {
 
 /* Start init */
 initLandingPage();
+/* ── DALFA v3: scroll progress bar ── */
+(function initScrollProgress() {
+  const fill = document.getElementById('lp-progress-fill');
+  if (!fill) return;
+  const onScroll = () => {
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    fill.style.width = (max > 0 ? (window.scrollY / max) * 100 : 0) + '%';
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+})();
