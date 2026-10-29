@@ -90,7 +90,7 @@
         <div class="breadcrumb">
           <span>Workspace</span>
           <span class="crumb-slash">/</span>
-          <strong id="breadcrumb-current">Ringkasan</strong>
+          <strong id="breadcrumb-current">Knowledge Base</strong>
         </div>
         <div class="topbar-actions">
           <span class="prototype-badge"><i></i> PROTOTIPE</span>
@@ -151,6 +151,12 @@
             <div><small>Menunggu proses</small><strong>2</strong></div>
           </div>
           <div class="knowledge-stat">
+            <span class="knowledge-stat-icon slate">
+              <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5"/><path d="M5.5 5.5l9 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </span>
+            <div><small>Nonaktif / draf</small><strong>2</strong></div>
+          </div>
+          <div class="knowledge-stat">
             <span class="knowledge-stat-icon purple">
               <svg viewBox="0 0 20 20" fill="none"><path d="M10 4v2M10 14v2M4 10H2M18 10h-2M5.4 5.4l1.4 1.4M13.2 13.2l1.4 1.4M5.4 14.6l1.4-1.4M13.2 6.8l1.4-1.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="10" cy="10" r="2.5" stroke="currentColor" stroke-width="1.5"/></svg>
             </span>
@@ -178,15 +184,15 @@
             <div class="empty-state hidden" id="doc-empty">Dokumen tidak ditemukan.</div>
           </div>
           <div class="table-footer">
-            <span>Menampilkan <strong id="doc-count">6 dokumen</strong> dari 38</span>
-            <div class="pagination">
-              <button disabled aria-label="Sebelumnya">←</button>
-              <button class="current-page">1</button>
+            <span id="doc-range">Menampilkan <strong>1–6</strong> dari <strong>38</strong> dokumen</span>
+            <div class="pagination" role="navigation" aria-label="Navigasi halaman">
+              <button class="page-nav" id="doc-prev" disabled aria-label="Halaman sebelumnya">&lsaquo; Previous</button>
+              <button class="current-page" aria-current="page">1</button>
               <button>2</button>
               <button>3</button>
-              <span>…</span>
+              <span class="page-gap">…</span>
               <button>7</button>
-              <button aria-label="Berikutnya">→</button>
+              <button class="page-nav" id="doc-next" aria-label="Halaman berikutnya">Next &rsaquo;</button>
             </div>
           </div>
         </div>

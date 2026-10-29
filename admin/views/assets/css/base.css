@@ -6,12 +6,15 @@
 
 /* ── DESIGN TOKENS ── */
 :root {
+  --navy: #1E1B4B;
+  --navy-hover: #2B2860;
+  --navy-tint: #E4E3EE;
   --green: #16A34A;
   --green-dark: #0a5c30;
   --green-mid: #14a05c;
   --green-light: #e8f5ee;
   --green-subtle: #f0faf4;
-  --ink: #0F172A;
+  --ink: #1E1B4B;
   --ink-2: #374151;
   --muted: #6b7280;
   --muted-2: #9ca3af;
@@ -19,11 +22,11 @@
   --line-2: #f3f4f6;
   --paper: #ffffff;
   --canvas: #f9fafb;
-  --sidebar-bg: #151B3A;
+  --sidebar-bg: #1E1B4B;
   --sidebar-border: #1f2937;
   --sidebar-text: #9ca3af;
   --sidebar-text-active: #ffffff;
-  --sidebar-hover: #1F2547;
+  --sidebar-hover: #2B2860;
   --sidebar-active-bg: rgba(15,116,64,0.18);
   --sidebar-active-border: #16A34A;
   --font: 'Inter', sans-serif;
@@ -67,7 +70,7 @@ a { text-decoration: none; }
   transform: translate(-50%, 14px);
   opacity: 0;
   pointer-events: none;
-  background: #0F172A;
+  background: #1E1B4B;
   color: #f9fafb;
   padding: 12px 20px;
   border-radius: 10px;

@@ -90,13 +90,13 @@
         <div class="breadcrumb">
           <span>Workspace</span>
           <span class="crumb-slash">/</span>
-          <strong id="breadcrumb-current">Ringkasan</strong>
+          <strong id="breadcrumb-current">Chat</strong>
         </div>
         <div class="topbar-actions">
           <span class="prototype-badge"><i></i> PROTOTIPE</span>
           <div class="topbar-pop-wrap">
             <button class="icon-btn notification-btn" aria-label="Notifikasi" id="topbar-notif-btn" aria-expanded="false">
-              <svg viewBox="0 0 20 20" fill="none"><path d="M10 2a6 6 0 016 6c0 3 .8 5 1.5 6H2.5C3.2 13 4 11 4 8a6 6 0 016-6z" stroke="currentColor" stroke-width="1.5"/><path d="M8 16a2 2 0 004 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              <svg viewBox="0 0 20 20" fill="none"><path d="M10 1.6a1 1 0 011 1v1.1a4 4 0 013.9 4v3.1l1.2 2a.8.8 0 01-.7 1.2H3.6a.8.8 0 01-.7-1.2l1.2-2V7.7A4 4 0 018.9 3.7V2.6a1 1 0 011-1zM8.2 8.6a.9.9 0 100 1.8.9.9 0 000-1.8zM11.8 8.6a.9.9 0 100 1.8.9.9 0 000-1.8zM8.4 12.2h3.2" stroke="currentColor" stroke-width="1.5"/><path d="M8 16a2 2 0 004 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
               <span class="notif-badge" id="notif-badge">3</span>
             </button>
             <div class="topbar-pop hidden" id="notif-pop" role="menu" aria-label="Notifikasi terbaru">
@@ -128,9 +128,18 @@
           </div>
           <span class="online-pill"><i></i> Asisten online</span>
         </div>
+        <button class="topics-toggle" id="topics-toggle" aria-label="Buka topik populer" aria-expanded="false" aria-controls="chat-topics">
+          <svg viewBox="0 0 20 20" fill="none"><path d="M3 6h14M3 10h14M3 14h14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+          Topik populer
+        </button>
         <div class="chat-layout">
-          <aside class="chat-topics panel">
-            <h3>Topik populer</h3>
+          <aside class="chat-topics panel" id="chat-topics">
+            <div class="chat-topics-head">
+              <h3>Topik populer</h3>
+              <button class="topics-close icon-btn" id="topics-close" aria-label="Tutup topik">
+                <svg viewBox="0 0 20 20" fill="none"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+              </button>
+            </div>
             <p>Pilih topik untuk memulai percakapan</p>
             <button class="topic-btn" data-prompt="Bagaimana cara mengajukan sertifikasi halal untuk UMKM?">
               <span class="topic-icon topic-green">
@@ -166,7 +175,7 @@
           <div class="chat-window panel">
             <div class="chat-window-head">
               <div class="bot-avatar">
-                <svg viewBox="0 0 20 20" fill="none"><path d="M10 2a6 6 0 016 6c0 3 .8 5 1.5 6H2.5C3.2 13 4 11 4 8a6 6 0 016-6z" stroke="currentColor" stroke-width="1.5"/><path d="M8 16a2 2 0 004 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                <svg viewBox="0 0 20 20" fill="none"><path d="M10 1.6a1 1 0 011 1v1.1a4 4 0 013.9 4v3.1l1.2 2a.8.8 0 01-.7 1.2H3.6a.8.8 0 01-.7-1.2l1.2-2V7.7A4 4 0 018.9 3.7V2.6a1 1 0 011-1zM8.2 8.6a.9.9 0 100 1.8.9.9 0 000-1.8zM11.8 8.6a.9.9 0 100 1.8.9.9 0 000-1.8zM8.4 12.2h3.2" stroke="currentColor" stroke-width="1.5"/><path d="M8 16a2 2 0 004 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
               </div>
               <div>
                 <strong>Asisten Halal KHB</strong>
@@ -180,7 +189,7 @@
               <div class="day-divider"><span>Hari ini</span></div>
               <div class="message-row bot-row">
                 <div class="message-avatar">
-                  <svg viewBox="0 0 20 20" fill="none"><path d="M10 2a6 6 0 016 6c0 3 .8 5 1.5 6H2.5C3.2 13 4 11 4 8a6 6 0 016-6z" stroke="currentColor" stroke-width="1.5"/><path d="M8 16a2 2 0 004 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                  <svg viewBox="0 0 20 20" fill="none"><path d="M10 1.6a1 1 0 011 1v1.1a4 4 0 013.9 4v3.1l1.2 2a.8.8 0 01-.7 1.2H3.6a.8.8 0 01-.7-1.2l1.2-2V7.7A4 4 0 018.9 3.7V2.6a1 1 0 011-1zM8.2 8.6a.9.9 0 100 1.8.9.9 0 000-1.8zM11.8 8.6a.9.9 0 100 1.8.9.9 0 000-1.8zM8.4 12.2h3.2" stroke="currentColor" stroke-width="1.5"/><path d="M8 16a2 2 0 004 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
                 </div>
                 <div class="message-content">
                   <span class="sender-name">Asisten Halal KHB</span>
@@ -188,8 +197,8 @@
                     Assalamu'alaikum! 👋<br><br>
                     Saya asisten edukasi halal dari Komunitas Halal Bandung. Saya siap membantu menjawab pertanyaan seputar <strong>sertifikasi halal, proses pengajuan, persyaratan,</strong> dan edukasi halal lainnya.<br><br>
                     Ada yang bisa saya bantu hari ini?
+                    <span class="message-time">10:24</span>
                   </div>
-                  <span class="message-time">10:24</span>
                 </div>
               </div>
             </div>

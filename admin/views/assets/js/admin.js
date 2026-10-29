@@ -131,6 +131,8 @@ function updateUserUI() {
    DOCUMENT RENDERING (Knowledge Base)
 ══════════════════════════════════════════════ */
 let activeDocFilter = 'Semua';
+const DOC_TOTAL = 38;   // total katalog; tabel hanya memuat sebagian sebagai contoh
+const HISTORY_TOTAL = 1284;   // total percakapan pada katalog contoh
 
 function renderDocuments(filter = 'Semua', query = '') {
   const normalized = query.trim().toLowerCase();
@@ -155,8 +157,22 @@ function renderDocuments(filter = 'Semua', query = '') {
 
   const emptyEl = document.getElementById('doc-empty');
   if (emptyEl) emptyEl.classList.toggle('hidden', matching.length > 0);
-  const countEl = document.getElementById('doc-count');
-  if (countEl) countEl.textContent = `${matching.length} dokumen`;
+
+  // range indicator: "Menampilkan 1–6 dari 38 dokumen"
+  const rangeEl = document.getElementById('doc-range');
+  if (rangeEl) {
+    const from = matching.length ? 1 : 0;
+    const to = matching.length;
+    rangeEl.innerHTML = `Menampilkan <strong>${from}–${to}</strong> dari <strong>${DOC_TOTAL}</strong> dokumen`;
+  }
+  // keep the "Semua" tab counter honest
+  const allTab = document.querySelector('.filter-tab[data-filter="Semua"] span');
+  if (allTab) allTab.textContent = DOC_TOTAL;
+
+  const prev = document.getElementById('doc-prev');
+  const next = document.getElementById('doc-next');
+  if (prev) prev.disabled = true;          // page 1 of 7
+  if (next) next.disabled = false;
 
   document.querySelectorAll('[data-document]').forEach(btn =>
     btn.addEventListener('click', () => notify(`Opsi dokumen "${btn.dataset.document}" — demo`))
@@ -173,6 +189,13 @@ document.querySelectorAll('.filter-tab').forEach(btn =>
 
 const docSearch = document.getElementById('doc-search');
 if (docSearch) docSearch.addEventListener('input', e => renderDocuments(activeDocFilter, e.target.value));
+
+document.getElementById('doc-next')?.addEventListener('click', () =>
+  notify('Halaman berikutnya tersedia setelah backend terhubung.')
+);
+document.getElementById('doc-prev')?.addEventListener('click', () =>
+  notify('Sudah di halaman pertama.')
+);
 
 document.getElementById('add-document')?.addEventListener('click', () =>
   document.getElementById('file-input').click()
@@ -198,7 +221,7 @@ function renderHistory(query = '') {
         <div class="avatar avatar-soft-${item.tone}">${item.initials}</div>
         <span><strong>${escapeHtml(item.name)}</strong><small>${escapeHtml(item.email)}</small></span>
       </div></td>
-      <td class="question-cell" title="${escapeHtml(item.question)}">${escapeHtml(item.question)}</td>
+      <td class="question-cell" data-full="${escapeHtml(item.question)}">${escapeHtml(item.question)}</td>
       <td><span class="category-label ${item.category === 'Biaya' ? 'orange' : item.category === 'Self declare' ? 'blue' : ''}">${escapeHtml(item.category)}</span></td>
       <td>${item.time}</td>
       <td><span class="resolved-status ${item.status === 'Terjawab' ? '' : 'escalated'}">${item.status}</span></td>
@@ -209,6 +232,17 @@ function renderHistory(query = '') {
   const emptyEl = document.getElementById('history-empty');
   if (emptyEl) emptyEl.classList.toggle('hidden', matching.length > 0);
 
+  // range indicator: "Menampilkan 1–10 dari 1.284 percakapan"
+  const rangeEl = document.getElementById('history-range');
+  if (rangeEl) {
+    const from = matching.length ? 1 : 0;
+    rangeEl.innerHTML = `Menampilkan <strong>${from}–${matching.length}</strong> dari <strong>${HISTORY_TOTAL.toLocaleString('id-ID')}</strong> percakapan`;
+  }
+  const prev = document.getElementById('history-prev');
+  const next = document.getElementById('history-next');
+  if (prev) prev.disabled = true;      // page 1
+  if (next) next.disabled = false;
+
   document.querySelectorAll('[data-history]').forEach(btn =>
     btn.addEventListener('click', () => notify(`Riwayat ${btn.dataset.history} — demo`))
   );
@@ -216,6 +250,13 @@ function renderHistory(query = '') {
 
 const historySearch = document.getElementById('history-search');
 if (historySearch) historySearch.addEventListener('input', e => renderHistory(e.target.value));
+
+document.getElementById('history-next')?.addEventListener('click', () =>
+  notify('Halaman berikutnya tersedia setelah backend terhubung.')
+);
+document.getElementById('history-prev')?.addEventListener('click', () =>
+  notify('Sudah di halaman pertama.')
+);
 
 document.getElementById('export-history')?.addEventListener('click', () =>
   notify('Ekspor riwayat memerlukan backend — fitur demo.')
@@ -226,11 +267,14 @@ document.getElementById('export-history')?.addEventListener('click', () =>
 ══════════════════════════════════════════════ */
 let notifFilter = 'all';
 let notifData = [...notifications];
+const NOTIF_PAGE = 5;         // kartu per batch
+let notifShown = NOTIF_PAGE;  // berapa yang sedang dirender
 
-function renderNotifications(filter) {
+function renderNotifications(filter, opts = {}) {
   notifFilter = filter;
   const list = document.getElementById('notif-list');
   if (!list) return;
+  if (!opts.keepCount) notifShown = NOTIF_PAGE;
 
   const filtered = filter === 'unread'
     ? notifData.filter(n => !n.read)
@@ -242,11 +286,14 @@ function renderNotifications(filter) {
 
   if (filtered.length === 0) {
     list.innerHTML = '<div class="empty-state">Tidak ada notifikasi.</div>';
+    updateNotifMore(0, 0);
     return;
   }
 
-  list.innerHTML = filtered.map(n => `
-    <div class="notif-item ${n.read ? '' : 'unread'}" data-notif-id="${n.id}">
+  const visible = filtered.slice(0, notifShown);
+
+  list.innerHTML = visible.map(n => `
+    <div class="notif-item ${n.read ? '' : 'unread'}" data-notif-id="${n.id}" tabindex="0" role="button">
       <div class="notif-icon ${n.icon}">
         ${getNotifIcon(n.type, n.icon)}
       </div>
@@ -254,29 +301,50 @@ function renderNotifications(filter) {
         <span class="notif-title">${escapeHtml(n.title)}</span>
         <p class="notif-desc">${escapeHtml(n.desc)}</p>
       </div>
-      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+      <div class="notif-side">
         <span class="notif-time">${n.time}</span>
         ${!n.read ? '<div class="notif-dot"></div>' : ''}
       </div>
     </div>
   `).join('');
 
+  updateNotifMore(visible.length, filtered.length);
+
   document.querySelectorAll('.notif-item').forEach(item => {
-    item.addEventListener('click', () => {
+    const markRead = () => {
       const id = parseInt(item.dataset.notifId);
       const notif = notifData.find(n => n.id === id);
-      if (notif && !notif.read) {
-        notif.read = true;
-        renderNotifications(notifFilter);
+      if (!notif || notif.read) return;
+      notif.read = true;
+      // fade out the green edge + dot before re-rendering
+      item.classList.add('is-read-flash');
+      item.classList.remove('unread');
+      const dot = item.querySelector('.notif-dot');
+      if (dot) dot.style.opacity = '0';
+      setTimeout(() => {
+        renderNotifications(notifFilter, { keepCount: true });
         updateNotifBadge();
         if (typeof renderNotifPop === 'function') renderNotifPop();
-if (el('settings-account')) initSettings();
-if (el('edit-profile-form')) syncProfileForm();
-      }
+      }, 300);
+    };
+    item.addEventListener('click', markRead);
+    item.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); markRead(); }
     });
   });
 
   updateNotifCounts();
+}
+
+/* load-more affordance */
+function updateNotifMore(shown, total) {
+  const btn = document.getElementById('notif-more');
+  const label = document.getElementById('notif-more-count');
+  if (!btn) return;
+  const rest = total - shown;
+  btn.hidden = rest <= 0;
+  btn.innerHTML = `<svg viewBox="0 0 20 20" fill="none"><path d="M10 4v10M6 10l4 4 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg> Muat lebih banyak (${rest})`;
+  if (label) label.textContent = total ? `Menampilkan ${shown} dari ${total} notifikasi` : '';
 }
 
 function getNotifIcon(type, color) {
@@ -312,6 +380,12 @@ document.querySelectorAll('[data-notif-filter]').forEach(btn => {
     document.querySelectorAll('[data-notif-filter]').forEach(t => t.classList.toggle('selected', t === btn));
     renderNotifications(btn.dataset.notifFilter);
   });
+});
+
+// Load more: tampilkan batch berikutnya
+document.getElementById('notif-more')?.addEventListener('click', () => {
+  notifShown += NOTIF_PAGE;
+  renderNotifications(notifFilter, { keepCount: true });
 });
 
 // Mark all read
@@ -468,8 +542,7 @@ function sendMessage(text) {
   userRow.innerHTML = `
     <div class="message-content">
       <span class="sender-name">Anda</span>
-      <div class="message-bubble">${escapeHtml(value)}</div>
-      <span class="message-time">Sekarang</span>
+      <div class="message-bubble">${escapeHtml(value)}<span class="message-time">Sekarang</span></div>
     </div>
   `;
   messages.append(userRow);
@@ -482,7 +555,7 @@ function sendMessage(text) {
   typing.id = 'typing-indicator';
   typing.innerHTML = `
     <div class="message-avatar">
-      <svg viewBox="0 0 20 20" fill="none"><path d="M10 2a6 6 0 016 6c0 3 .8 5 1.5 6H2.5C3.2 13 4 11 4 8a6 6 0 016-6z" stroke="currentColor" stroke-width="1.5"/><path d="M8 16a2 2 0 004 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <svg viewBox="0 0 20 20" fill="none"><path d="M10 1.6a1 1 0 011 1v1.1a4 4 0 013.9 4v3.1l1.2 2a.8.8 0 01-.7 1.2H3.6a.8.8 0 01-.7-1.2l1.2-2V7.7A4 4 0 018.9 3.7V2.6a1 1 0 011-1zM8.2 8.6a.9.9 0 100 1.8.9.9 0 000-1.8zM11.8 8.6a.9.9 0 100 1.8.9.9 0 000-1.8zM8.4 12.2h3.2" stroke="currentColor" stroke-width="1.5"/><path d="M8 16a2 2 0 004 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
     </div>
     <div class="message-content">
       <span class="sender-name">Asisten Halal KHB</span>
@@ -505,12 +578,11 @@ function sendMessage(text) {
     reply.className = 'message-row bot-row';
     reply.innerHTML = `
       <div class="message-avatar">
-        <svg viewBox="0 0 20 20" fill="none"><path d="M10 2a6 6 0 016 6c0 3 .8 5 1.5 6H2.5C3.2 13 4 11 4 8a6 6 0 016-6z" stroke="currentColor" stroke-width="1.5"/><path d="M8 16a2 2 0 004 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <svg viewBox="0 0 20 20" fill="none"><path d="M10 1.6a1 1 0 011 1v1.1a4 4 0 013.9 4v3.1l1.2 2a.8.8 0 01-.7 1.2H3.6a.8.8 0 01-.7-1.2l1.2-2V7.7A4 4 0 018.9 3.7V2.6a1 1 0 011-1zM8.2 8.6a.9.9 0 100 1.8.9.9 0 000-1.8zM11.8 8.6a.9.9 0 100 1.8.9.9 0 000-1.8zM8.4 12.2h3.2" stroke="currentColor" stroke-width="1.5"/><path d="M8 16a2 2 0 004 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
       </div>
       <div class="message-content">
         <span class="sender-name">Asisten Halal KHB</span>
-        <div class="message-bubble">${responseFor(value)}</div>
-        <span class="message-time">Sekarang</span>
+        <div class="message-bubble">${responseFor(value)}<span class="message-time">Sekarang</span></div>
       </div>
     `;
     messages.append(reply);
@@ -548,6 +620,134 @@ document.querySelectorAll('[data-prompt]').forEach(btn =>
   btn.addEventListener('click', () => sendMessage(btn.dataset.prompt))
 );
 /* ══════════════════════════════════════════════
+   DASHBOARD WIDGETS (avatar remainder, tooltips)
+══════════════════════════════════════════════ */
+/* Remaining users = total − avatars actually rendered (never hardcoded) */
+function initUserRemainder() {
+  document.querySelectorAll('.user-dots[data-total]').forEach(box => {
+    const total = Number(box.dataset.total) || 0;
+    const shown = box.querySelectorAll('i').length;
+    const out = box.querySelector('[data-remainder]');
+    if (out) out.textContent = `+${Math.max(0, total - shown).toLocaleString('id-ID')} lainnya`;
+  });
+}
+
+/* Chart series: one point per day, values derived from the drawn path */
+const CHART_SERIES = [
+  { d: '1 Jun', v: 84 }, { d: '3 Jun', v: 92 }, { d: '5 Jun', v: 88 }, { d: '7 Jun', v: 105 },
+  { d: '9 Jun', v: 98 },  { d: '11 Jun', v: 121 }, { d: '13 Jun', v: 112 }, { d: '15 Jun', v: 138 },
+  { d: '17 Jun', v: 126 }, { d: '19 Jun', v: 149 }, { d: '21 Jun', v: 141 }, { d: '23 Jun', v: 163 },
+  { d: '25 Jun', v: 152 }, { d: '27 Jun', v: 176 }, { d: '29 Jun', v: 168 }, { d: '30 Jun', v: 191 }
+];
+
+function initChartTooltip() {
+  const chart = el('activity-chart');
+  const tip = el('chart-tip');
+  const guide = el('chart-hover');
+  if (!chart || !tip || !guide) return;
+
+  const maxV = 200;                       // matches the y-axis top label
+  const dot = guide.querySelector('i');
+
+  const move = e => {
+    const box = chart.getBoundingClientRect();
+    const x = Math.min(Math.max(e.clientX - box.left, 0), box.width);
+    const idx = Math.min(CHART_SERIES.length - 1,
+      Math.round((x / box.width) * (CHART_SERIES.length - 1)));
+    const pt = CHART_SERIES[idx];
+
+    guide.style.left = `${(idx / (CHART_SERIES.length - 1)) * 100}%`;
+    guide.style.top = '0';
+    guide.style.bottom = '20px';
+    if (dot) dot.style.top = `${(1 - pt.v / maxV) * 100}%`;
+
+    tip.innerHTML = `<b>${pt.v}</b><small>percakapan · ${pt.d}</small>`;
+    tip.style.left = `${Math.min(Math.max((idx / (CHART_SERIES.length - 1)) * box.width, 42), box.width - 42)}px`;
+    tip.style.top = `${(1 - pt.v / maxV) * box.height - 10}px`;
+    tip.classList.add('show');
+    guide.classList.add('show');
+  };
+
+  const leave = () => {
+    tip.classList.remove('show');
+    guide.classList.remove('show');
+  };
+
+  chart.addEventListener('mousemove', move);
+  chart.addEventListener('mouseleave', leave);
+}
+
+/* Sparkline bars are generated so each can carry its own datum */
+function initSparkline() {
+  const spark = el('spark-total');
+  if (!spark) return;
+
+  const data = CHART_SERIES.slice(-12).map(p => ({ d: p.d, v: p.v }));
+  const max = Math.max(...data.map(p => p.v));
+
+  spark.innerHTML = data
+    .map(p => `<i style="height:${Math.round((p.v / max) * 100)}%" data-d="${p.d}" data-v="${p.v}"></i>`)
+    .join('');
+
+  const tip = document.createElement('div');
+  tip.className = 'chart-tip';
+  spark.parentElement.classList.add('spark-wrap');
+  spark.parentElement.appendChild(tip);
+
+  spark.querySelectorAll('i').forEach(bar => {
+    bar.addEventListener('mouseenter', () => {
+      spark.querySelectorAll('i').forEach(b => b.classList.remove('hot'));
+      bar.classList.add('hot');
+      tip.innerHTML = `<b>${bar.dataset.v}</b><small>percakapan · ${bar.dataset.d}</small>`;
+      const host = spark.parentElement.getBoundingClientRect();
+      const b = bar.getBoundingClientRect();
+      tip.style.left = `${Math.min(Math.max(b.left - host.left + b.width / 2, 40), host.width - 40)}px`;
+      tip.style.top = `${b.top - host.top - 6}px`;
+      tip.classList.add('show');
+    });
+    bar.addEventListener('mouseleave', () => {
+      bar.classList.remove('hot');
+      tip.classList.remove('show');
+    });
+  });
+}
+
+/* ══════════════════════════════════════════════
+   CHAT: TOPICS DRAWER (mobile)
+══════════════════════════════════════════════ */
+function initTopicsDrawer() {
+  const panel = el('chat-topics');
+  const toggle = el('topics-toggle');
+  const close = el('topics-close');
+  if (!panel || !toggle) return;
+
+  let backdrop = null;
+
+  const shut = () => {
+    panel.classList.remove('open');
+    toggle.setAttribute('aria-expanded', 'false');
+    if (backdrop) { backdrop.remove(); backdrop = null; }
+  };
+
+  const open = () => {
+    panel.classList.add('open');
+    toggle.setAttribute('aria-expanded', 'true');
+    backdrop = document.createElement('div');
+    backdrop.className = 'topics-backdrop';
+    backdrop.addEventListener('click', shut);
+    document.body.appendChild(backdrop);
+  };
+
+  toggle.addEventListener('click', () =>
+    panel.classList.contains('open') ? shut() : open()
+  );
+  close?.addEventListener('click', shut);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') shut(); });
+  // picking a topic closes the drawer so the conversation is visible
+  panel.querySelectorAll('.topic-btn').forEach(b => b.addEventListener('click', shut));
+}
+
+/* ══════════════════════════════════════════════
    PAGINATION (demo)
 ══════════════════════════════════════════════ */
 document.querySelectorAll('.pagination button:not(:disabled)').forEach(btn =>
@@ -558,6 +758,11 @@ document.querySelectorAll('.pagination button:not(:disabled)').forEach(btn =>
 ══════════════════════════════════════════════ */
 if (el('document-rows')) renderDocuments();
 if (el('history-rows')) renderHistory();
+if (el('notif-list')) renderNotifications('all');
+initUserRemainder();
+initSparkline();
+initChartTooltip();
+initTopicsDrawer();
 updateNotifBadge();
 initTopbarPops();
 if (el('settings-account')) initSettings();
