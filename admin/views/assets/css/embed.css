@@ -1,4 +1,29 @@
-/* KHB widget embed — Dalfa v3: vibrant pill float + rounded-2rem modal */
+/* ══════════════════════════════════════════════
+   WIDGET CHAT modern (Dalfa) — blok terpusat
+   ══════════════════════════════════════════════ */
+.wchat{display:flex;flex-direction:column;height:100vh;max-height:100vh;background:linear-gradient(180deg,#f0fdf4 0%,#f9fafb 30%)}
+.wchat .messages{flex:1;overflow:auto;padding:16px}
+.wchat .chat-input-row{margin:0 12px 4px;border-radius:999px;background:#fff;border:1.5px solid var(--line,#e5e7eb);box-shadow:0 4px 16px rgba(15,23,42,.06)}
+.wchat .chat-input-row:focus-within{border-color:#16A34A;box-shadow:0 0 0 4px rgba(22,163,74,.12)}
+.wchat .send-button{background:linear-gradient(135deg,#16A34A,#0d9488);border-radius:50%;box-shadow:0 4px 14px rgba(22,163,74,.4)}
+.wchat .send-button:hover{transform:scale(1.06)}
+.whead{display:flex;align-items:center;gap:10px;padding:14px 16px;background:linear-gradient(135deg,#14532D,#16A34A 60%,#0d9488);color:#fff;border-radius:0 0 20px 20px;box-shadow:0 6px 20px rgba(22,163,74,.3)}
+.whead .wava{width:38px;height:38px;border-radius:14px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);display:grid;place-items:center;flex:none}
+.whead .wava svg{width:20px;height:20px}
+.whead-info{flex:1;min-width:0}
+.whead strong{display:block;font-size:13.5px;font-family:var(--display);white-space:nowrap}
+.whead small{display:flex;align-items:center;gap:5px;font-size:11px;opacity:.85;white-space:nowrap}
+.whead small i{width:7px;height:7px;border-radius:50%;background:#4ade80;animation:badge-pulse 2s infinite;flex:none}
+.whead-badge{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.35);font-size:10px;font-weight:800;letter-spacing:1px;border-radius:9px;padding:5px 9px;flex:none}
+.wchat .messages{flex:1;overflow:auto;padding:16px}
+.wtyping{display:flex;gap:5px;align-items:center;padding:12px 16px;margin:0 16px 6px;background:#fff;border:1px solid var(--line,#e5e7eb);border-radius:4px 14px 14px 14px;width:fit-content;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+.wtyping.hidden{display:none}
+.wtyping span{width:7px;height:7px;background:#16A34A;border-radius:50%;animation:typing-dot .8s infinite}
+.wtyping span:nth-child(2){animation-delay:.15s}
+.wtyping span:nth-child(3){animation-delay:.3s}
+/* ══════════════════════════════════════════════
+   KHB FLOAT + MODAL (snippet eksternal)
+   ══════════════════════════════════════════════ */
 .khb-float{position:fixed;z-index:9998;display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--khb-btn,#16A34A),#0d9488);color:#fff;border:none;border-radius:999px;padding:14px 22px;font:700 14px var(--font,Inter,sans-serif);cursor:pointer;box-shadow:0 10px 32px rgba(22,163,74,.45);transition:transform .18s;animation:float-y 5s ease-in-out infinite}
 .khb-float:hover{transform:translateY(-3px) scale(1.03)}
 .khb-float.br{right:22px;bottom:22px}.khb-float.bl{left:22px;bottom:22px}
@@ -10,7 +35,15 @@
 .khb-modal-head span i{width:7px;height:7px;border-radius:50%;background:#4ade80}
 .khb-modal-head button{background:rgba(255,255,255,.15);border:none;color:#fff;width:26px;height:26px;border-radius:8px;cursor:pointer}
 .khb-modal iframe{flex:1;border:none;width:100%;background:#f9fafb}
-/* === halaman Integrasi (admin) === */
+/* ═══ halaman Integrasi (admin) ═══ */
+.integ-hero{display:flex;align-items:center;gap:16px;background:linear-gradient(140deg,#14532D,#16A34A 55%,#0d9488);border-radius:2rem;padding:28px;color:#fff;position:relative;overflow:hidden;margin-bottom:18px;box-shadow:0 14px 40px rgba(22,163,74,.3)}
+.integ-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(420px 200px at 85% 0%,rgba(255,255,255,.22),transparent 65%),radial-gradient(300px 200px at 10% 100%,rgba(163,230,53,.25),transparent 65%)}
+.integ-hero .wava{width:52px;height:52px;border-radius:17px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);display:grid;place-items:center;flex:none;position:relative}
+.integ-hero h2{font-family:var(--display);font-size:19px;font-weight:800;letter-spacing:-.4px;margin-bottom:5px;position:relative}
+.integ-hero p{font-size:12.5px;color:rgba(255,255,255,.8);line-height:1.6;position:relative}
+.integ-hero .wava svg{width:26px;height:26px}
+.integ-hero .pill{margin-left:auto;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:8px 16px;font-size:11.5px;font-weight:800;flex:none;position:relative}
+.integ-hero .pill i{display:inline-block;width:7px;height:7px;border-radius:50%;background:#4ade80;margin-right:6px;animation:badge-pulse 2s infinite}
 .embed-toolbar{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:12px}
 .embed-opts{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end}
 .embed-opts label{display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:var(--ink-2)}
@@ -36,9 +69,11 @@
 .qr-chip {
   padding: 7px 14px; border-radius: 999px; border: 1.5px solid var(--line);
   background: #fff; color: var(--ink-2); font-size: 11.5px; font-weight: 600;
-  cursor: pointer; transition: var(--transition); white-space: nowrap;
+  cursor: pointer; transition: var(--transition); white-space: nowrap; flex: none;
 }
 .qr-chip:hover { background: #f0fdf4; border-color: #16A34A; color: #16A34A; transform: translateY(-1px); }
-.widget-prompts { display: flex; gap: 6px; padding: 8px 12px; overflow-x: auto; }
+.qr-chip:active { transform: scale(.96); }
+.widget-prompts { display: flex; gap: 6px; padding: 8px 12px; overflow-x: auto; scrollbar-width: none; }
+.widget-prompts::-webkit-scrollbar { display: none; }
 .embed-check{list-style:none;display:grid;gap:9px;font-size:13px;color:var(--ink-2)}
 .embed-check code{background:var(--green-subtle);padding:1px 6px;border-radius:6px;font-size:12px}

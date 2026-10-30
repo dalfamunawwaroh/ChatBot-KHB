@@ -8,27 +8,13 @@
   <link rel="stylesheet" href="../assets/css/base.css">
   <link rel="stylesheet" href="../assets/css/admin.css">
   <link rel="stylesheet" href="../assets/css/embed.css">
-  <style>
-    body{background:linear-gradient(180deg,#f0fdf4 0%,#f9fafb 30%);padding:0}
-    .wchat{display:flex;flex-direction:column;height:100vh;max-height:100vh}
-    .wchat .messages{flex:1;overflow:auto;padding:16px}
-    .wchat .chat-input-row{margin:0 12px 4px;border-radius:999px}
-    .whead{display:flex;align-items:center;gap:10px;padding:14px 16px;background:linear-gradient(135deg,#14532D,#16A34A 60%,#0d9488);color:#fff;border-radius:0 0 20px 20px;box-shadow:0 6px 20px rgba(22,163,74,.3)}
-    .whead .wava{width:38px;height:38px;border-radius:14px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);display:grid;place-items:center;flex:none}
-    .whead .wava svg{width:20px;height:20px}
-    .whead strong{display:block;font-size:13.5px;font-family:var(--display)}
-    .whead small{display:flex;align-items:center;gap:5px;font-size:11px;opacity:.85}
-    .whead small i{width:7px;height:7px;border-radius:50%;background:#4ade80;animation:badge-pulse 2s infinite}
-    .wchat .message-bubble{border-radius:18px;box-shadow:0 2px 10px rgba(0,0,0,.05)}
-    .wchat .user-row .message-bubble{background:linear-gradient(135deg,#16A34A,#0d9488);border:none}
-    .wchat .send-button{background:linear-gradient(135deg,#16A34A,#0d9488);border-radius:50%;box-shadow:0 4px 14px rgba(22,163,74,.4)}
-  </style>
 </head>
 <body>
   <div class="wchat">
     <div class="whead">
       <span class="wava"><svg viewBox="0 0 20 20" fill="none"><path d="M10 2a6 6 0 016 6c0 3 .8 5 1.5 6H2.5C3.2 13 4 11 4 8a6 6 0 016-6z" stroke="currentColor" stroke-width="1.5"/><path d="M8 16a2 2 0 004 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
-      <div><strong>Asisten Halal KHB</strong><small><i></i>Online · balas &lt; 2 dtk</small></div>
+      <div class="whead-info"><strong>Asisten Halal KHB</strong><small><i></i>Online · balas &lt; 2 dtk</small></div>
+      <span class="whead-badge">AI</span>
     </div>
     <div class="messages" id="messages">
       <div class="day-divider"><span>Hari ini</span></div>
@@ -41,10 +27,12 @@
         </div>
       </div>
     </div>
+    <div class="wtyping hidden" id="wtyping"><span></span><span></span><span></span></div>
     <div class="suggested-prompts widget-prompts">
       <button class="qr-chip" data-prompt="Bagaimana cara mengajukan sertifikasi halal untuk UMKM?">Cara sertifikasi</button>
       <button class="qr-chip" data-prompt="Apa itu sertifikat halal self declare?">Self declare</button>
       <button class="qr-chip" data-prompt="Berapa biaya sertifikasi halal?">Biaya</button>
+      <button class="qr-chip" data-prompt="Dokumen apa saja yang perlu disiapkan?">Dokumen</button>
     </div>
     <form class="chat-input-row" id="chat-form">
       <textarea id="chat-input" rows="1" placeholder="Tulis pertanyaan seputar halal..." aria-label="Tulis pesan"></textarea>
