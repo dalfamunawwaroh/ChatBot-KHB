@@ -44,6 +44,25 @@ document.querySelectorAll('.lp-nav-link, .lp-mobile-link').forEach(link => {
   });
 });
 
+/* ── Scrollspy: nav aktif hijau sesuai section (skill react-vite-frontend pitfall #18) ── */
+(function initNavSpy() {
+  const links = Array.from(document.querySelectorAll('.lp-nav-link, .lp-mobile-link'));
+  const secs = links
+    .map(a => document.querySelector(a.getAttribute('href')))
+    .filter(Boolean);
+  if (!links.length || !secs.length || !('IntersectionObserver' in window)) return;
+  const byHref = {};
+  links.forEach(a => { (byHref[a.getAttribute('href')] = byHref[a.getAttribute('href')] || []).push(a); });
+  const spy = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      links.forEach(a => a.classList.remove('active'));
+      (byHref['#' + e.target.id] || []).forEach(a => a.classList.add('active'));
+    });
+  }, { rootMargin: '-40% 0px -55% 0px' });
+  secs.forEach(s => spy.observe(s));
+})();
+
 /* ── FAQ Accordion ── */
 document.querySelectorAll('.lp-faq-q').forEach(btn => {
   btn.addEventListener('click', () => {

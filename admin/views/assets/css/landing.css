@@ -70,6 +70,9 @@
 .lp-nav .lp-nav-link:hover { background: rgba(255,255,255,.14); color: #fff; }
 .lp-nav.scrolled .lp-nav-link { color: #4b5563; }
 .lp-nav.scrolled .lp-nav-link:hover { background: #f3f4f6; color: #0F172A; }
+.lp-nav-link.active { color: #16A34A !important; font-weight: 700; }
+.lp-nav.scrolled .lp-nav-link.active { color: #16A34A !important; }
+.lp-mobile-link.active { color: #16A34A !important; font-weight: 700; }
 .lp-nav-link {
   padding: 8px 14px; font-size: 14px; font-weight: 500;
   text-decoration: none; border-radius: 8px;
