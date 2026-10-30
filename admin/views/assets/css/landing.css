@@ -846,6 +846,21 @@
 .legal-cta .btn-w{background:#fff;color:#15803d;border:none;border-radius:999px;padding:12px 26px;font-weight:800;font-size:14px;cursor:pointer;text-decoration:none}
 .legal-cta .btn-o{background:rgba(255,255,255,.12);color:#fff;border:1.5px solid rgba(255,255,255,.35);border-radius:999px;padding:12px 26px;font-weight:700;font-size:14px;cursor:pointer;text-decoration:none}
 @media(max-width:900px){.legal-layout{grid-template-columns:1fr}.legal-toc-v2{position:static}.legal-toc-v2 nav{display:flex;overflow-x:auto;gap:8px}.legal-toc-v2 a{white-space:nowrap}}
+@media(max-width:640px){
+  .legal-hero-v2{padding:40px 0 0}
+  .legal-hero-v2 h1{font-size:30px;letter-spacing:-.8px}
+  .legal-hero-v2 .sub{font-size:14px}
+  .legal-meta span{font-size:10.5px;padding:6px 11px}
+  .legal-wave{height:40px}
+  .legal-layout{padding:22px 16px 60px}
+  .legal-pasal{padding:20px;border-radius:22px}
+  .legal-pasal-num{width:38px;height:38px;font-size:15px;border-radius:13px}
+  .legal-pasal h2{font-size:16px}
+  .legal-pasal p,.legal-pasal li{font-size:13px}
+  .legal-cta{padding:26px 20px;border-radius:22px}
+  .legal-cta h3{font-size:18px}
+  .legal-back{padding:8px 14px;font-size:12px}
+}
 .legal-toc-v2 a.active{background:#f0fdf4;color:#15803d}
 .legal-toc-v2 a.active i{background:linear-gradient(135deg,#16A34A,#0d9488);color:#fff}
 .legal-back{display:inline-flex;align-items:center;gap:8px;color:#fff;text-decoration:none;font-size:13px;font-weight:700;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:9px 18px;margin-bottom:20px;position:relative;z-index:1}
