@@ -90,7 +90,7 @@
         <div class="breadcrumb">
           <span>Workspace</span>
           <span class="crumb-slash">/</span>
-          <strong id="breadcrumb-current">Ringkasan</strong>
+          <strong id="breadcrumb-current">Riwayat Percakapan</strong>
         </div>
         <div class="topbar-actions">
           <span class="prototype-badge"><i></i> PROTOTIPE</span>
@@ -183,15 +183,15 @@
             <div class="empty-state hidden" id="history-empty">Tidak ada percakapan yang cocok.</div>
           </div>
           <div class="table-footer">
-            <span>Menampilkan <strong>1–6</strong> dari 1.284 percakapan</span>
-            <div class="pagination">
-              <button disabled aria-label="Sebelumnya">←</button>
-              <button class="current-page">1</button>
+            <span id="history-range">Menampilkan <strong>1–10</strong> dari <strong>1.284</strong> percakapan</span>
+            <div class="pagination" role="navigation" aria-label="Navigasi halaman">
+              <button class="page-nav" id="history-prev" disabled aria-label="Halaman sebelumnya">&lsaquo; Previous</button>
+              <button class="current-page" aria-current="page">1</button>
               <button>2</button>
               <button>3</button>
-              <span>…</span>
+              <span class="page-gap">…</span>
               <button>214</button>
-              <button aria-label="Berikutnya">→</button>
+              <button class="page-nav" id="history-next" aria-label="Halaman berikutnya">Next &rsaquo;</button>
             </div>
           </div>
         </div>
