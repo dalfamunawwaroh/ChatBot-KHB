@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 
 const items = [
   { to: '/dashboard', label: 'Ringkasan' },
@@ -8,7 +8,12 @@ const items = [
   { to: '/history', label: 'Riwayat Chat' },
 ];
 
+const LogoutIcon = () => (
+  <svg viewBox="0 0 20 20" fill="none"><path d="M8 3H4a1 1 0 00-1 1v12a1 1 0 001 1h4M13 14l4-4-4-4M17 10H7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
+);
+
 export default function Sidebar() {
+  const navigate = useNavigate();
   return (
     <aside className="sidebar" id="sidebar">
       <NavLink className="brand" to="/dashboard" aria-label="KHB Beranda">
@@ -46,6 +51,10 @@ export default function Sidebar() {
           <small id="sidebar-role">Administrator</small>
         </div>
       </NavLink>
+      <button className="logout-btn" onClick={() => navigate('/login')} aria-label="Keluar">
+        <LogoutIcon />
+        <span>Keluar</span>
+      </button>
     </aside>
   );
 }
