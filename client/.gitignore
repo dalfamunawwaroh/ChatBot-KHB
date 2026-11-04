@@ -1,0 +1,12 @@
+# deps + build
+node_modules/
+dist/
+*.local
+
+# env
+.env
+
+# editor / os
+.vscode/
+.DS_Store
+Thumbs.db
