@@ -95,13 +95,6 @@ export default function Sidebar({ open = false, onClose }: SidebarProps) {
 
       <div className="sidebar-spacer"></div>
 
-      <div className="help-card">
-        <div className="help-icon">✦</div>
-        <strong>Butuh bantuan?</strong>
-        <p>Tim KHB siap membantu Anda.</p>
-        <a href="https://halalbandung.com/" target="_blank" rel="noreferrer">Kunjungi KHB <span>↗</span></a>
-      </div>
-
       <NavLink className="profile" to="/edit-profile" id="profile-trigger">
         <div className="avatar avatar-admin" id="sidebar-avatar">A</div>
         <div className="profile-info">
