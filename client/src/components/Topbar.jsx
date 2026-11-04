@@ -23,6 +23,9 @@ export default function Topbar() {
         <button className="topbar-avatar-btn" aria-label="Menu profil" onClick={() => navigate('/edit-profile')}>
           <div className="avatar avatar-admin" id="topbar-avatar">A</div>
         </button>
+        <button className="icon-btn" aria-label="Keluar" title="Keluar" onClick={() => navigate('/login')}>
+          <svg viewBox="0 0 20 20" fill="none"><path d="M8 3H4a1 1 0 00-1 1v12a1 1 0 001 1h4M13 14l4-4-4-4M17 10H7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
+        </button>
       </div>
     </header>
   );
