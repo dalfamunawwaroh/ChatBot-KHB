@@ -1,4 +1,39 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+const TABS = [
+  {
+    id: 'account',
+    label: 'Akun',
+    icon: <><circle cx="10" cy="7" r="3" stroke="currentColor" strokeWidth="1.5" /><path d="M3 17c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></>,
+  },
+  {
+    id: 'appearance',
+    label: 'Tampilan',
+    icon: <><circle cx="10" cy="10" r="7" stroke="currentColor" strokeWidth="1.5" /><path d="M10 3v2M10 15v2M3 10h2M15 10h2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></>,
+  },
+  {
+    id: 'notifications-settings',
+    label: 'Notifikasi',
+    icon: <><path d="M10 2a6 6 0 016 6c0 3 .8 5 1.5 6H2.5C3.2 13 4 11 4 8a6 6 0 016-6z" stroke="currentColor" strokeWidth="1.5" /><path d="M8 16a2 2 0 004 0" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></>,
+  },
+  {
+    id: 'security',
+    label: 'Keamanan',
+    icon: <><path d="M10 2l7 3v6c0 4.8-3.2 7.6-7 9-3.8-1.4-7-4.2-7-9V5l7-3z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" /><path d="M7 10l2.5 2.5 3.5-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></>,
+  },
+  {
+    id: 'chatbot',
+    label: 'Chatbot AI',
+    icon: <path d="M3 4h14a1 1 0 011 1v8a1 1 0 01-1 1H6l-4 3V5a1 1 0 011-1z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />,
+  },
+];
+
 export default function SettingsPage() {
+  const [tab, setTab] = useState('account');
+  const [theme, setTheme] = useState('light');
+  const navigate = useNavigate();
+
   return (
     <>
 {/*─── SETTINGS VIEW ───*/}
@@ -12,36 +47,31 @@ export default function SettingsPage() {
         </div>
         <div className="settings-layout">
           <div className="settings-nav-wrap">
-            <nav className="settings-nav panel">
-              <button className="settings-nav-item active" data-settings="account">
-                <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="7" r="3" stroke="currentColor" strokeWidth="1.5"/><path d="M3 17c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
-                Akun
-              </button>
-              <button className="settings-nav-item" data-settings="appearance">
-                <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="currentColor" strokeWidth="1.5"/><path d="M10 3v2M10 15v2M3 10h2M15 10h2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
-                Tampilan
-              </button>
-              <button className="settings-nav-item" data-settings="notifications-settings">
-                <svg viewBox="0 0 20 20" fill="none"><path d="M10 2a6 6 0 016 6c0 3 .8 5 1.5 6H2.5C3.2 13 4 11 4 8a6 6 0 016-6z" stroke="currentColor" strokeWidth="1.5"/><path d="M8 16a2 2 0 004 0" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
-                Notifikasi
-              </button>
-              <button className="settings-nav-item" data-settings="security">
-                <svg viewBox="0 0 20 20" fill="none"><path d="M10 2l7 3v6c0 4.8-3.2 7.6-7 9-3.8-1.4-7-4.2-7-9V5l7-3z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/><path d="M7 10l2.5 2.5 3.5-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                Keamanan
-              </button>
-              <button className="settings-nav-item" data-settings="chatbot">
-                <svg viewBox="0 0 20 20" fill="none"><path d="M3 4h14a1 1 0 011 1v8a1 1 0 01-1 1H6l-4 3V5a1 1 0 011-1z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/></svg>
-                Chatbot AI
-              </button>
+            <nav className="settings-nav panel" role="tablist" aria-label="Kategori pengaturan">
+              {TABS.map((t) => (
+                <button
+                  key={t.id}
+                  role="tab"
+                  type="button"
+                  aria-selected={tab === t.id}
+                  aria-controls={`settings-${t.id}`}
+                  className={`settings-nav-item${tab === t.id ? ' active' : ''}`}
+                  data-settings={t.id}
+                  onClick={() => setTab(t.id)}
+                >
+                  <svg viewBox="0 0 20 20" fill="none">{t.icon}</svg>
+                  {t.label}
+                </button>
+              ))}
             </nav>
           </div>
           <div className="settings-content">
             {/*Account Settings*/}
-            <div className="settings-section active" id="settings-account">
+            <div className={`settings-section${tab === 'account' ? ' active' : ''}`} id="settings-account" role="tabpanel">
               <div className="settings-card panel">
                 <div className="settings-card-header settings-card-header-row">
                   <div><h3>Informasi Akun</h3><p>Detail dasar akun Anda</p></div>
-                  <button className="btn btn-secondary btn-sm settings-edit-cta" data-go="edit-profile">Edit Profil</button>
+                  <button className="btn btn-secondary btn-sm settings-edit-cta" onClick={() => navigate('/edit-profile')}>Edit Profil</button>
                 </div>
                 <div className="settings-field"><label>Nama Lengkap</label><div className="settings-value">Admin KHB</div></div>
                 <div className="settings-field"><label>Email</label><div className="settings-value">admin@khb.or.id</div></div>
@@ -49,19 +79,19 @@ export default function SettingsPage() {
                 <div className="settings-field"><label>Bergabung sejak</label><div className="settings-value">1 Januari 2024</div></div>
               </div>
               <div className="settings-card panel">
-                <div className="settings-card-header"><h3>Zona Waktu & Bahasa</h3><p>Sesuaikan regional Anda</p></div>
+                <div className="settings-card-header"><h3>Zona Waktu &amp; Bahasa</h3><p>Sesuaikan regional Anda</p></div>
                 <div className="settings-field">
                   <label>Zona waktu</label>
-                  <select className="settings-select">
-                    <option selected>Asia/Jakarta (WIB, GMT+7)</option>
+                  <select className="settings-select" defaultValue="Asia/Jakarta (WIB, GMT+7)">
+                    <option>Asia/Jakarta (WIB, GMT+7)</option>
                     <option>Asia/Makassar (WITA, GMT+8)</option>
                     <option>Asia/Jayapura (WIT, GMT+9)</option>
                   </select>
                 </div>
                 <div className="settings-field">
                   <label>Bahasa antarmuka</label>
-                  <select className="settings-select">
-                    <option selected>Bahasa Indonesia</option>
+                  <select className="settings-select" defaultValue="Bahasa Indonesia">
+                    <option>Bahasa Indonesia</option>
                     <option>English</option>
                   </select>
                 </div>
@@ -70,34 +100,24 @@ export default function SettingsPage() {
             </div>
 
             {/*Appearance Settings*/}
-            <div className="settings-section" id="settings-appearance">
+            <div className={`settings-section${tab === 'appearance' ? ' active' : ''}`} id="settings-appearance" role="tabpanel">
               <div className="settings-card panel">
                 <div className="settings-card-header"><h3>Tema Antarmuka</h3><p>Pilih tampilan yang nyaman</p></div>
                 <div className="theme-options">
-                  <label className="theme-option selected" id="theme-light-label">
-                    <input type="radio" name="theme" value="light" id="theme-light" checked />
-                    <div className="theme-preview theme-preview-light">
-                      <div className="tp-sidebar"></div>
-                      <div className="tp-content"><div className="tp-bar"></div><div className="tp-card"></div></div>
-                    </div>
-                    <span>Terang</span>
-                  </label>
-                  <label className="theme-option" id="theme-dark-label">
-                    <input type="radio" name="theme" value="dark" id="theme-dark" />
-                    <div className="theme-preview theme-preview-dark">
-                      <div className="tp-sidebar"></div>
-                      <div className="tp-content"><div className="tp-bar"></div><div className="tp-card"></div></div>
-                    </div>
-                    <span>Gelap</span>
-                  </label>
-                  <label className="theme-option" id="theme-system-label">
-                    <input type="radio" name="theme" value="system" id="theme-system" />
-                    <div className="theme-preview theme-preview-system">
-                      <div className="tp-sidebar"></div>
-                      <div className="tp-content"><div className="tp-bar"></div><div className="tp-card"></div></div>
-                    </div>
-                    <span>Ikuti sistem</span>
-                  </label>
+                  {[
+                    ['light', 'Terang', 'theme-preview-light'],
+                    ['dark', 'Gelap', 'theme-preview-dark'],
+                    ['system', 'Ikuti sistem', 'theme-preview-system'],
+                  ].map(([val, label, preview]) => (
+                    <label className={`theme-option${theme === val ? ' selected' : ''}`} key={val} id={`theme-${val}-label`}>
+                      <input type="radio" name="theme" value={val} id={`theme-${val}`} checked={theme === val} onChange={() => setTheme(val)} />
+                      <div className={`theme-preview ${preview}`}>
+                        <div className="tp-sidebar"></div>
+                        <div className="tp-content"><div className="tp-bar"></div><div className="tp-card"></div></div>
+                      </div>
+                      <span>{label}</span>
+                    </label>
+                  ))}
                 </div>
               </div>
               <div className="settings-card panel">
@@ -111,21 +131,21 @@ export default function SettingsPage() {
             </div>
 
             {/*Notification Settings*/}
-            <div className="settings-section" id="settings-notifications-settings">
+            <div className={`settings-section${tab === 'notifications-settings' ? ' active' : ''}`} id="settings-notifications-settings" role="tabpanel">
               <div className="settings-card panel">
                 <div className="settings-card-header"><h3>Preferensi Notifikasi</h3><p>Atur kapan Anda ingin diberitahu</p></div>
                 <div className="settings-toggle-list">
                   <div className="settings-toggle-item">
                     <div><strong>Pesan chat baru</strong><small>Notifikasi saat ada pertanyaan masuk</small></div>
                     <label className="toggle-switch">
-                      <input type="checkbox" checked />
+                      <input type="checkbox" defaultChecked />
                       <span className="toggle-slider"></span>
                     </label>
                   </div>
                   <div className="settings-toggle-item">
                     <div><strong>Pembaruan dokumen</strong><small>Notifikasi saat dokumen diperbarui</small></div>
                     <label className="toggle-switch">
-                      <input type="checkbox" checked />
+                      <input type="checkbox" defaultChecked />
                       <span className="toggle-slider"></span>
                     </label>
                   </div>
@@ -139,7 +159,7 @@ export default function SettingsPage() {
                   <div className="settings-toggle-item">
                     <div><strong>Peringatan sistem</strong><small>Notifikasi kritis tentang status sistem</small></div>
                     <label className="toggle-switch">
-                      <input type="checkbox" checked />
+                      <input type="checkbox" defaultChecked />
                       <span className="toggle-slider"></span>
                     </label>
                   </div>
@@ -155,7 +175,7 @@ export default function SettingsPage() {
             </div>
 
             {/*Security Settings*/}
-            <div className="settings-section" id="settings-security">
+            <div className={`settings-section${tab === 'security' ? ' active' : ''}`} id="settings-security" role="tabpanel">
               <div className="settings-card panel">
                 <div className="settings-card-header"><h3>Kata Sandi</h3><p>Perbarui kata sandi secara berkala</p></div>
                 <div className="form-group">
@@ -202,37 +222,37 @@ export default function SettingsPage() {
             </div>
 
             {/*Chatbot Settings*/}
-            <div className="settings-section" id="settings-chatbot">
+            <div className={`settings-section${tab === 'chatbot' ? ' active' : ''}`} id="settings-chatbot" role="tabpanel">
               <div className="settings-card panel">
                 <div className="settings-card-header"><h3>Konfigurasi Asisten AI</h3><p>Atur perilaku chatbot Anda</p></div>
                 <div className="form-group">
                   <label>Bahasa respons chatbot</label>
-                  <select className="settings-select">
-                    <option selected>Bahasa Indonesia</option>
+                  <select className="settings-select" defaultValue="Bahasa Indonesia">
+                    <option>Bahasa Indonesia</option>
                     <option>English</option>
                     <option>Bilingual (ID/EN)</option>
                   </select>
                 </div>
                 <div className="form-group">
                   <label>Gaya respons</label>
-                  <select className="settings-select">
-                    <option selected>Formal & informatif</option>
-                    <option>Santai & ramah</option>
-                    <option>Singkat & padat</option>
+                  <select className="settings-select" defaultValue="Formal & informatif">
+                    <option>Formal &amp; informatif</option>
+                    <option>Santai &amp; ramah</option>
+                    <option>Singkat &amp; padat</option>
                   </select>
                 </div>
                 <div className="settings-toggle-list">
                   <div className="settings-toggle-item">
                     <div><strong>Tampilkan sumber referensi</strong><small>Cantumkan sumber dokumen dalam jawaban</small></div>
                     <label className="toggle-switch">
-                      <input type="checkbox" checked />
+                      <input type="checkbox" defaultChecked />
                       <span className="toggle-slider"></span>
                     </label>
                   </div>
                   <div className="settings-toggle-item">
                     <div><strong>Mode saran otomatis</strong><small>Tampilkan pertanyaan terkait setelah respons</small></div>
                     <label className="toggle-switch">
-                      <input type="checkbox" checked />
+                      <input type="checkbox" defaultChecked />
                       <span className="toggle-slider"></span>
                     </label>
                   </div>

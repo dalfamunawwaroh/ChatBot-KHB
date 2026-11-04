@@ -1286,3 +1286,54 @@ body.dark-theme .topbar-pop .profile-dd-item:hover{background:#21262d}
 body.dark-theme .topbar-pop .profile-dd-item svg{color:#e6edf3}
 body.dark-theme .topbar-pop .profile-dd-item.danger,
 body.dark-theme .topbar-pop .profile-dd-item.danger svg{color:#f87171}
+
+/* ══════════════════════════════════════════════
+   SETTINGS — layout rapat (scoped #view-settings)
+   Tujuan: kartu tidak memanjang ke bawah; field
+   berpasangan 2 kolom di layar lebar.
+══════════════════════════════════════════════ */
+#view-settings .settings-section { gap: 14px; }
+#view-settings .settings-card { padding: 18px 22px 20px; }
+#view-settings .settings-card-header { margin-bottom: 14px; }
+#view-settings .settings-card-header h3 { margin-bottom: 2px; }
+#view-settings .settings-field { margin-bottom: 12px; }
+#view-settings .settings-field:last-child { margin-bottom: 0; }
+#view-settings .settings-field label { margin-bottom: 4px; }
+#view-settings .settings-actions {
+  margin-top: 14px; padding-top: 14px;
+  border-top: 1px solid var(--line-2);
+}
+#view-settings .settings-toggle-item { padding: 11px 0; }
+#view-settings .settings-toggle-item:first-child { padding-top: 2px; }
+#view-settings .session-item { padding: 11px 0; }
+#view-settings .session-item:first-of-type { padding-top: 2px; }
+body.dark-theme #view-settings .settings-actions { border-top-color: #30363d; }
+
+/* Layar lebar: isi kartu jadi 2 kolom supaya tinggi halaman turun */
+@media (min-width: 820px) {
+  #view-settings .settings-card {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 26px;
+    row-gap: 16px;
+    align-content: start;
+  }
+  #view-settings .settings-card-header,
+  #view-settings .settings-actions,
+  #view-settings .settings-toggle-list,
+  #view-settings .theme-options,
+  #view-settings .font-size-options,
+  #view-settings .session-item,
+  #view-settings .form-group:has(textarea) { grid-column: 1 / -1; }
+  #view-settings .settings-field,
+  #view-settings .form-group { margin-bottom: 0; min-width: 0; }
+  #view-settings .settings-field + .settings-field,
+  #view-settings .form-group + .form-group { grid-column: auto; }
+  #view-settings .settings-actions { margin-top: 2px; }
+  /* tema: 3 pilihan mengisi lebar kartu, preview ikut melebar */
+  #view-settings .theme-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+  #view-settings .theme-option { align-items: stretch; }
+  #view-settings .theme-preview { width: 100%; height: 72px; }
+  #view-settings .theme-option span { text-align: center; }
+}
+
