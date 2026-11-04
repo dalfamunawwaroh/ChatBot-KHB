@@ -1,66 +1,74 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { PageHead, Panel, Badge, Icon, Empty } from '../components/ui/PageKit';
+import { PageHead, Panel, Stat, StatsGrid, Badge, Icon, Empty } from '../components/ui/PageKit';
 import { channels } from '../data/omni';
 import { useToast } from '../components/Toast';
+
+const FILTERS = ['Semua', 'Aktif', 'Draf'] as const;
 
 export default function ChannelListPage() {
   const navigate = useNavigate();
   const notify = useToast();
   const [rows, setRows] = useState(channels);
+  const [filter, setFilter] = useState<(typeof FILTERS)[number]>('Semua');
+
+  const visible = useMemo(
+    () => rows.filter((row) => filter === 'Semua' || row.status === filter),
+    [rows, filter]
+  );
 
   const disconnect = (id: string) => {
     setRows((prev) => prev.map((row) => (row.id === id ? { ...row, status: 'Draf', lastSync: 'Terputus' } : row)));
     notify('Kanal diputuskan');
   };
 
+  const totalMessages = rows.reduce((sum, row) => sum + row.messages, 0);
+
   return (
     <section className="view active" id="view-channels">
-      <PageHead
-        eyebrow="KANAL PERCAKAPAN"
-        title="Kanal"
-        subtitle="Hubungkan asisten halal ke kanal yang dipakai UMKM."
-      >
+      <PageHead eyebrow="KANAL PERCAKAPAN" title="Channels" subtitle="Hubungkan asisten halal ke kanal yang dipakai UMKM.">
         <Link className="btn btn-primary" to="/channels/new">
           {Icon.plus}
           Hubungkan Kanal
         </Link>
       </PageHead>
 
-      <div className="grid-4" style={{ marginBottom: 16 }}>
-        <div className="panel mini-kpi">
-          <span className="mini-icon">{Icon.link}</span>
-          <div><small>Kanal aktif</small><strong>{rows.filter((r) => r.status === 'Aktif').length}</strong></div>
-        </div>
-        <div className="panel mini-kpi">
-          <span className="mini-icon blue">{Icon.chat}</span>
-          <div><small>Pesan 30 hari</small><strong>{rows.reduce((sum, r) => sum + r.messages, 0)}</strong></div>
-        </div>
-        <div className="panel mini-kpi">
-          <span className="mini-icon amber">{Icon.clock}</span>
-          <div><small>Menunggu</small><strong>{rows.filter((r) => r.status !== 'Aktif').length}</strong></div>
-        </div>
-        <div className="panel mini-kpi">
-          <span className="mini-icon violet">{Icon.bolt}</span>
-          <div><small>Respons rata-rata</small><strong>1,8 s</strong></div>
-        </div>
-      </div>
+      <StatsGrid>
+        <Stat label="Kanal aktif" value={rows.filter((r) => r.status === 'Aktif').length} icon={Icon.link} tone="green" foot={<span>dari {rows.length} kanal terdaftar</span>} />
+        <Stat label="Pesan 30 hari" value={totalMessages.toLocaleString('id-ID')} icon={Icon.chat} tone="blue" foot={<span className="history-trend">↗ 12,4%</span>} />
+        <Stat label="Menunggu" value={rows.filter((r) => r.status !== 'Aktif').length} icon={Icon.clock} tone="orange" foot={<span>perlu kredensial</span>} />
+        <Stat label="Respons rata-rata" value="1,8" unit="s" icon={Icon.bolt} tone="purple" foot={<span>di semua kanal</span>} />
+      </StatsGrid>
 
-      <Panel title="Daftar kanal" subtitle={`${rows.length} kanal terdaftar`}>
+      <Panel padding={false}>
+        <div className="history-toolbar">
+          <div>
+            <h2>Daftar kanal</h2>
+            <p>{visible.length} kanal ditampilkan</p>
+          </div>
+          <div className="filter-tabs" style={{ height: 36 }}>
+            {FILTERS.map((item) => (
+              <button key={item} className={`filter-tab${filter === item ? ' selected' : ''}`} onClick={() => setFilter(item)}>
+                {item}
+              </button>
+            ))}
+          </div>
+        </div>
+
         <div className="table-wrap">
           <table className="data-table">
             <thead>
               <tr><th>KANAL</th><th>IDENTITAS</th><th>STATUS</th><th>SINKRON TERAKHIR</th><th>PESAN</th><th></th></tr>
             </thead>
             <tbody>
-              {rows.map((row) => (
+              {visible.map((row) => (
                 <tr key={row.id}>
                   <td>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                      <span className="list-icon" style={{ width: 30, height: 30 }}>{Icon.chat}</span>
+                    <div className="user-cell">
+                      <span className="avatar avatar-soft-green" style={{ width: 30, height: 30, fontSize: 11 }}>{row.platform.charAt(0)}</span>
                       <div>
-                        <strong style={{ display: 'block', color: 'var(--ink)', fontSize: 12.5 }}>{row.name}</strong>
-                        <span style={{ fontSize: 11.5 }}>{row.platform}</span>
+                        <strong>{row.name}</strong>
+                        <small>{row.platform}</small>
                       </div>
                     </div>
                   </td>
@@ -78,7 +86,14 @@ export default function ChannelListPage() {
               ))}
             </tbody>
           </table>
-          {rows.length === 0 ? <Empty text="Belum ada kanal terhubung." /> : null}
+          {visible.length === 0 ? <Empty text="Tidak ada kanal pada filter ini." /> : null}
+        </div>
+
+        <div className="table-footer">
+          <span>Menampilkan <strong>{visible.length}</strong> dari <strong>{rows.length}</strong> kanal</span>
+          <div className="pagination">
+            <button className="current-page" aria-current="page">1</button>
+          </div>
         </div>
       </Panel>
 

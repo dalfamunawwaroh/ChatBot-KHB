@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { PageHead, Badge, Icon } from '../components/ui/PageKit';
+import { PageHead, Panel, Badge, Icon } from '../components/ui/PageKit';
 import { csInbox } from '../data/omni';
 
 export default function CsInboxPage() {
@@ -26,53 +26,46 @@ export default function CsInboxPage() {
         <Badge tone="green" dot>{csInbox.filter((item) => item.status === 'Terbuka').length} terbuka</Badge>
       </PageHead>
 
-      <div className="panel" style={{ padding: 0, overflow: 'hidden' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr', minHeight: 520 }}>
-          <div style={{ borderRight: '1px solid var(--line)' }}>
-            <div style={{ padding: 14, borderBottom: '1px solid var(--line-2)' }}>
+      <Panel padding={false}>
+        <div className="inbox-layout">
+          <div className="inbox-list">
+            <div className="inbox-search">
               <label className="search-box" style={{ width: '100%' }}>
                 {Icon.search}
                 <input type="search" placeholder="Cari percakapan..." />
               </label>
             </div>
-            <div>
-              {csInbox.map((item) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => setActiveId(item.id)}
-                  style={{
-                    width: '100%', textAlign: 'left', border: 0, cursor: 'pointer',
-                    padding: '12px 14px', display: 'flex', gap: 10, alignItems: 'center',
-                    background: activeId === item.id ? 'var(--green-subtle)' : '#fff',
-                    borderBottom: '1px solid var(--line-2)',
-                  }}
-                >
-                  <span className="avatar avatar-soft-green" style={{ width: 32, height: 32, fontSize: 11 }}>{item.name.charAt(0)}</span>
-                  <span style={{ flex: 1, minWidth: 0 }}>
-                    <strong style={{ display: 'block', fontSize: 12.5, color: 'var(--ink)' }}>{item.name}</strong>
-                    <span style={{ display: 'block', fontSize: 11.5, color: 'var(--muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.last}</span>
-                  </span>
-                  <span style={{ textAlign: 'right' }}>
-                    <span style={{ display: 'block', fontSize: 10.5, color: 'var(--muted-2)' }}>{item.time}</span>
-                    {item.unread > 0 ? <Badge tone="green">{item.unread}</Badge> : null}
-                  </span>
-                </button>
-              ))}
-            </div>
+            {csInbox.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => setActiveId(item.id)}
+                className={`inbox-item${activeId === item.id ? ' active' : ''}`}
+              >
+                <span className="avatar avatar-soft-green" style={{ width: 32, height: 32, fontSize: 11 }}>{item.name.charAt(0)}</span>
+                <span className="inbox-item-copy">
+                  <strong>{item.name}</strong>
+                  <span>{item.last}</span>
+                </span>
+                <span className="inbox-item-meta">
+                  <time>{item.time}</time>
+                  {item.unread > 0 ? <Badge tone="green">{item.unread}</Badge> : null}
+                </span>
+              </button>
+            ))}
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ padding: '14px 18px', borderBottom: '1px solid var(--line-2)', display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div className="inbox-chat">
+            <div className="inbox-chat-head">
               <span className="avatar avatar-admin" style={{ width: 32, height: 32, fontSize: 11 }}>{active.name.charAt(0)}</span>
               <div style={{ flex: 1 }}>
-                <strong style={{ fontSize: 13, color: 'var(--ink)' }}>{active.name}</strong>
-                <span style={{ display: 'block', fontSize: 11.5, color: 'var(--muted)' }}>{active.channel} · {active.status}</span>
+                <strong>{active.name}</strong>
+                <span>{active.channel} · {active.status}</span>
               </div>
               <Badge tone={active.status === 'Eskalasi' ? 'amber' : 'green'} dot>{active.status}</Badge>
             </div>
 
-            <div style={{ flex: 1, padding: 18, display: 'grid', gap: 10, alignContent: 'start', background: 'var(--canvas)' }}>
+            <div className="inbox-messages">
               {messages.map((msg, index) => (
                 <div key={index} className={`public-msg ${msg.from === 'user' ? 'user' : 'bot'}`} style={{ maxWidth: '72%', marginLeft: msg.from === 'agent' ? 'auto' : 0, background: msg.from === 'agent' ? 'var(--green)' : undefined, color: msg.from === 'agent' ? '#fff' : undefined }}>
                   {msg.text}
@@ -80,18 +73,18 @@ export default function CsInboxPage() {
               ))}
             </div>
 
-            <form onSubmit={send} style={{ display: 'flex', gap: 8, padding: 14, borderTop: '1px solid var(--line)' }}>
+            <form className="inbox-composer" onSubmit={send}>
               <input
                 value={draft}
                 onChange={(event) => setDraft(event.target.value)}
                 placeholder="Tulis balasan untuk UMKM..."
-                style={{ flex: 1, padding: '10px 14px', border: '1.5px solid var(--line)', borderRadius: 999, fontSize: 12.5, outline: 'none' }}
+                aria-label="Tulis balasan"
               />
               <button className="btn btn-primary" type="submit">Kirim</button>
             </form>
           </div>
         </div>
-      </div>
+      </Panel>
 
       <footer className="page-footer">
         <span>© 2025 Komunitas Halal Bandung</span>

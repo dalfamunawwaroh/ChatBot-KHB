@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { products } from '../data/omni';
+import { Icon } from '../components/ui/PageKit';
 
 interface ChatMessage {
   from: 'bot' | 'user';
@@ -156,19 +157,23 @@ export default function StoreChatPage() {
           <h2>Produk UMKM binaan</h2>
           <span>{products.length} produk contoh</span>
         </div>
-        <div className="grid-3">
-          {products.slice(0, 3).map((product) => (
-            <article className="panel" key={product.id} style={{ padding: 16 }}>
-              <div className="store-product-thumb"></div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, alignItems: 'center' }}>
-                <strong style={{ fontSize: 13, color: 'var(--ink)' }}>{product.name}</strong>
-                <span className={`badge-pill ${product.halal === 'Tersertifikasi' ? 'badge-green' : 'badge-amber'}`}>
-                  <i></i>{product.halal}
+        <div className="panel" style={{ padding: '4px 18px' }}>
+          <div className="flat-list">
+            {products.slice(0, 4).map((product) => (
+              <div className="flat-row" key={product.id}>
+                <span className="row-icon">{Icon.store}</span>
+                <span className="row-copy">
+                  <strong>{product.name}</strong>
+                  <span>{product.category} · {product.price} · {product.sku}</span>
+                </span>
+                <span className="row-meta">
+                  <span className={`badge-pill ${product.halal === 'Tersertifikasi' ? 'badge-green' : 'badge-amber'}`}>
+                    <i></i>{product.halal}
+                  </span>
                 </span>
               </div>
-              <span style={{ fontSize: 12, color: 'var(--muted)' }}>{product.category} · {product.price}</span>
-            </article>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
 

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { PageHead, Panel, Field, Icon, Badge } from '../components/ui/PageKit';
+import { PageHead, Panel, Field, Badge, Icon } from '../components/ui/PageKit';
 import { products } from '../data/omni';
 import { useToast } from '../components/Toast';
 
@@ -37,52 +37,77 @@ export default function ProductFormPage() {
       </PageHead>
 
       <div className="grid-2-1">
-        <Panel title="Informasi produk">
+        <Panel title="Informasi produk" subtitle="Lengkapi data agar asisten bisa menjawab pertanyaan produk">
           <form onSubmit={submit}>
-            <div className="form-grid">
-              <Field label="Nama produk">
-                <input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Contoh: Kopi Arabika Preanger 200g" />
+            <Field label="Nama produk">
+              <input
+                className="settings-input"
+                required
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                placeholder="Contoh: Kopi Arabika Preanger 200g"
+              />
+            </Field>
+
+            <div className="form-row-two">
+              <Field label="SKU">
+                <input className="settings-input" value={form.sku} onChange={(e) => setForm({ ...form, sku: e.target.value })} placeholder="KHB-KOP-01" />
               </Field>
-              <div className="form-grid two">
-                <Field label="SKU"><input value={form.sku} onChange={(e) => setForm({ ...form, sku: e.target.value })} placeholder="KHB-KOP-01" /></Field>
-                <Field label="Kategori">
-                  <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}>
-                    <option>Makanan Ringan</option><option>Minuman</option><option>Bumbu</option><option>Madu</option><option>Katering</option>
-                  </select>
-                </Field>
-              </div>
-              <div className="form-grid two">
-                <Field label="Harga"><input value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} placeholder="Rp45.000" /></Field>
-                <Field label="Status halal">
-                  <select value={form.halal} onChange={(e) => setForm({ ...form, halal: e.target.value as typeof form.halal })}>
-                    <option>Tersertifikasi</option><option>Proses</option><option>Belum</option>
-                  </select>
-                </Field>
-              </div>
-              <Field label="Deskripsi" hint="Bahan utama dan proses produksi membantu asisten menjawab pertanyaan.">
-                <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Bahan: kopi arabika, tanpa tambahan gula..." />
+              <Field label="Kategori">
+                <select className="settings-select" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}>
+                  <option>Makanan Ringan</option>
+                  <option>Minuman</option>
+                  <option>Bumbu</option>
+                  <option>Madu</option>
+                  <option>Katering</option>
+                </select>
               </Field>
             </div>
-            <div className="form-actions">
+
+            <div className="form-row-two">
+              <Field label="Harga">
+                <input className="settings-input" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} placeholder="Rp45.000" />
+              </Field>
+              <Field label="Status halal">
+                <select
+                  className="settings-select"
+                  value={form.halal}
+                  onChange={(e) => setForm({ ...form, halal: e.target.value as typeof form.halal })}
+                >
+                  <option>Tersertifikasi</option>
+                  <option>Proses</option>
+                  <option>Belum</option>
+                </select>
+              </Field>
+            </div>
+
+            <Field label="Deskripsi" hint="Bahan utama dan proses produksi membantu asisten menjawab pertanyaan.">
+              <textarea
+                className="settings-textarea"
+                value={form.description}
+                onChange={(e) => setForm({ ...form, description: e.target.value })}
+                placeholder="Bahan: kopi arabika, tanpa tambahan gula..."
+              />
+            </Field>
+
+            <div className="settings-actions">
               <button type="button" className="btn btn-secondary" onClick={() => navigate('/products')}>Batal</button>
               <button type="submit" className="btn btn-primary">{Icon.check} {isEdit ? 'Simpan Perubahan' : 'Tambah Produk'}</button>
             </div>
           </form>
         </Panel>
 
-        <Panel title="Ringkasan">
+        <Panel title="Ringkasan" subtitle="Pratinjau data produk">
           <div className="kv">
             <div className="kv-row"><span>Nama</span><strong>{form.name || '—'}</strong></div>
+            <div className="kv-row"><span>SKU</span><strong>{form.sku || '—'}</strong></div>
             <div className="kv-row"><span>Kategori</span><strong>{form.category}</strong></div>
             <div className="kv-row"><span>Harga</span><strong>{form.price || '—'}</strong></div>
             <div className="kv-row"><span>Status halal</span><strong><Badge tone={form.halal === 'Tersertifikasi' ? 'green' : form.halal === 'Proses' ? 'amber' : 'slate'} dot>{form.halal}</Badge></strong></div>
           </div>
-          <div className="preview-box" style={{ marginTop: 14 }}>
-            <div className="preview-label">Saran</div>
-            <p style={{ margin: 0, fontSize: 12.5, color: 'var(--muted)', lineHeight: 1.6 }}>
-              Lengkapi daftar bahan agar asisten bisa menjawab pertanyaan bahan kritis tanpa eskalasi.
-            </p>
-          </div>
+          <p className="knowledge-note">
+            Produk berstatus “Tersertifikasi” akan ditandai pada halaman publik dan katalog UMKM.
+          </p>
         </Panel>
       </div>
 

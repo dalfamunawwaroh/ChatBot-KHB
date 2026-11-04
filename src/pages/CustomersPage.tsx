@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { PageHead, Panel, Badge, Icon } from '../components/ui/PageKit';
+import { PageHead, Panel, Stat, StatsGrid, Badge, Icon, Empty } from '../components/ui/PageKit';
 import { customers } from '../data/omni';
 
 export default function CustomersPage() {
@@ -21,30 +21,34 @@ export default function CustomersPage() {
         <button className="btn btn-secondary" onClick={() => window.print()}>{Icon.download} Ekspor Data</button>
       </PageHead>
 
-      <div className="grid-4" style={{ marginBottom: 16 }}>
-        <div className="panel mini-kpi"><span className="mini-icon">{Icon.user}</span><div><small>Total UMKM</small><strong>847</strong></div></div>
-        <div className="panel mini-kpi"><span className="mini-icon blue">{Icon.chat}</span><div><small>Percakapan</small><strong>1.284</strong></div></div>
-        <div className="panel mini-kpi"><span className="mini-icon amber">{Icon.bolt}</span><div><small>Baru bulan ini</small><strong>38</strong></div></div>
-        <div className="panel mini-kpi"><span className="mini-icon violet">{Icon.check}</span><div><small>Sudah sertifikat</small><strong>312</strong></div></div>
-      </div>
+      <StatsGrid>
+        <Stat label="Total UMKM" value="847" icon={Icon.user} tone="green" foot={<span className="history-trend">↗ 38 bulan ini</span>} />
+        <Stat label="Percakapan" value="1.284" icon={Icon.chat} tone="blue" foot={<span>30 hari terakhir</span>} />
+        <Stat label="Pelanggan baru" value="38" icon={Icon.bolt} tone="orange" foot={<span>bulan ini</span>} />
+        <Stat label="Sudah bersertifikat" value="312" icon={Icon.check} tone="purple" foot={<span>37% dari total</span>} />
+      </StatsGrid>
 
-      <div className="toolbar-row">
-        <div className="toolbar-left">
-          <div className="chip-row">
-            {['Semua', 'Aktif', 'Baru'].map((item) => (
-              <button key={item} className={`chip${segment === item ? ' active' : ''}`} onClick={() => setSegment(item)}>{item}</button>
-            ))}
+      <Panel padding={false}>
+        <div className="history-toolbar">
+          <div>
+            <h2>Daftar pelanggan</h2>
+            <p>{rows.length} UMKM ditampilkan</p>
+          </div>
+          <div className="history-filters">
+            <div className="filter-tabs" style={{ height: 36 }}>
+              {['Semua', 'Aktif', 'Baru'].map((item) => (
+                <button key={item} className={`filter-tab${segment === item ? ' selected' : ''}`} onClick={() => setSegment(item)}>
+                  {item}
+                </button>
+              ))}
+            </div>
+            <label className="search-box">
+              {Icon.search}
+              <input type="search" placeholder="Cari nama atau usaha..." value={query} onChange={(e) => setQuery(e.target.value)} />
+            </label>
           </div>
         </div>
-        <div className="toolbar-right">
-          <label className="search-box">
-            {Icon.search}
-            <input type="search" placeholder="Cari nama atau usaha..." value={query} onChange={(e) => setQuery(e.target.value)} />
-          </label>
-        </div>
-      </div>
 
-      <Panel title="Daftar pelanggan" subtitle={`${rows.length} UMKM ditampilkan`}>
         <div className="table-wrap">
           <table className="data-table">
             <thead>
@@ -54,9 +58,9 @@ export default function CustomersPage() {
               {rows.map((row) => (
                 <tr key={row.id}>
                   <td>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div className="user-cell">
                       <span className="avatar avatar-soft-green" style={{ width: 30, height: 30, fontSize: 11 }}>{row.name.charAt(0)}</span>
-                      <strong style={{ color: 'var(--ink)', fontSize: 12.5 }}>{row.name}</strong>
+                      <div><strong>{row.name}</strong><small>{row.city}</small></div>
                     </div>
                   </td>
                   <td>{row.business}</td>
@@ -68,6 +72,19 @@ export default function CustomersPage() {
               ))}
             </tbody>
           </table>
+          {rows.length === 0 ? <Empty text="Tidak ada pelanggan yang cocok." /> : null}
+        </div>
+
+        <div className="table-footer">
+          <span>Menampilkan <strong>{rows.length}</strong> dari <strong>847</strong> UMKM</span>
+          <div className="pagination">
+            <button className="current-page" aria-current="page">1</button>
+            <button>2</button>
+            <button>3</button>
+            <span className="page-gap">…</span>
+            <button>170</button>
+            <button className="page-nav">Next ›</button>
+          </div>
         </div>
       </Panel>
 

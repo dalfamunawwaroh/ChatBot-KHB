@@ -79,6 +79,20 @@ src/assets/css/extras.css   # utilitas tambahan untuk halaman baru (grid, badge,
 Semua halaman baru memakai kelas yang sama (`panel`, `data-table`, `btn btn-primary`, `stat-card`,
 `badge-pill`, `field`, `switch`) sehingga tampilannya menyatu dengan halaman lama.
 
+### Aturan tampilan (jangan dilanggar saat menambah halaman)
+
+1. Satu halaman = satu `<PageHead>` + beberapa `.panel`. Jangan membuat kartu di dalam kartu.
+2. Angka ringkasan memakai `.stats-grid` + `.stat-card` (maksimal 4 per halaman).
+3. Daftar panjang memakai `.panel` + `.history-toolbar` + `.data-table` + `.table-footer`.
+4. Form memakai `.settings-field` / `.settings-input`, bukan kartu per field.
+5. Baris ringkas (menu, aktivitas, panduan) memakai `.flat-list` + `.flat-row`, bukan deretan kartu.
+6. `extras.css` hanya berisi utilitas yang belum ada di CSS lama; jangan menaruh komponen kartu baru di sana.
+7. Jarak: `.view.active > * + *` = 20px, gap grid = 20px. Untuk panel bertumpuk di dalam kolom
+   (bukan grid) bungkus dengan `.stack`.
+8. `.panel` di CSS lama TIDAK punya padding (halaman lama menambah kelas sendiri seperti
+   `.activity-panel`, `.card-clean`). Karena itu `<Panel>` dari PageKit selalu membungkus isi dengan
+   `.panel-body` (padding 22px). Jangan menaruh isi langsung di dalam `.panel` tanpa `.panel-body`.
+
 ## Struktur
 
 ```

@@ -3,10 +3,10 @@ import { PageHead, Panel, Badge, Icon } from '../components/ui/PageKit';
 import { onboardingSteps } from '../data/omni';
 
 const QUICK_LINKS = [
-  { to: '/channels', title: 'Hubungkan kanal', desc: 'WhatsApp, Instagram, widget web.', icon: Icon.link },
-  { to: '/knowledge-base', title: 'Tambah dokumen', desc: 'Regulasi BPJPH & panduan KHB.', icon: Icon.doc },
-  { to: '/embed', title: 'Pasang di website', desc: 'Salin snippet embed siap pakai.', icon: Icon.chat },
-  { to: '/cs/inbox', title: 'Buka inbox agen', desc: 'Balas percakapan yang dieskalasi.', icon: Icon.user },
+  { to: '/channels', title: 'Hubungkan kanal', desc: 'WhatsApp, Instagram, atau widget website.', icon: Icon.link, tone: 'blue' },
+  { to: '/knowledge-base', title: 'Tambah dokumen', desc: 'Regulasi BPJPH dan panduan internal KHB.', icon: Icon.doc, tone: '' },
+  { to: '/embed', title: 'Pasang di website', desc: 'Salin snippet embed siap pakai.', icon: Icon.chat, tone: 'amber' },
+  { to: '/cs/inbox', title: 'Buka inbox agen', desc: 'Balas percakapan yang dieskalasi asisten.', icon: Icon.user, tone: 'violet' },
 ];
 
 export default function GettingStartedPage() {
@@ -21,26 +21,26 @@ export default function GettingStartedPage() {
         subtitle="Siapkan asisten halal KHB dalam lima langkah singkat."
       />
 
-      <div className="grid-2-1" style={{ alignItems: 'stretch' }}>
+      <div className="grid-2-1">
         <Panel title="Checklist persiapan" subtitle={`${done} dari ${onboardingSteps.length} langkah selesai`}>
-          <div className="progress-track" style={{ marginTop: 4, marginBottom: 18 }}>
+          <div className="progress-track" style={{ marginTop: 2, marginBottom: 16 }}>
             <span style={{ width: `${percent}%` }}></span>
           </div>
           <div className="steps">
             {onboardingSteps.map((step, index) => (
               <div className={`step-item${step.done ? ' done' : ''}`} key={step.title}>
                 <span className="step-num">{step.done ? '✓' : index + 1}</span>
-                <div>
+                <div style={{ flex: 1 }}>
                   <strong>{step.title}</strong>
                   <p>{step.desc}</p>
                 </div>
-                <span style={{ marginLeft: 'auto' }}>
+                <span className="step-badge">
                   <Badge tone={step.done ? 'green' : 'amber'}>{step.done ? 'Selesai' : 'Belum'}</Badge>
                 </span>
               </div>
             ))}
           </div>
-          <div className="form-actions" style={{ justifyContent: 'flex-start' }}>
+          <div className="settings-actions" style={{ justifyContent: 'flex-start' }}>
             <Link className="btn btn-primary" to="/chatbot">
               {Icon.bolt}
               Lanjut atur asisten
@@ -58,31 +58,35 @@ export default function GettingStartedPage() {
             <div className="kv-row"><span>Versi asisten</span><strong>v2.0 · prototipe</strong></div>
           </div>
 
-          <div style={{ marginTop: 16, paddingTop: 14, borderTop: '1px solid var(--line-2)' }}>
-            <div className="preview-label" style={{ marginBottom: 8 }}>Langkah berikutnya</div>
-            <div className="card-list">
-              <div className="list-item" style={{ padding: '10px 12px' }}>
-                <span className="list-icon">{Icon.bolt}</span>
-                <div className="list-copy"><strong>Atur nada jawaban</strong><span>2 menit</span></div>
-              </div>
-              <div className="list-item" style={{ padding: '10px 12px' }}>
-                <span className="list-icon">{Icon.chat}</span>
-                <div className="list-copy"><strong>Uji coba widget</strong><span>3 menit</span></div>
-              </div>
+          <div style={{ marginTop: 18, paddingTop: 4 }}>
+            <div className="eyebrow" style={{ marginBottom: 6 }}><span className="eyebrow-dot"></span> LANGKAH BERIKUTNYA</div>
+            <div className="flat-list">
+              <Link className="flat-row" to="/chatbot" style={{ textDecoration: 'none' }}>
+                <span className="row-icon">{Icon.bolt}</span>
+                <span className="row-copy"><strong>Atur nada jawaban</strong><span>Bahasa, gaya jawaban, dan eskalasi</span></span>
+                <span className="row-meta">2 menit</span>
+              </Link>
+              <Link className="flat-row" to="/embed" style={{ textDecoration: 'none' }}>
+                <span className="row-icon blue">{Icon.chat}</span>
+                <span className="row-copy"><strong>Uji coba widget</strong><span>Kirim pertanyaan contoh ke asisten</span></span>
+                <span className="row-meta">3 menit</span>
+              </Link>
             </div>
           </div>
         </Panel>
       </div>
 
-      <div className="grid-4" style={{ marginTop: 16 }}>
-        {QUICK_LINKS.map((item) => (
-          <Link key={item.to} to={item.to} className="panel quick-card">
-            <span className="mini-icon">{item.icon}</span>
-            <strong>{item.title}</strong>
-            <span>{item.desc}</span>
-          </Link>
-        ))}
-      </div>
+      <Panel title="Aksi cepat" subtitle="Pintasan konfigurasi yang sering dipakai" className="panel" >
+        <div className="flat-rows-2" style={{ marginTop: 14 }}>
+          {QUICK_LINKS.map((item) => (
+            <Link key={item.to} to={item.to} className="flat-row" style={{ textDecoration: 'none' }}>
+              <span className={`row-icon ${item.tone}`}>{item.icon}</span>
+              <span className="row-copy"><strong>{item.title}</strong><span>{item.desc}</span></span>
+              <span className="row-meta">Buka →</span>
+            </Link>
+          ))}
+        </div>
+      </Panel>
 
       <footer className="page-footer">
         <span>© 2025 Komunitas Halal Bandung</span>

@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 
+/* ── Header halaman ── */
 interface PageHeadProps {
   eyebrow?: string;
   title: string;
@@ -24,19 +25,21 @@ export function PageHead({ eyebrow, title, subtitle, children }: PageHeadProps) 
   );
 }
 
+/* ── Panel ── */
 interface PanelProps {
   title?: string;
   subtitle?: string;
   actions?: ReactNode;
   children?: ReactNode;
   className?: string;
+  padding?: boolean;
 }
 
-export function Panel({ title, subtitle, actions, children, className = '' }: PanelProps) {
+export function Panel({ title, subtitle, actions, children, className = '', padding = true }: PanelProps) {
   return (
-    <section className={`panel ${className}`.trim()}>
+    <section className={`panel ${className}`.trim()} style={padding ? undefined : { overflow: 'hidden' }}>
       {title || actions ? (
-        <div className="panel-heading">
+        <div className={`panel-heading panel-head${padding ? '' : ' flush'}`}>
           <div>
             {title ? <h2>{title}</h2> : null}
             {subtitle ? <p>{subtitle}</p> : null}
@@ -44,11 +47,44 @@ export function Panel({ title, subtitle, actions, children, className = '' }: Pa
           {actions}
         </div>
       ) : null}
-      {children}
+      {padding ? <div className="panel-body">{children}</div> : children}
     </section>
   );
 }
 
+/* ── Statistik (stat-card asli) ── */
+type StatTone = 'green' | 'blue' | 'orange' | 'purple';
+
+interface StatProps {
+  label: string;
+  value: ReactNode;
+  unit?: string;
+  icon?: ReactNode;
+  tone?: StatTone;
+  foot?: ReactNode;
+}
+
+export function Stat({ label, value, unit, icon, tone = 'green', foot }: StatProps) {
+  return (
+    <article className="stat-card">
+      <div className="stat-top">
+        <span>{label}</span>
+        {icon ? <span className={`stat-icon ${tone}`}>{icon}</span> : null}
+      </div>
+      <div className="stat-value">
+        {value}
+        {unit ? <span className="stat-unit">{unit}</span> : null}
+      </div>
+      {foot ? <div className="stat-foot">{foot}</div> : null}
+    </article>
+  );
+}
+
+export function StatsGrid({ children }: { children: ReactNode }) {
+  return <div className="stats-grid">{children}</div>;
+}
+
+/* ── Field form (settings-field asli) ── */
 interface FieldProps {
   label?: string;
   hint?: string;
@@ -57,28 +93,15 @@ interface FieldProps {
 
 export function Field({ label, hint, children }: FieldProps) {
   return (
-    <label className="field">
-      {label ? (
-        <span
-          style={{
-            display: 'block',
-            fontSize: 11,
-            fontWeight: 700,
-            letterSpacing: '.4px',
-            textTransform: 'uppercase',
-            color: 'var(--muted)',
-            marginBottom: 6,
-          }}
-        >
-          {label}
-        </span>
-      ) : null}
+    <div className="settings-field">
+      {label ? <label>{label}</label> : null}
       {children}
-      {hint ? <span className="field-hint">{hint}</span> : null}
-    </label>
+      {hint ? <small className="field-hint">{hint}</small> : null}
+    </div>
   );
 }
 
+/* ── Badge ── */
 type BadgeTone = 'green' | 'amber' | 'red' | 'blue' | 'slate' | 'violet';
 
 export function Badge({ tone = 'green', dot = false, children }: { tone?: BadgeTone; dot?: boolean; children: ReactNode }) {
@@ -94,6 +117,7 @@ export function Empty({ text = 'Belum ada data.' }: { text?: string }) {
   return <div className="empty-state">{text}</div>;
 }
 
+/* ── Toggle (toggle-switch asli) ── */
 interface ToggleProps {
   checked: boolean;
   onChange: (value: boolean) => void;
@@ -103,23 +127,20 @@ interface ToggleProps {
 
 export function Toggle({ checked, onChange, label, desc }: ToggleProps) {
   return (
-    <div className="switch-row">
-      <div className="switch-copy">
+    <div className="settings-toggle-item">
+      <div>
         <strong>{label}</strong>
-        {desc ? <span>{desc}</span> : null}
+        {desc ? <small>{desc}</small> : null}
       </div>
-      <button
-        type="button"
-        role="switch"
-        aria-checked={checked}
-        aria-label={label}
-        className={`switch${checked ? ' on' : ''}`}
-        onClick={() => onChange(!checked)}
-      />
+      <label className="toggle-switch">
+        <input type="checkbox" checked={checked} onChange={(event) => onChange(event.target.checked)} aria-label={label} />
+        <span className="toggle-slider"></span>
+      </label>
     </div>
   );
 }
 
+/* ── Ikon SVG (mengikuti gaya ikon desain lama) ── */
 export const Icon = {
   plus: (
     <svg viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
@@ -162,5 +183,14 @@ export const Icon = {
   ),
   arrow: (
     <svg viewBox="0 0 20 20" fill="none"><path d="M4 10h12M12 6l4 4-4 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>
+  ),
+  chart: (
+    <svg viewBox="0 0 20 20" fill="none"><path d="M4 16V8M10 16V4M16 16v-6" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" /></svg>
+  ),
+  shield: (
+    <svg viewBox="0 0 20 20" fill="none"><path d="M10 2l7 3v6c0 4.8-3.2 7.6-7 9-3.8-1.4-7-4.2-7-9V5l7-3z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" /><path d="M7 10l2.5 2.5 3.5-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+  ),
+  store: (
+    <svg viewBox="0 0 20 20" fill="none"><path d="M3 7l1.5-4h11L17 7M3 7h14v9a1 1 0 01-1 1H4a1 1 0 01-1-1V7z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" /><path d="M8 17v-4h4v4" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" /></svg>
   ),
 };

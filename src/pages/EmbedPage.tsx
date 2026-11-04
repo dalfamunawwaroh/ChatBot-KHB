@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { PageHead, Panel, Badge, Icon, Field } from '../components/ui/PageKit';
+import { PageHead, Panel, Field, Badge, Icon } from '../components/ui/PageKit';
 import { useToast } from '../components/Toast';
 
 const TABS = ['Widget', 'Snippet', 'REST API'] as const;
@@ -40,7 +40,7 @@ export default function EmbedPage() {
     <section className="view active" id="view-embed">
       <PageHead
         eyebrow="INTEGRASI WEB"
-        title="Embed & Widget"
+        title="Embed Website"
         subtitle="Pasang asisten halal di website komunitas atau portal UMKM."
       >
         <Link className="btn btn-secondary" to="/embed/khb-bandung" target="_blank">
@@ -50,84 +50,76 @@ export default function EmbedPage() {
       </PageHead>
 
       <div className="grid-2-1">
-        <Panel
-          title="Kode pemasangan"
-          subtitle="Tempel sebelum tag penutup </body>"
-          actions={
-            <button className="btn btn-secondary btn-sm" onClick={copy}>
-              Salin
-            </button>
-          }
-        >
-          <div className="chip-row" style={{ marginBottom: 14 }}>
-            {TABS.map((item) => (
-              <button key={item} className={`chip${tab === item ? ' active' : ''}`} onClick={() => setTab(item)}>
-                {item}
+        <Panel padding={false}>
+          <div className="document-toolbar" style={{ padding: '0 18px', borderBottom: '1px solid var(--line)' }}>
+            <div className="filter-tabs">
+              {TABS.map((item) => (
+                <button key={item} className={`filter-tab${tab === item ? ' selected' : ''}`} onClick={() => setTab(item)}>
+                  {item}
+                </button>
+              ))}
+            </div>
+            <button className="btn btn-secondary btn-sm" onClick={copy}>Salin Kode</button>
+          </div>
+
+          <div style={{ padding: 18 }}>
+            <pre className="code-block">{SNIPPETS[tab]}</pre>
+
+            <div className="form-row-two" style={{ marginTop: 18 }}>
+              <Field label="Posisi tombol">
+                <select className="settings-select" value={position} onChange={(e) => setPosition(e.target.value)}>
+                  <option>Kanan bawah</option>
+                  <option>Kiri bawah</option>
+                  <option>Kanan atas</option>
+                </select>
+              </Field>
+              <Field label="Warna utama">
+                <input
+                  className="settings-input"
+                  type="color"
+                  value={color}
+                  onChange={(e) => setColor(e.target.value)}
+                  style={{ height: 41, padding: 4 }}
+                />
+              </Field>
+            </div>
+
+            <Field label="Sapaan widget">
+              <input className="settings-input" value={greeting} onChange={(e) => setGreeting(e.target.value)} />
+            </Field>
+
+            <div className="settings-actions">
+              <button className="btn btn-primary" onClick={() => notify('Konfigurasi widget disimpan')}>
+                {Icon.check}
+                Simpan Konfigurasi
               </button>
-            ))}
-          </div>
-          <pre className="code-block">{SNIPPETS[tab]}</pre>
-
-          <div className="form-grid two" style={{ marginTop: 18 }}>
-            <Field label="Posisi tombol">
-              <select value={position} onChange={(event) => setPosition(event.target.value)}>
-                <option>Kanan bawah</option>
-                <option>Kiri bawah</option>
-                <option>Kanan atas</option>
-              </select>
-            </Field>
-            <Field label="Warna utama">
-              <input type="color" value={color} onChange={(event) => setColor(event.target.value)} style={{ height: 40, padding: 4 }} />
-            </Field>
-          </div>
-          <Field label="Sapaan widget">
-            <input value={greeting} onChange={(event) => setGreeting(event.target.value)} />
-          </Field>
-
-          <div className="form-actions">
-            <button className="btn btn-primary" onClick={() => notify('Konfigurasi widget disimpan')}>
-              {Icon.check}
-              Simpan Konfigurasi
-            </button>
+            </div>
           </div>
         </Panel>
 
-        <div style={{ display: 'grid', gap: 16 }}>
+        <div className="stack">
           <Panel title="Pratinjau widget">
-            <div className="preview-box" style={{ minHeight: 190, display: 'grid', alignContent: 'end', gap: 8 }}>
-              <div className="preview-bubble" style={{ maxWidth: 240, marginLeft: 'auto' }}>{greeting}</div>
-              <div
-                style={{
-                  marginLeft: 'auto', width: 46, height: 46, borderRadius: '50%',
-                  background: color, display: 'grid', placeItems: 'center', color: '#fff',
-                  boxShadow: '0 8px 20px rgba(22,163,74,.35)',
-                }}
-              >
-                {Icon.chat}
-              </div>
+            <div className="preview-widget">
+              <div className="public-msg bot" style={{ marginLeft: 'auto' }}>{greeting}</div>
+              <div className="preview-bubble-btn" style={{ background: color }}>{Icon.chat}</div>
             </div>
-            <p style={{ fontSize: 11.5, color: 'var(--muted-2)', marginTop: 10 }}>
-              Posisi: {position} · Warna: {color}
-            </p>
+            <div className="kv" style={{ marginTop: 14 }}>
+              <div className="kv-row"><span>Posisi</span><strong>{position}</strong></div>
+              <div className="kv-row"><span>Warna</span><strong>{color}</strong></div>
+            </div>
           </Panel>
 
-          <Panel title="Status pemasangan">
-            <div className="card-list">
-              <div className="list-item">
-                <span className="list-icon">{Icon.check}</span>
-                <div className="list-copy">
-                  <strong>halalbandung.com</strong>
-                  <span>Aktif sejak 12 Jun 2025</span>
-                </div>
-                <Badge tone="green" dot>Aktif</Badge>
+          <Panel title="Status pemasangan" subtitle="Domain yang sudah memakai widget">
+            <div className="flat-list">
+              <div className="flat-row">
+                <span className="row-icon">{Icon.check}</span>
+                <span className="row-copy"><strong>halalbandung.com</strong><span>Aktif sejak 12 Jun 2025</span></span>
+                <span className="row-meta"><Badge tone="green" dot>Aktif</Badge></span>
               </div>
-              <div className="list-item">
-                <span className="list-icon">{Icon.clock}</span>
-                <div className="list-copy">
-                  <strong>Portal UMKM Bandung</strong>
-                  <span>Menunggu verifikasi domain</span>
-                </div>
-                <Badge tone="amber" dot>Menunggu</Badge>
+              <div className="flat-row">
+                <span className="row-icon amber">{Icon.clock}</span>
+                <span className="row-copy"><strong>Portal UMKM Bandung</strong><span>Menunggu verifikasi domain</span></span>
+                <span className="row-meta"><Badge tone="amber" dot>Menunggu</Badge></span>
               </div>
             </div>
           </Panel>
@@ -136,7 +128,7 @@ export default function EmbedPage() {
 
       <footer className="page-footer">
         <span>© 2025 Komunitas Halal Bandung</span>
-        <span>Embed & widget <i>●</i> Prototipe PKM</span>
+        <span>Embed &amp; widget <i>●</i> Prototipe PKM</span>
       </footer>
     </section>
   );

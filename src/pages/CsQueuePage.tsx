@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { PageHead, Badge, Icon, Empty } from '../components/ui/PageKit';
+import { PageHead, Panel, Stat, StatsGrid, Badge, Icon, Empty } from '../components/ui/PageKit';
 import { aiQueue } from '../data/omni';
 import { useToast } from '../components/Toast';
 
@@ -18,36 +18,66 @@ export default function CsQueuePage() {
         <Badge tone="amber" dot>{rows.length} menunggu tinjauan</Badge>
       </PageHead>
 
-      <div className="grid-3" style={{ marginBottom: 16 }}>
-        <div className="panel mini-kpi"><span className="mini-icon">{Icon.chat}</span><div><small>Antrean hari ini</small><strong>14</strong></div></div>
-        <div className="panel mini-kpi"><span className="mini-icon blue">{Icon.check}</span><div><small>Disetujui</small><strong>9</strong></div></div>
-        <div className="panel mini-kpi"><span className="mini-icon amber">{Icon.clock}</span><div><small>Rata-rata tinjau</small><strong>42 s</strong></div></div>
-      </div>
+      <StatsGrid>
+        <Stat label="Antrean hari ini" value="14" icon={Icon.chat} tone="green" foot={<span>masuk sejak 00.00</span>} />
+        <Stat label="Disetujui" value="9" icon={Icon.check} tone="blue" foot={<span className="history-trend">↗ 3 dari kemarin</span>} />
+        <Stat label="Rata-rata tinjau" value="42" unit="s" icon={Icon.clock} tone="orange" foot={<span>target &lt; 60 detik</span>} />
+        <Stat label="Eskalasi ke agen" value="2" icon={Icon.bolt} tone="purple" foot={<span>butuh pendamping</span>} />
+      </StatsGrid>
 
-      <div className="card-list">
-        {rows.map((row) => (
-          <div className="panel" key={row.id} style={{ padding: 16 }}>
-            <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-              <span className="list-icon">{Icon.bolt}</span>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', marginBottom: 4 }}>
-                  <Badge tone={row.confidence >= 80 ? 'green' : 'amber'}>{row.confidence}% keyakinan</Badge>
-                  <span style={{ fontSize: 11.5, color: 'var(--muted-2)' }}>{row.topic} · {row.time}</span>
-                </div>
-                <strong style={{ display: 'block', fontSize: 13, color: 'var(--ink)', marginBottom: 6 }}>{row.question}</strong>
-                <div className="progress-track" style={{ marginTop: 0 }}>
-                  <span style={{ width: `${row.confidence}%` }}></span>
-                </div>
-              </div>
-              <div style={{ display: 'flex', gap: 6 }}>
-                <button className="btn btn-secondary btn-sm" onClick={() => notify('Draf jawaban dibuka')}>Tinjau</button>
-                <button className="btn btn-primary btn-sm" onClick={() => approve(row.id)}>{Icon.check} Setujui</button>
-              </div>
-            </div>
+      <Panel padding={false}>
+        <div className="history-toolbar">
+          <div>
+            <h2>Perlu tinjauan</h2>
+            <p>Keyakinan model di bawah 80%</p>
           </div>
-        ))}
-        {rows.length === 0 ? <Empty text="Antrean kosong. Semua jawaban sudah ditinjau." /> : null}
-      </div>
+          <span className="status-active"><i></i> Diperbarui otomatis</span>
+        </div>
+
+        <div className="table-wrap">
+          <table className="data-table">
+            <thead>
+              <tr><th>PERTANYAAN</th><th>TOPIK</th><th>KEYAKINAN</th><th>WAKTU</th><th></th></tr>
+            </thead>
+            <tbody>
+              {rows.map((row) => (
+                <tr key={row.id}>
+                  <td className="question-cell" data-full={row.question}>{row.question}</td>
+                  <td><span className="category-label">{row.topic}</span></td>
+                  <td>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 170 }}>
+                      <span className={`badge-pill ${row.confidence >= 80 ? 'badge-green' : 'badge-amber'}`}>
+                        {row.confidence}%
+                      </span>
+                      <span
+                        className="progress-track"
+                        style={{ width: 70, flex: 'none', marginTop: 0 }}
+                        role="img"
+                        aria-label={`Keyakinan ${row.confidence} persen`}
+                      >
+                        <span style={{ width: `${row.confidence}%` }}></span>
+                      </span>
+                    </div>
+                  </td>
+                  <td>{row.time}</td>
+                  <td>
+                    <div className="row-actions">
+                      <button className="btn btn-secondary btn-sm" onClick={() => notify('Draf jawaban dibuka')}>Tinjau</button>
+                      <button className="btn btn-primary btn-sm" onClick={() => approve(row.id)}>{Icon.check} Setujui</button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {rows.length === 0 ? <Empty text="Antrean kosong. Semua jawaban sudah ditinjau." /> : null}
+        </div>
+
+        <div className="table-footer">
+          <span>Menampilkan <strong>{rows.length}</strong> jawaban menunggu tinjauan</span>
+          <span className="status-active"><i></i> Agen aktif: Admin KHB</span>
+        </div>
+      </Panel>
 
       <footer className="page-footer">
         <span>© 2025 Komunitas Halal Bandung</span>

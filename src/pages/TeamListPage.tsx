@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { PageHead, Panel, Badge, Icon } from '../components/ui/PageKit';
+import { PageHead, Panel, Stat, StatsGrid, Badge, Icon, Empty } from '../components/ui/PageKit';
 import { team } from '../data/omni';
 import { useToast } from '../components/Toast';
 
@@ -8,40 +8,60 @@ export default function TeamListPage() {
   const navigate = useNavigate();
   const notify = useToast();
   const [rows, setRows] = useState(team);
+  const [filter, setFilter] = useState('Semua');
+
+  const visible = rows.filter((row) => filter === 'Semua' || row.role === filter);
 
   const toggle = (id: string) => {
-    setRows((prev) => prev.map((row) => (row.id === id ? { ...row, status: row.status === 'Aktif' ? 'Ditangguhkan' : 'Aktif' } : row)));
+    setRows((prev) =>
+      prev.map((row) => (row.id === id ? { ...row, status: row.status === 'Aktif' ? 'Ditangguhkan' : 'Aktif' } : row))
+    );
     notify('Status anggota diperbarui');
   };
 
   return (
     <section className="view active" id="view-team">
-      <PageHead eyebrow="KOLABORASI" title="Tim" subtitle="Kelola admin, pendamping, dan agen yang mengelola asisten.">
+      <PageHead eyebrow="KOLABORASI" title="Pengguna" subtitle="Kelola admin, pendamping, dan agen yang mengelola asisten.">
         <div style={{ display: 'flex', gap: 8 }}>
           <Link className="btn btn-secondary" to="/team/register-admin">Daftarkan Admin</Link>
           <Link className="btn btn-primary" to="/team/new">{Icon.plus} Tambah Anggota</Link>
         </div>
       </PageHead>
 
-      <div className="grid-3" style={{ marginBottom: 16 }}>
-        <div className="panel mini-kpi"><span className="mini-icon">{Icon.user}</span><div><small>Total anggota</small><strong>{rows.length}</strong></div></div>
-        <div className="panel mini-kpi"><span className="mini-icon blue">{Icon.check}</span><div><small>Aktif</small><strong>{rows.filter((r) => r.status === 'Aktif').length}</strong></div></div>
-        <div className="panel mini-kpi"><span className="mini-icon amber">{Icon.clock}</span><div><small>Menunggu verifikasi</small><strong>{rows.filter((r) => r.status === 'Menunggu').length}</strong></div></div>
-      </div>
+      <StatsGrid>
+        <Stat label="Total anggota" value={rows.length} icon={Icon.user} tone="green" foot={<span>di workspace KHB</span>} />
+        <Stat label="Aktif" value={rows.filter((r) => r.status === 'Aktif').length} icon={Icon.check} tone="blue" foot={<span>dapat mengakses panel</span>} />
+        <Stat label="Menunggu verifikasi" value={rows.filter((r) => r.status === 'Menunggu').length} icon={Icon.clock} tone="orange" foot={<span>undangan terkirim</span>} />
+        <Stat label="Peran tersedia" value="3" icon={Icon.shield} tone="purple" foot={<span>Admin · Pendamping · Agen</span>} />
+      </StatsGrid>
 
-      <Panel title="Anggota tim" subtitle="Peran menentukan akses ke panel admin">
+      <Panel padding={false}>
+        <div className="history-toolbar">
+          <div>
+            <h2>Anggota tim</h2>
+            <p>{visible.length} pengguna ditampilkan</p>
+          </div>
+          <div className="filter-tabs" style={{ height: 36 }}>
+            {['Semua', 'Admin', 'Pendamping', 'Agen'].map((item) => (
+              <button key={item} className={`filter-tab${filter === item ? ' selected' : ''}`} onClick={() => setFilter(item)}>
+                {item}
+              </button>
+            ))}
+          </div>
+        </div>
+
         <div className="table-wrap">
           <table className="data-table">
             <thead>
               <tr><th>NAMA</th><th>EMAIL</th><th>PERAN</th><th>BERGABUNG</th><th>STATUS</th><th></th></tr>
             </thead>
             <tbody>
-              {rows.map((row) => (
+              {visible.map((row) => (
                 <tr key={row.id}>
                   <td>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div className="user-cell">
                       <span className="avatar avatar-admin" style={{ width: 30, height: 30, fontSize: 11 }}>{row.name.charAt(0)}</span>
-                      <strong style={{ color: 'var(--ink)', fontSize: 12.5 }}>{row.name}</strong>
+                      <div><strong>{row.name}</strong><small>{row.email}</small></div>
                     </div>
                   </td>
                   <td>{row.email}</td>
@@ -58,12 +78,18 @@ export default function TeamListPage() {
               ))}
             </tbody>
           </table>
+          {visible.length === 0 ? <Empty text="Tidak ada anggota pada filter ini." /> : null}
+        </div>
+
+        <div className="table-footer">
+          <span>Menampilkan <strong>{visible.length}</strong> dari <strong>{rows.length}</strong> anggota</span>
+          <div className="pagination"><button className="current-page" aria-current="page">1</button></div>
         </div>
       </Panel>
 
       <footer className="page-footer">
         <span>© 2025 Komunitas Halal Bandung</span>
-        <span>Manajemen tim <i>●</i> Prototipe PKM</span>
+        <span>Manajemen pengguna <i>●</i> Prototipe PKM</span>
       </footer>
     </section>
   );
