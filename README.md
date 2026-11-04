@@ -11,8 +11,11 @@ Seluruh kode ditulis **TypeScript (`.tsx` / `.ts`)**, tanpa file `.jsx`, dan `ts
 
 ```bash
 npm install
-npm run dev                  # http://localhost:3000
-npm run dev -- --port 3100   # kalau port 3000 dipakai proyek lain
+npm run dev                  # frontend + backend sekaligus
+npm run dev -- --port 3100   # tentukan port frontend sendiri
+npm run dev -- --api-port 4100
+npm run dev:web              # frontend saja
+npm run dev:api              # backend saja
 npm run build                # build produksi ke dist/
 npm run preview
 npm run lint                 # tsc --noEmit
@@ -85,6 +88,31 @@ Semua halaman baru memakai kelas yang sama (`panel`, `data-table`, `btn btn-prim
 8. `.panel` di CSS lama TIDAK punya padding (halaman lama menambah kelas sendiri seperti
    `.activity-panel`, `.card-clean`). Karena itu `<Panel>` dari PageKit selalu membungkus isi dengan
    `.panel-body` (padding 22px). Jangan menaruh isi langsung di dalam `.panel` tanpa `.panel-body`.
+
+## Backend (server/)
+
+Backend ada di `server/` dengan stack **sama seperti AiOnesCare/omnicare**:
+Express 5 + TypeScript + Prisma + **MySQL**, Zod, pino, helmet, rate limit.
+Login belum punya backend (sesuai permintaan); endpoint admin masih terbuka di
+jaringan lokal.
+
+```bash
+npm run api:install          # install dependensi backend
+mysql -u root -e "CREATE DATABASE IF NOT EXISTS khb_chatbot CHARACTER SET utf8mb4"
+cp server/.env.example server/.env   # isi DATABASE_URL + LLM_*
+npm run api:db:push          # buat tabel
+npm run api:db:seed          # 6 dokumen rujukan + data contoh
+npm run api:dev              # http://localhost:4000
+```
+
+Vite sudah memproksi `/api/*` ke `http://localhost:4000`, jadi React cukup
+memanggil `fetch('/api/v1/...')`.
+
+AI menjawab berlapis: **RAG eksternal → retrieval dokumen lokal → LLM umum
+(pengetahuan di luar dokumen) → handoff**. Jawaban selalu membawa `source`
+(`rag`/`general`/`handoff`), `citations`, dan `confidence`, dan mode umum bisa
+dimatikan admin lewat `allowGeneralKnowledge`. Rincian endpoint + cara kerja:
+`server/README.md`.
 
 ## Struktur
 

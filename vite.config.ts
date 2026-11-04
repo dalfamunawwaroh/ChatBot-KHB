@@ -11,5 +11,13 @@ export default defineConfig({
     // Jangan pindah port otomatis: kalau 3000 dipakai proyek lain, lebih baik
     // gagal dengan pesan jelas daripada diam-diam membuka aplikasi lain.
     strictPort: true,
+    // Backend KHB (server/) berjalan di port 4000 — semua panggilan /api
+    // diteruskan ke sana agar frontend tidak perlu tahu URL absolut.
+    proxy: {
+      '/api': {
+        target: 'http://localhost:4000',
+        changeOrigin: true,
+      },
+    },
   },
 });

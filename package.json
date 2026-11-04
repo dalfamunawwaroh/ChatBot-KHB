@@ -4,10 +4,18 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --port 3000 --host",
+    "dev": "node scripts/dev.mjs",
+    "dev:web": "vite --port 3000 --host",
+    "dev:api": "npm --prefix server run dev",
     "build": "tsc && vite build",
     "preview": "vite preview --port 3000 --host",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "api:dev": "npm --prefix server run dev",
+    "api:install": "npm --prefix server install",
+    "api:db:push": "npm --prefix server run db:push",
+    "api:db:seed": "npm --prefix server run db:seed",
+    "api:build": "npm --prefix server run build",
+    "api:typecheck": "npm --prefix server run typecheck"
   },
   "dependencies": {
     "lucide-react": "^1.16.0",

@@ -8,8 +8,8 @@ if not exist "node_modules" (
   if errorlevel 1 goto error
 )
 
-echo [2/2] Menjalankan KHB di http://localhost:3000
-echo Jika port 3000 dipakai proyek lain, jalankan: npm run dev -- --port 3100
+echo [2/2] Menjalankan frontend + backend KHB...
+echo Frontend otomatis pindah port bila 3000 terpakai (mis. 3100). Backend: 4000.
 echo Tutup jendela ini untuk menghentikan server.
 echo.
 call npm run dev
