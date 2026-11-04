@@ -1,107 +1,109 @@
 # KHB — Asisten Edukasi Halal (Komunitas Halal Bandung)
 
-Aplikasi untuk PKM: asisten edukasi halal berbasis AI untuk UMKM Bandung.
-Terdiri dari **satu halaman publik** (konsep mengikuti AionesCare) dan **panel admin** terpisah
-untuk mengelola percakapan, dokumen rujukan, dan pengaturan asisten.
+Aplikasi prototipe PKM: asisten edukasi halal berbasis AI untuk UMKM Bandung.
+**Set halaman mengikuti AiOnesCare (omnicare)** — dashboard, chatbot, kanal, produk, knowledge,
+tim, pelanggan, audit, customer service, auth — dengan **tampilan (desain) seperti sebelum refactor**:
+sidebar navy, aksen hijau KHB, kartu putih, font Inter + Plus Jakarta Sans.
 
-## Stack (identik dengan AionesCare)
-
-| Bagian | Teknologi |
-| --- | --- |
-| UI | React 19 + TypeScript 5.7 |
-| Build | Vite 6 (`@vitejs/plugin-react` 4) |
-| Styling | Tailwind CSS v4 via `@tailwindcss/vite` (tanpa `tailwind.config`) |
-| Ikon | `lucide-react` |
-| Routing | `react-router-dom` 7 (hanya untuk memisahkan `/` dan `/admin`) |
-| Font | Plus Jakarta Sans + Inter (Google Fonts) |
-
-Tidak ada backend — seluruh data adalah demo di sisi klien.
+Seluruh kode ditulis **TypeScript (`.tsx` / `.ts`)**, tanpa file `.jsx`, dan `tsc --noEmit` bersih.
 
 ## Menjalankan
 
 ```bash
 npm install
-npm run dev      # http://localhost:3000
-npm run dev -- --port 3100   # kalau port 3000 sedang dipakai proyek lain
-npm run build    # typecheck + build produksi ke dist/
-npm run preview  # pratinjau hasil build
-npm run lint     # tsc --noEmit
+npm run dev                  # http://localhost:3000
+npm run dev -- --port 3100   # kalau port 3000 dipakai proyek lain
+npm run build                # build produksi ke dist/
+npm run preview
+npm run lint                 # tsc --noEmit
 ```
 
-`vite.config.ts` memakai `strictPort`, jadi Vite berhenti dengan pesan jelas bila port 3000
-sudah dipakai (tidak diam-diam pindah port dan membuka aplikasi lain).
+`vite.config.ts` memakai `strictPort` supaya Vite tidak diam-diam pindah port.
+Di Windows cukup klik `start-khb.bat`.
 
-Di Windows cukup klik dua kali `start-khb.bat`.
+## Halaman
 
-## Halaman & rute
-
-| Rute | Isi |
+### Publik
+| Rute | Halaman |
 | --- | --- |
-| `/` | Landing publik (hero, fitur, cara kerja, sumber, teknologi, etika, FAQ, CTA, kontak) |
-| `/admin` | Panel admin — Ringkasan (statistik, grafik, topik, percakapan terbaru) |
-| `/admin/percakapan` | Riwayat percakapan + pencarian, filter status, panel detail |
-| `/admin/knowledge` | Knowledge base: tambah, aktif/nonaktif, indeks ulang, hapus dokumen |
-| `/admin/notifikasi` | Daftar notifikasi, tandai dibaca / semua dibaca |
-| `/admin/pengaturan` | Profil pengelola, informasi komunitas, perilaku asisten |
+| `/` | Landing (hero, statistik, fitur, cara kerja, FAQ, CTA, footer) |
+| `/:slug` | Halaman publik organisasi (mis. `/khb-bandung`): pra-chat, chat, katalog produk |
+| `/login` · `/register` · `/forgot` `/forgot-password` · `/reset` · `/change-password` | Autentikasi |
+| `/widget` | Halaman widget chat |
+| `/chat/:slug` | Pratinjau widget chat publik |
+| `/embed/:slug` | Embed chat + panel riwayat (drawer di layar sempit) |
+| `/syarat` · `/privasi` | Legal |
 
-Akses admin juga tersedia lewat tautan **“Panel admin”** di footer landing.
-Belum ada autentikasi — `/admin` terbuka langsung karena ini prototipe PKM.
+### Panel admin (`AppLayout`)
+| Rute | Halaman |
+| --- | --- |
+| `/dashboard` | Ringkasan: 4 statistik, grafik, aktivitas terbaru |
+| `/getting-started` | Panduan awal + checklist onboarding |
+| `/chat` | Chat edukasi (asisten) |
+| `/chatbot` | Pengaturan asisten: identitas, gaya jawaban, eskalasi |
+| `/channels` · `/channels/new` · `/channels/:id/edit` | Kanal: daftar, hubungkan, edit |
+| `/products` · `/products/new` · `/products/:id/edit` | Katalog produk UMKM |
+| `/knowledge-base` | Dokumen rujukan (6 dokumen contoh) |
+| `/knowledge` | Flow builder (kanvas node + editor) · `/flows` dialihkan ke sini |
+| `/customers` | Data pelanggan/UMKM |
+| `/team` · `/team/new` · `/team/:id/edit` · `/team/register-admin` | Tim & peran |
+| `/audit` | Audit log aktivitas |
+| `/embed` | Embed & widget: snippet, opsi, pratinjau |
+| `/integrasi` | Integrasi web (versi lama, tetap tersedia) |
+| `/history` | Riwayat percakapan |
+| `/notifications` | Notifikasi |
+| `/settings` · `/edit-profile` | Pengaturan & profil |
+
+### Customer service (`CsLayout`)
+| Rute | Halaman |
+| --- | --- |
+| `/cs/queue` | Antrean AI (tinjau jawaban keyakinan rendah) |
+| `/cs/inbox` | Inbox agen: daftar percakapan + panel balasan |
+| `/cs/analytics` | Analitik layanan: volume harian, topik, catatan kualitas |
+
+Rute tidak dikenal → halaman 404.
+
+## Desain
+
+Desain memakai kembali CSS sebelum refactor apa adanya:
+
+```
+src/assets/css/base.css     # token: navy #1E1B4B, green #16A34A, radius, shadow
+src/assets/css/admin.css    # shell admin: sidebar, topbar, panel, tabel, chat
+src/assets/css/auth.css     # login/register/reset
+src/assets/css/landing.css  # landing publik
+src/assets/css/embed.css    # widget embed
+src/assets/css/extras.css   # utilitas tambahan untuk halaman baru (grid, badge, form, timeline)
+```
+
+Semua halaman baru memakai kelas yang sama (`panel`, `data-table`, `btn btn-primary`, `stat-card`,
+`badge-pill`, `field`, `switch`) sehingga tampilannya menyatu dengan halaman lama.
 
 ## Struktur
 
 ```
-.
-├── index.html                  # entri HTML + meta/OG + font
-├── src/
-│   ├── main.tsx                # bootstrap React + BrowserRouter
-│   ├── App.tsx                 # definisi rute
-│   ├── index.css               # Tailwind v4 @theme + utility (card, mesh, aurora, input)
-│   ├── pages/
-│   │   └── LandingPage.tsx     # komposisi halaman publik
-│   ├── data/
-│   │   ├── content.ts          # SEMUA teks landing + pasangan tanya-jawab chatbot
-│   │   └── admin.ts            # data demo panel admin
-│   ├── components/             # komponen landing (Navbar, Hero, Features, ChatDemo, ...)
-│   └── admin/
-│       ├── AdminLayout.tsx     # sidebar + topbar + footer admin
-│       ├── AdminContext.tsx    # state notifikasi + toast
-│       └── pages/              # Dashboard, Conversations, KnowledgeBase, Notifications, Settings
-├── public/favicon.svg
-├── metadata.json
-└── start-khb.bat
+src/
+├── App.tsx                 # seluruh rute
+├── main.tsx                # bootstrap + import CSS
+├── assets/css/             # desain lama + extras.css
+├── components/
+│   ├── AppLayout.tsx       # sidebar + topbar admin (drawer di mobile)
+│   ├── CsLayout.tsx        # layout customer service
+│   ├── Sidebar.tsx         # menu 4 grup (AI & Knowledge, Omnichannel, Workspace, KHB)
+│   ├── Topbar.tsx          # breadcrumb, notifikasi, menu profil
+│   ├── Toast.tsx
+│   └── ui/PageKit.tsx      # PageHead, Panel, Field, Badge, Toggle, ikon SVG
+├── data/
+│   ├── khb.ts              # data landing, dokumen, riwayat, notifikasi, label
+│   └── omni.ts             # data halaman baru (kanal, produk, tim, pelanggan, audit, CS)
+└── pages/                  # 38 halaman (.tsx)
 ```
 
-## Mengubah konten
+## Catatan prototipe
 
-**Landing & chatbot** → `src/data/content.ts`:
-
-```ts
-export const CHAT_ANSWERS = [
-  {
-    keywords: ["kemasan", "packaging"],   // kata kunci huruf kecil
-    answer: "Penjelasan singkat...",
-    source: "Nama_Dokumen.pdf",
-    sourceDetail: "Bab 1 · Hal. 3",
-  },
-];
-```
-
-`ChatDemo` memakai entri pertama yang kata kuncinya muncul; jika tidak ada, dipakai
-`CHAT_FALLBACK` (eskalasi ke Pendamping PPH).
-
-**Panel admin** → `src/data/admin.ts` (statistik, grafik, topik, percakapan, dokumen, notifikasi).
-
-## Sebelum dipakai untuk presentasi PKM
-
-Ganti placeholder di `src/data/content.ts`:
-
-- `LINKS.whatsapp` — nomor WhatsApp asli (sekarang `628112233445`)
-- `CONTACT_INFO.email`, `whatsappNumber`, `officeAddress`
-- Angka pada `STATS` dan `MARQUEE_ITEMS` (1.284+, 847, 38, 96,4%)
-
-## Catatan refactor
-
-Versi lama (MPA `admin/views/*.html` + salinan React 18 dengan `react-router-dom` dan CSS per
-halaman) sudah dihapus dari working tree. Isinya tetap dapat diambil dari riwayat git
-(`git show 3a6e98d:client/src/App.jsx`, `git checkout 3a6e98d -- admin`), karena belum ada commit
-baru setelah refactor.
+- Tidak ada backend: form, tombol simpan, dan filter bekerja di sisi klien (state React + toast).
+- Belum ada autentikasi: semua rute admin terbuka langsung.
+- Placeholder yang perlu diganti: nomor WhatsApp (`628112233445`), email, alamat, dan angka statistik.
+- Folder `_arsip-desain-aionescare/` menyimpan versi desain aionescare-style sebelumnya (tidak dipakai
+  build). Boleh dihapus jika tidak diperlukan.
+- `tailwindcss` masih ada di `package.json` (sisa stack aionescare) tetapi tidak dipakai oleh desain ini.
