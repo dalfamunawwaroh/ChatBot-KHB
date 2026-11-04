@@ -1,4 +1,34 @@
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useToast } from '../components/Toast.jsx';
+
 export default function LoginPage() {
+  const navigate = useNavigate();
+  const notify = useToast();
+  const [email, setEmail] = useState(() => { try { return localStorage.getItem('khb_email') || ''; } catch { return ''; } });
+  const [password, setPassword] = useState('');
+  const [remember, setRemember] = useState(!!email);
+  const [err, setErr] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [showPw, setShowPw] = useState(false);
+
+  const submit = (e) => {
+    e.preventDefault();
+    const bad = !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.trim());
+    setErr(bad ? 'Masukkan email yang valid' : '');
+    if (bad) return;
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      try {
+        if (remember) localStorage.setItem('khb_email', email.trim());
+        else localStorage.removeItem('khb_email');
+      } catch {}
+      notify('Selamat datang kembali!');
+      navigate('/dashboard');
+    }, 800);
+  };
+
   return (
     <>
 <div className="auth-pages" id="auth-pages">
@@ -31,64 +61,59 @@ export default function LoginPage() {
             <div className="auth-trust">
               <span>✦ Gratis selamanya</span><span>✦ Data terenkripsi</span><span>✦ Rujukan BPJPH</span>
             </div>
-            <div className="auth-mini-chat" aria-hidden="true" style={{marginTop:'18px'}}>
-              <div className="mrow"><span className="mava">✦</span><span className="mbub">Syarat self declare untuk keripik pisang apa saja?</span></div>
-              <div className="mrow user"><span className="mbub">NIB + daftar bahan + alur produksi ✅</span></div>
-            </div>
           </div>
         </div>
         <div className="auth-form-panel">
           <div className="auth-form-inner">
             <div className="auth-form-header">
-              <a href="/" className="auth-back-link back-home">
+              <Link to="/" className="auth-back-link back-home">
                 <svg viewBox="0 0 20 20" fill="none"><path d="M13 5l-5 5 5 5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
                 Beranda
-              </a>
+              </Link>
               <div><span className="auth-badge"><i></i>MASUK</span></div>
               <h1>Masuk ke akun Anda</h1>
-              <p>Belum punya akun? <a href="/register" id="go-register" className="auth-link">Daftar sekarang</a></p>
+              <p>Belum punya akun? <Link to="/register" className="auth-link">Daftar sekarang</Link></p>
             </div>
-            <form className="auth-form" id="login-form" noValidate>
+            <form className="auth-form" id="login-form" noValidate onSubmit={submit}>
               <div className="form-group">
-                <div className="input-wrap float-wrap">
+                <div className={`input-wrap float-wrap${err ? ' invalid' : ''}`}>
                   <span className="input-icon">
                     <svg viewBox="0 0 20 20" fill="none"><path d="M3 5h14a1 1 0 011 1v8a1 1 0 01-1 1H3a1 1 0 01-1-1V6a1 1 0 011-1z" stroke="currentColor" strokeWidth="1.4"/><path d="m2 6 8 6 8-6" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/></svg>
                   </span>
-                  <input type="email" id="login-email" placeholder=" " autocomplete="email" required />
+                  <input type="email" id="login-email" placeholder=" " autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
                   <label className="floating" htmlFor="login-email">Alamat Email</label>
                 </div>
+                {err ? <span className="field-err show">{err}</span> : null}
               </div>
               <div className="form-group">
                 <div className="pw-label-row">
                   <span>Kata Sandi</span>
-                  <a href="/forgot" id="go-forgot" className="auth-link-small">Lupa kata sandi?</a>
+                  <Link to="/forgot" className="auth-link-small">Lupa kata sandi?</Link>
                 </div>
                 <div className="input-wrap float-wrap">
                   <span className="input-icon">
                     <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="9" width="14" height="9" rx="2" stroke="currentColor" strokeWidth="1.4"/><path d="M7 9V6a3 3 0 016 0v3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/></svg>
                   </span>
-                  <input type="password" id="login-password" placeholder=" " autocomplete="current-password" required />
+                  <input type={showPw ? 'text' : 'password'} id="login-password" placeholder=" " autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} />
                   <label className="floating" htmlFor="login-password">Masukkan kata sandi</label>
-                  <button type="button" className="input-toggle-pw" aria-label="Tampilkan kata sandi" data-target="login-password">
+                  <button type="button" className="input-toggle-pw" aria-label="Tampilkan kata sandi" onClick={() => setShowPw((v) => !v)}>
                     <svg viewBox="0 0 20 20" fill="none"><path d="M2 10s3-6 8-6 8 6 8 6-3 6-8 6-8-6-8-6z" stroke="currentColor" strokeWidth="1.4"/><circle cx="10" cy="10" r="2.5" stroke="currentColor" strokeWidth="1.4"/></svg>
                   </button>
                 </div>
-                <span className="caps-hint" id="caps-login">Caps Lock aktif — periksa huruf besar/kecil</span>
-                <span className="field-err" id="err-login-email">Masukkan email yang valid</span>
               </div>
               <div className="form-checkbox-row">
                 <label className="checkbox-label">
-                  <input type="checkbox" id="login-remember" />
+                  <input type="checkbox" id="login-remember" checked={remember} onChange={(e) => setRemember(e.target.checked)} />
                   <span className="checkbox-custom"></span>
                   <span>Ingat saya</span>
                 </label>
               </div>
-              <button type="submit" className="btn-auth" id="login-btn">
-                <span className="btn-text">Masuk</span>
-                <span className="btn-loader hidden"></span>
+              <button type="submit" className="btn-auth" id="login-btn" disabled={loading}>
+                <span className="btn-text">{loading ? 'Memeriksa...' : 'Masuk'}</span>
+                <span className={`btn-loader${loading ? '' : ' hidden'}`}></span>
               </button>
               <div className="auth-social">
-                <button type="button" className="btn-social" id="google-login">
+                <button type="button" className="btn-social" id="google-login" onClick={() => { notify('Login Google — fitur demo'); setTimeout(() => navigate('/dashboard'), 600); }}>
                   <svg viewBox="0 0 24 24" fill="none"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
                   Google
                 </button>
@@ -98,7 +123,7 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
-</div>{/*/auth-pages*/}
+</div>
     </>
   );
 }

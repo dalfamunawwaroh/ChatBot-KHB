@@ -1,10 +1,43 @@
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useToast } from '../components/Toast.jsx';
+import { useApp } from '../context/AppContext.jsx';
+
 export default function RegisterPage() {
+  const navigate = useNavigate();
+  const notify = useToast();
+  const { user, setUser } = useApp();
+  const [f, setF] = useState({ first: '', last: '', email: '', phone: '', pw: '', confirm: '', terms: false });
+  const [loading, setLoading] = useState(false);
+  const [show1, setShow1] = useState(false);
+  const [show2, setShow2] = useState(false);
+  const set = (k) => (e) => setF({ ...f, [k]: e.target.type === 'checkbox' ? e.target.checked : e.target.value });
+
+  const score = [f.pw.length >= 8, /[A-Z]/.test(f.pw), /[0-9]/.test(f.pw), /[^a-zA-Z0-9]/.test(f.pw)].filter(Boolean).length;
+  const bar = f.pw ? (score <= 1 ? 'weak' : score <= 2 ? 'medium' : 'strong') : '';
+  const label = !f.pw ? 'Masukkan kata sandi' : score <= 1 ? 'Lemah' : score <= 2 ? 'Sedang' : 'Kuat';
+
+  const submit = (e) => {
+    e.preventDefault();
+    if (!f.first || !f.last || !f.email || !f.pw) { notify('Harap lengkapi semua kolom yang wajib'); return; }
+    if (f.pw.length < 8) { notify('Kata sandi minimal 8 karakter'); return; }
+    if (f.pw !== f.confirm) { notify('Kata sandi tidak cocok'); return; }
+    if (!f.terms) { notify('Harap setujui syarat & ketentuan'); return; }
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      setUser({ ...user, firstName: f.first, lastName: f.last, email: f.email, initials: (f.first[0] + (f.last[0] || '')).toUpperCase() });
+      notify('Akun berhasil dibuat! Selamat datang, ' + f.first + '!');
+      navigate('/dashboard');
+    }, 900);
+  };
+
   return (
     <>
 <div className="auth-pages" id="auth-pages">
 <div className="auth-page active" id="page-register">
       <div className="auth-split">
-<div className="auth-brand-panel">
+        <div className="auth-brand-panel">
           <span className="blob auth-blob-1"></span>
           <span className="blob auth-blob-2"></span>
           <div className="auth-brand-inner">
@@ -20,105 +53,78 @@ export default function RegisterPage() {
                 <div className="auth-brand-sub">BANDUNG · AI ASSISTANT</div>
               </div>
             </div>
-            <h2 className="auth-panel-tagline">Bergabunglah dengan ribuan pelaku UMKM halal</h2>
-            <p className="auth-panel-desc">Akses knowledge base terlengkap tentang sertifikasi halal dan tanya jawab langsung dengan asisten AI kami.</p>
-            <div className="auth-hero-card">
-              <div className="kicker">KENAPA KHB?</div>
-              <h3>Jawaban halal akurat dalam &lt; 2 detik</h3>
-              <p>Berbasis 38 dokumen resmi BPJPH — bukan tebakan AI generik.</p>
-              <span className="proof"><span className="avatars"><span style={{background:'#86efac',color:'#15803d'}}>RA</span><span style={{background:'#93c5fd',color:'#1d4ed8'}}>DP</span><span style={{background:'#fca5a5',color:'#dc2626'}}>SW</span></span>847+ UMKM terbantu</span>
-            </div>
-            <div className="auth-trust">
-              <span>✦ Gratis selamanya</span><span>✦ Data terenkripsi</span><span>✦ Rujukan BPJPH</span>
-            </div>
-            <div className="auth-mini-chat" aria-hidden="true" style={{marginTop:'18px'}}>
-              <div className="mrow"><span className="mava">✦</span><span className="mbub">Syarat self declare untuk keripik pisang apa saja?</span></div>
-              <div className="mrow user"><span className="mbub">NIB + daftar bahan + alur produksi ✅</span></div>
-            </div>
+            <h2 className="auth-panel-tagline">Bergabung dengan 847+ UMKM halal.</h2>
+            <p className="auth-panel-desc">Daftar gratis — akses edukasi halal, chat AI, dan panduan sertifikasi.</p>
           </div>
         </div>
         <div className="auth-form-panel">
           <div className="auth-form-inner">
             <div className="auth-form-header">
-              <a href="/" className="auth-back-link back-home">
-                <svg viewBox="0 0 20 20" fill="none"><path d="M13 5l-5 5 5 5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                Beranda
-              </a>
+              <Link to="/" className="auth-back-link back-home">Beranda</Link>
               <div><span className="auth-badge"><i></i>DAFTAR</span></div>
               <h1>Buat akun baru</h1>
-              <p>Sudah punya akun? <a href="/login" id="go-login" className="auth-link">Masuk di sini</a></p>
+              <p>Sudah punya akun? <Link to="/login" className="auth-link">Masuk</Link></p>
             </div>
-            <form className="auth-form" id="register-form" noValidate>
-              <div className="form-row-two">
+            <form className="auth-form" id="register-form" noValidate onSubmit={submit}>
+              <div className="form-row-2">
                 <div className="form-group">
                   <div className="input-wrap float-wrap">
-                  <span className="input-icon"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="7" r="3" stroke="currentColor" strokeWidth="1.4"/><path d="M3 17c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/></svg></span>
-                    <input type="text" id="reg-firstname" placeholder=" " required />
-                  <label className="floating" htmlFor="reg-firstname">Nama Depan</label>
+                    <input type="text" id="reg-firstname" placeholder=" " required value={f.first} onChange={set('first')} />
+                    <label className="floating" htmlFor="reg-firstname">Nama Depan</label>
                   </div>
                 </div>
                 <div className="form-group">
                   <div className="input-wrap float-wrap">
-                  <span className="input-icon"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="7" r="3" stroke="currentColor" strokeWidth="1.4"/><path d="M3 17c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/></svg></span>
-                    <input type="text" id="reg-lastname" placeholder=" " required />
-                  <label className="floating" htmlFor="reg-lastname">Nama Belakang</label>
+                    <input type="text" id="reg-lastname" placeholder=" " required value={f.last} onChange={set('last')} />
+                    <label className="floating" htmlFor="reg-lastname">Nama Belakang</label>
                   </div>
                 </div>
               </div>
               <div className="form-group">
                 <div className="input-wrap float-wrap">
-                  <span className="input-icon"><svg viewBox="0 0 20 20" fill="none"><path d="M3 5h14a1 1 0 011 1v8a1 1 0 01-1 1H3a1 1 0 01-1-1V6a1 1 0 011-1z" stroke="currentColor" strokeWidth="1.4"/><path d="m2 6 8 6 8-6" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/></svg></span>
-                  <input type="email" id="reg-email" placeholder=" " required />
+                  <input type="email" id="reg-email" placeholder=" " required value={f.email} onChange={set('email')} />
                   <label className="floating" htmlFor="reg-email">Alamat Email</label>
                 </div>
               </div>
               <div className="form-group">
                 <div className="input-wrap float-wrap">
-                  <span className="input-icon"><svg viewBox="0 0 20 20" fill="none"><rect x="4" y="2" width="12" height="16" rx="2" stroke="currentColor" strokeWidth="1.4"/><circle cx="10" cy="15" r="1" fill="currentColor"/></svg></span>
-                  <input type="tel" id="reg-phone" placeholder=" " />
-                  <label className="floating" htmlFor="reg-phone">Nomor WhatsApp (opsional)</label>
+                  <input type="tel" id="reg-phone" placeholder=" " value={f.phone} onChange={set('phone')} />
+                  <label className="floating" htmlFor="reg-phone">No. WhatsApp (opsional)</label>
                 </div>
               </div>
               <div className="form-group">
                 <div className="input-wrap float-wrap">
-                  <span className="input-icon"><svg viewBox="0 0 20 20" fill="none"><rect x="3" y="9" width="14" height="9" rx="2" stroke="currentColor" strokeWidth="1.4"/><path d="M7 9V6a3 3 0 016 0v3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/></svg></span>
-                  <input type="password" id="reg-password" placeholder=" " required />
+                  <input type={show1 ? 'text' : 'password'} id="reg-password" placeholder=" " required value={f.pw} onChange={set('pw')} />
                   <label className="floating" htmlFor="reg-password">Kata Sandi (min. 8)</label>
-                  <button type="button" className="input-toggle-pw" aria-label="Tampilkan kata sandi" data-target="reg-password">
-                    <svg viewBox="0 0 20 20" fill="none"><path d="M2 10s3-6 8-6 8 6 8 6-3 6-8 6-8-6-8-6z" stroke="currentColor" strokeWidth="1.4"/><circle cx="10" cy="10" r="2.5" stroke="currentColor" strokeWidth="1.4"/></svg>
-                  </button>
+                  <button type="button" className="input-toggle-pw" aria-label="Tampilkan" onClick={() => setShow1((v) => !v)}>👁</button>
                 </div>
-                <div className="pw-strength" id="pw-strength"><div className="pw-bar"><span id="pw-bar-fill"></span></div><span id="pw-strength-label">Masukkan kata sandi</span></div>
+                <div className="pw-strength"><span id="pw-bar-fill" className={bar} style={{ width: f.pw ? (score / 4) * 100 + '%' : '0' }}></span></div>
+                <span id="pw-strength-label">{label}</span>
               </div>
               <div className="form-group">
                 <div className="input-wrap float-wrap">
-                  <span className="input-icon"><svg viewBox="0 0 20 20" fill="none"><rect x="3" y="9" width="14" height="9" rx="2" stroke="currentColor" strokeWidth="1.4"/><path d="M7 9V6a3 3 0 016 0v3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/></svg></span>
-                  <input type="password" id="reg-confirm" placeholder=" " required />
+                  <input type={show2 ? 'text' : 'password'} id="reg-confirm" placeholder=" " required value={f.confirm} onChange={set('confirm')} />
                   <label className="floating" htmlFor="reg-confirm">Konfirmasi Kata Sandi</label>
-                  <button type="button" className="input-toggle-pw" aria-label="Tampilkan kata sandi" data-target="reg-confirm">
-                    <svg viewBox="0 0 20 20" fill="none"><path d="M2 10s3-6 8-6 8 6 8 6-3 6-8 6-8-6-8-6z" stroke="currentColor" strokeWidth="1.4"/><circle cx="10" cy="10" r="2.5" stroke="currentColor" strokeWidth="1.4"/></svg>
-                  </button>
+                  <button type="button" className="input-toggle-pw" aria-label="Tampilkan" onClick={() => setShow2((v) => !v)}>👁</button>
                 </div>
               </div>
               <div className="form-checkbox-row">
                 <label className="checkbox-label">
-                  <input type="checkbox" id="reg-terms" required />
+                  <input type="checkbox" id="reg-terms" required checked={f.terms} onChange={set('terms')} />
                   <span className="checkbox-custom"></span>
-                  <span>Saya setuju dengan <a href="/syarat" className="auth-link">Syarat & Ketentuan</a> dan <a href="/privasi" className="auth-link">Kebijakan Privasi</a></span>
+                  <span>Saya setuju dengan <Link to="/syarat" className="auth-link">Syarat</Link> &amp; <Link to="/privasi" className="auth-link">Privasi</Link></span>
                 </label>
               </div>
-              <button type="submit" className="btn-auth" id="register-btn">
-                <span className="btn-text">Buat Akun</span>
-                <span className="btn-loader hidden"></span>
+              <button type="submit" className="btn-auth" id="register-btn" disabled={loading}>
+                <span className="btn-text">{loading ? 'Membuat akun...' : 'Buat Akun'}</span>
+                <span className={`btn-loader${loading ? '' : ' hidden'}`}></span>
               </button>
             </form>
           </div>
         </div>
-                
       </div>
     </div>
-
-</div>{/*/auth-pages*/}
+</div>
     </>
   );
 }

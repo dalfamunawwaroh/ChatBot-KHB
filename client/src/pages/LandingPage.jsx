@@ -1,4 +1,6 @@
+import { Link, useNavigate } from 'react-router-dom';
 export default function LandingPage() {
+  const navigate = useNavigate();
   return (
     <>
 <div className="landing-page" id="landing-page">
@@ -26,8 +28,8 @@ export default function LandingPage() {
           <a href="#faq" className="lp-nav-link">FAQ</a>
         </div>
         <div className="lp-nav-actions">
-          <button className="lp-btn-ghost" id="lp-login-btn">Masuk</button>
-          <button className="lp-btn-primary" id="lp-register-btn">
+          <button onClick={() => navigate('/login')} className="lp-btn-ghost" id="lp-login-btn">Masuk</button>
+          <button onClick={() => navigate('/register')} className="lp-btn-primary" id="lp-register-btn">
             Daftar Gratis
             <svg viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
           </button>
@@ -43,8 +45,8 @@ export default function LandingPage() {
         
         <a href="#faq" className="lp-mobile-link">FAQ</a>
         <div className="lp-mobile-actions">
-          <button className="lp-btn-ghost lp-btn-full" id="lp-login-btn-m">Masuk</button>
-          <button className="lp-btn-primary lp-btn-full" id="lp-register-btn-m">Daftar Gratis</button>
+          <button onClick={() => navigate('/login')} className="lp-btn-ghost lp-btn-full" id="lp-login-btn-m">Masuk</button>
+          <button onClick={() => navigate('/register')} className="lp-btn-primary lp-btn-full" id="lp-register-btn-m">Daftar Gratis</button>
         </div>
       </div>
     </nav>
@@ -74,11 +76,11 @@ export default function LandingPage() {
             Asisten cerdas berbasis knowledge base resmi BPJPH. Tanya apa saja seputar halal dan dapatkan jawaban akurat secara instan — gratis untuk semua UMKM.
           </p>
           <div className="lp-hero-cta">
-            <button className="lp-btn-hero-primary lp-btn-glow" id="lp-hero-cta-main">
+            <button onClick={() => navigate('/register')} className="lp-btn-hero-primary lp-btn-glow" id="lp-hero-cta-main">
               <svg viewBox="0 0 20 20" fill="none"><path d="M3 4h14a1 1 0 011 1v8a1 1 0 01-1 1H6l-4 3V5a1 1 0 011-1z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round"/></svg>
               Mulai Chat Sekarang — Gratis
             </button>
-            <button className="lp-btn-hero-secondary" id="lp-hero-cta-demo">
+            <button onClick={() => navigate('/widget')} className="lp-btn-hero-secondary" id="lp-hero-cta-demo">
               <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="currentColor" strokeWidth="1.5"/><path d="M8 7.5l5 2.5-5 2.5V7.5z" fill="currentColor"/></svg>
               Lihat Demo
             </button>
@@ -352,7 +354,7 @@ export default function LandingPage() {
               </div>
               <h3>Masih ada pertanyaan?</h3>
               <p>Tanyakan langsung ke asisten AI kami — tersedia 24/7 untuk membantu Anda.</p>
-              <button className="lp-btn-primary lp-btn-full" id="lp-faq-chat-btn">Tanya Asisten AI Sekarang</button>
+              <button onClick={() => navigate('/widget')} className="lp-btn-primary lp-btn-full" id="lp-faq-chat-btn">Tanya Asisten AI Sekarang</button>
             </div>
           </div>
         </div>
@@ -371,11 +373,11 @@ export default function LandingPage() {
           <h2 className="lp-cta-title">Siap memulai perjalanan halal Anda?</h2>
           <p className="lp-cta-desc">Bergabung dengan 847+ pelaku UMKM yang sudah terbantu. Gratis, mudah, dan terpercaya.</p>
           <div className="lp-cta-actions">
-            <button className="lp-btn-cta-primary lp-btn-glow-cta" id="lp-cta-register">
+            <button onClick={() => navigate('/register')} className="lp-btn-cta-primary lp-btn-glow-cta" id="lp-cta-register">
               Daftar Gratis Sekarang
               <svg viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
             </button>
-            <button className="lp-btn-cta-secondary" id="lp-cta-login">Sudah punya akun? Masuk</button>
+            <button onClick={() => navigate('/login')} className="lp-btn-cta-secondary" id="lp-cta-login">Sudah punya akun? Masuk</button>
           </div>
           <div className="lp-cta-trust">
             <span>✦ Gratis selamanya untuk UMKM</span>
@@ -405,8 +407,8 @@ export default function LandingPage() {
             <h4>Platform</h4>
             <a href="#fitur">Fitur</a>
             <a href="#cara-kerja">Cara Kerja</a>
-            <a href="#" id="lp-footer-login">Masuk</a>
-            <a href="#" id="lp-footer-register">Daftar</a>
+            <a href="#" id="lp-footer-login" onClick={(e) => { e.preventDefault(); navigate('/login'); }}>Masuk</a>
+            <a href="#" id="lp-footer-register" onClick={(e) => { e.preventDefault(); navigate('/register'); }}>Daftar</a>
           </div>
           <div className="lp-footer-col">
             <h4>Sumber Halal</h4>

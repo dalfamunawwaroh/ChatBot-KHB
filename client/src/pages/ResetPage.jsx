@@ -1,10 +1,70 @@
+import { useEffect, useRef, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useToast } from '../components/Toast.jsx';
+
 export default function ResetPage() {
+  const navigate = useNavigate();
+  const notify = useToast();
+  const [email, setEmail] = useState('');
+  const [digits, setDigits] = useState(['', '', '', '', '', '']);
+  const [verified, setVerified] = useState(false);
+  const [pw, setPw] = useState('');
+  const [confirm, setConfirm] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [sec, setSec] = useState(60);
+  const boxes = useRef([]);
+
+  useEffect(() => {
+    let em = '';
+    try { em = sessionStorage.getItem('khb_reset_email') || ''; } catch {}
+    if (!em) { notify('Isi email dulu di halaman lupa kata sandi'); navigate('/forgot'); return; }
+    setEmail(em);
+    boxes.current[0]?.focus();
+  }, []);
+
+  useEffect(() => {
+    if (sec <= 0) return;
+    const t = setTimeout(() => setSec((s) => s - 1), 1000);
+    return () => clearTimeout(t);
+  }, [sec]);
+
+  const setDigit = (i, v) => {
+    v = v.replace(/\D/g, '').slice(0, 1);
+    const nd = [...digits]; nd[i] = v; setDigits(nd);
+    if (v && i < 5) boxes.current[i + 1]?.focus();
+  };
+
+  const verify = (e) => {
+    e.preventDefault();
+    if (digits.join('').length < 6) { notify('Lengkapi 6 digit OTP'); return; }
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      try { sessionStorage.setItem('khb_otp_ok', '1'); } catch {}
+      setVerified(true);
+      notify('OTP benar — buat kata sandi baru');
+    }, 700);
+  };
+
+  const reset = (e) => {
+    e.preventDefault();
+    if (!pw || pw.length < 8) { notify('Kata sandi minimal 8 karakter'); return; }
+    if (pw !== confirm) { notify('Kata sandi tidak cocok'); return; }
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      try { sessionStorage.removeItem('khb_otp_ok'); sessionStorage.removeItem('khb_reset_email'); } catch {}
+      notify('Kata sandi berhasil direset!');
+      navigate('/login');
+    }, 700);
+  };
+
   return (
     <>
 <div className="auth-pages" id="auth-pages">
 <div className="auth-page active" id="page-reset">
       <div className="auth-split">
-<div className="auth-brand-panel">
+        <div className="auth-brand-panel">
           <span className="blob auth-blob-1"></span>
           <span className="blob auth-blob-2"></span>
           <div className="auth-brand-inner">
@@ -22,100 +82,82 @@ export default function ResetPage() {
             </div>
             <h2 className="auth-panel-tagline">Satu langkah lagi kembali masuk.</h2>
             <p className="auth-panel-desc">Verifikasi OTP, lalu buat kata sandi baru yang kuat.</p>
-            <div className="auth-hero-card">
-              <div className="kicker">KENAPA KHB?</div>
-              <h3>Jawaban halal akurat dalam &lt; 2 detik</h3>
-              <p>Berbasis 38 dokumen resmi BPJPH — bukan tebakan AI generik.</p>
-              <span className="proof"><span className="avatars"><span style={{background:'#86efac',color:'#15803d'}}>RA</span><span style={{background:'#93c5fd',color:'#1d4ed8'}}>DP</span><span style={{background:'#fca5a5',color:'#dc2626'}}>SW</span></span>847+ UMKM terbantu</span>
-            </div>
-            <div className="auth-trust">
-              <span>✦ Gratis selamanya</span><span>✦ Data terenkripsi</span><span>✦ Rujukan BPJPH</span>
-            </div>
-            <div className="auth-mini-chat" aria-hidden="true" style={{marginTop:'18px'}}>
-              <div className="mrow"><span className="mava">✦</span><span className="mbub">Syarat self declare untuk keripik pisang apa saja?</span></div>
-              <div className="mrow user"><span className="mbub">NIB + daftar bahan + alur produksi ✅</span></div>
-            </div>
           </div>
         </div>
         <div className="auth-form-panel">
           <div className="auth-form-inner">
             <div className="auth-form-header">
-              <a href="/" className="auth-back-link back-home">
-                <svg viewBox="0 0 20 20" fill="none"><path d="M13 5l-5 5 5 5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                Beranda
-              </a>
+              <Link to="/" className="auth-back-link back-home">Beranda</Link>
               <div><span className="auth-badge"><i></i>KATA SANDI BARU</span></div>
               <h1>Reset Kata Sandi</h1>
-              <p id="reset-sub">Masukkan 6 digit kode OTP yang dikirim ke email Anda.</p>
+              <p>{verified ? 'OTP terverifikasi. Buat kata sandi baru Anda.' : 'Masukkan 6 digit kode OTP yang dikirim ke email Anda.'}</p>
             </div>
             <div className="stepper-mini">
-              <span className="step-mini on" id="st-otp"><i>1</i>OTP</span>
+              <span className={`step-mini${verified ? '' : ' on'}`}><i>{verified ? '✓' : '1'}</i>OTP</span>
               <span className="step-mini-bar"></span>
-              <span className="step-mini" id="st-pw"><i>2</i>Sandi baru</span>
+              <span className={`step-mini${verified ? ' on' : ''}`}><i>{verified ? '✓' : '2'}</i>Sandi baru</span>
             </div>
-            {/*STEP 1: OTP*/}
-            <form className="auth-form" id="otp-form" noValidate>
+            {!verified ? (
+            <form className="auth-form" id="otp-form" noValidate onSubmit={verify}>
               <div className="form-group">
                 <label>Kode OTP</label>
                 <div className="otp-row" id="otp-row">
-                  <input className="otp-box" inputmode="numeric" maxLength="1" aria-label="Digit 1" />
-                  <input className="otp-box" inputmode="numeric" maxLength="1" aria-label="Digit 2" />
-                  <input className="otp-box" inputmode="numeric" maxLength="1" aria-label="Digit 3" />
-                  <input className="otp-box" inputmode="numeric" maxLength="1" aria-label="Digit 4" />
-                  <input className="otp-box" inputmode="numeric" maxLength="1" aria-label="Digit 5" />
-                  <input className="otp-box" inputmode="numeric" maxLength="1" aria-label="Digit 6" />
+                  {digits.map((d, i) => (
+                    <input key={i} ref={(el) => (boxes.current[i] = el)} className={`otp-box${d ? ' filled' : ''}`}
+                      inputMode="numeric" maxLength="1" aria-label={'Digit ' + (i + 1)} value={d}
+                      onChange={(e) => setDigit(i, e.target.value)}
+                      onKeyDown={(e) => { if (e.key === 'Backspace' && !digits[i] && i > 0) boxes.current[i - 1]?.focus(); }}
+                      onPaste={(e) => {
+                        const t = (e.clipboardData.getData('text') || '').replace(/\D/g, '').slice(0, 6);
+                        if (!t) return;
+                        e.preventDefault();
+                        const nd = [...digits];
+                        t.split('').forEach((ch, j) => { nd[j] = ch; });
+                        setDigits(nd);
+                        boxes.current[Math.min(t.length, 5)]?.focus();
+                      }} />
+                  ))}
                 </div>
                 <div className="otp-meta">
-                  <span id="otp-target">Dikirim ke email Anda</span>
-                  <button type="button" className="otp-resend" id="otp-resend" disabled>Kirim ulang (<span id="otp-timer">60</span>d)</button>
+                  <span>Dikirim ke {email || 'email Anda'}</span>
+                  <button type="button" className="otp-resend" disabled={sec > 0} onClick={() => { notify('Kode OTP baru dikirim'); setSec(60); }}>
+                    {sec > 0 ? 'Kirim ulang (' + sec + 'd)' : 'Kirim ulang kode'}
+                  </button>
                 </div>
               </div>
-              <button type="submit" className="btn-auth">
-                <span className="btn-text">Verifikasi OTP</span>
-                <span className="btn-loader hidden"></span>
+              <button type="submit" className="btn-auth" disabled={loading}>
+                <span className="btn-text">{loading ? 'Memeriksa...' : 'Verifikasi OTP'}</span>
+                <span className={`btn-loader${loading ? '' : ' hidden'}`}></span>
               </button>
             </form>
-            {/*STEP 2: PASSWORD (hidden)*/}
-            <form className="auth-form hidden" id="reset-form" noValidate>
+            ) : (
+            <form className="auth-form" id="reset-form" noValidate onSubmit={reset}>
               <div className="form-group">
-                
                 <div className="input-wrap float-wrap">
-                  <span className="input-icon"><svg viewBox="0 0 20 20" fill="none"><rect x="3" y="9" width="14" height="9" rx="2" stroke="currentColor" strokeWidth="1.4"/><path d="M7 9V6a3 3 0 016 0v3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/></svg></span>
-                  <input type="password" id="reset-password" placeholder=" " required aria-label="Kata Sandi Baru" />
+                  <input type="password" id="reset-password" placeholder=" " required aria-label="Kata Sandi Baru" value={pw} onChange={(e) => setPw(e.target.value)} />
                   <label className="floating" htmlFor="reset-password">Kata Sandi Baru (min. 8)</label>
-                  <button type="button" className="input-toggle-pw" data-target="reset-password" aria-label="Tampilkan">
-                    <svg viewBox="0 0 20 20" fill="none"><path d="M2 10s3-6 8-6 8 6 8 6-3 6-8 6-8-6-8-6z" stroke="currentColor" strokeWidth="1.4"/><circle cx="10" cy="10" r="2.5" stroke="currentColor" strokeWidth="1.4"/></svg>
-                  </button>
                 </div>
               </div>
               <div className="form-group">
-                
                 <div className="input-wrap float-wrap">
-                  <span className="input-icon"><svg viewBox="0 0 20 20" fill="none"><rect x="3" y="9" width="14" height="9" rx="2" stroke="currentColor" strokeWidth="1.4"/><path d="M7 9V6a3 3 0 016 0v3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/></svg></span>
-                  <input type="password" id="reset-confirm" placeholder=" " required aria-label="Konfirmasi Kata Sandi" />
+                  <input type="password" id="reset-confirm" placeholder=" " required aria-label="Konfirmasi Kata Sandi" value={confirm} onChange={(e) => setConfirm(e.target.value)} />
                   <label className="floating" htmlFor="reset-confirm">Konfirmasi Kata Sandi</label>
-                  <button type="button" className="input-toggle-pw" data-target="reset-confirm" aria-label="Tampilkan">
-                    <svg viewBox="0 0 20 20" fill="none"><path d="M2 10s3-6 8-6 8 6 8 6-3 6-8 6-8-6-8-6z" stroke="currentColor" strokeWidth="1.4"/><circle cx="10" cy="10" r="2.5" stroke="currentColor" strokeWidth="1.4"/></svg>
-                  </button>
                 </div>
               </div>
-              <button type="submit" className="btn-auth">
-                <span className="btn-text">Simpan Kata Sandi Baru</span>
-                <span className="btn-loader hidden"></span>
+              <button type="submit" className="btn-auth" disabled={loading}>
+                <span className="btn-text">{loading ? 'Menyimpan...' : 'Simpan Kata Sandi Baru'}</span>
+                <span className={`btn-loader${loading ? '' : ' hidden'}`}></span>
               </button>
             </form>
+            )}
             <div className="auth-card-footer" style={{marginTop:'18px'}}>
-              <a href="/login" className="auth-back-link">
-                <svg viewBox="0 0 20 20" fill="none"><path d="M13 5l-5 5 5 5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                Kembali masuk
-              </a>
+              <Link to="/login" className="auth-back-link">Kembali masuk</Link>
             </div>
           </div>
         </div>
-                
-        </div>
       </div>
     </div>
+</div>
     </>
   );
 }
