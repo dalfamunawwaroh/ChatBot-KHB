@@ -46,20 +46,13 @@ Di Windows cukup klik `start-khb.bat`.
 | `/knowledge-base` | Dokumen rujukan (6 dokumen contoh) |
 | `/knowledge` | Flow builder (kanvas node + editor) · `/flows` dialihkan ke sini |
 | `/customers` | Data pelanggan/UMKM |
-| `/team` · `/team/new` · `/team/:id/edit` · `/team/register-admin` | Tim & peran |
-| `/audit` | Audit log aktivitas |
-| `/embed` | Embed & widget: snippet, opsi, pratinjau |
 | `/integrasi` | Integrasi web (versi lama, tetap tersedia) |
 | `/history` | Riwayat percakapan |
-| `/notifications` | Notifikasi |
-| `/settings` · `/edit-profile` | Pengaturan & profil |
+| `/notifications` | Notifikasi (dibuka dari lonceng di topbar) |
+| `/settings` · `/edit-profile` | Pengaturan & profil (dibuka dari dropdown avatar) |
 
-### Customer service (`CsLayout`)
-| Rute | Halaman |
-| --- | --- |
-| `/cs/queue` | Antrean AI (tinjau jawaban keyakinan rendah) |
-| `/cs/inbox` | Inbox agen: daftar percakapan + panel balasan |
-| `/cs/analytics` | Analitik layanan: volume harian, topik, catatan kualitas |
+Aplikasi ini hanya punya satu peran: admin. Halaman tim (`/team`), CS (`/cs/*`), jejak audit (`/audit`), dan embed admin
+(`/embed`) sudah dihapus — rute lamanya dialihkan ke `/dashboard`.
 
 Rute tidak dikenal → halaman 404.
 

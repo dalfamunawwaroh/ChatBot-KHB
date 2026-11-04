@@ -8,8 +8,6 @@ const resolveLabel = (key: string): string => {
   if (labels[key]) return labels[key];
   if (key.startsWith('channels/')) return 'Edit Kanal';
   if (key.startsWith('products/')) return 'Edit Produk';
-  if (key.startsWith('team/')) return 'Edit Anggota';
-  if (key.startsWith('cs/')) return 'Customer Service';
   return 'Ringkasan';
 };
 
@@ -39,9 +37,11 @@ const MENU: MenuItem[] = [
 
 interface TopbarProps {
   onMenu?: () => void;
+  onToggleSidebar?: () => void;
+  sidebarCollapsed?: boolean;
 }
 
-export default function Topbar({ onMenu }: TopbarProps) {
+export default function Topbar({ onMenu, onToggleSidebar, sidebarCollapsed = false }: TopbarProps) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const title = resolveLabel(pathKey(pathname));
@@ -68,6 +68,21 @@ export default function Topbar({ onMenu }: TopbarProps) {
     <header className="topbar">
       <button className="mobile-menu icon-btn" onClick={onMenu} aria-label="Buka menu">
         <svg viewBox="0 0 20 20" fill="none"><path d="M3 6h14M3 10h14M3 14h14" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" /></svg>
+      </button>
+      <button
+        className="icon-btn sidebar-collapse-btn"
+        onClick={onToggleSidebar}
+        aria-label={sidebarCollapsed ? 'Buka sidebar' : 'Tutup sidebar'}
+        aria-expanded={!sidebarCollapsed}
+        title={sidebarCollapsed ? 'Buka sidebar' : 'Tutup sidebar'}
+      >
+        <svg viewBox="0 0 20 20" fill="none">
+          <rect x="2.5" y="3.5" width="15" height="13" rx="2" stroke="currentColor" strokeWidth="1.5" />
+          <path d="M7.5 3.5v13" stroke="currentColor" strokeWidth="1.5" />
+          {sidebarCollapsed
+            ? <path d="M11 8l2 2-2 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            : <path d="M13 8l-2 2 2 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />}
+        </svg>
       </button>
       <div className="breadcrumb">
         <span>Workspace</span>

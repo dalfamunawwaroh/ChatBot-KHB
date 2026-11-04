@@ -6,7 +6,7 @@ const QUICK_LINKS = [
   { to: '/channels', title: 'Hubungkan kanal', desc: 'WhatsApp, Instagram, atau widget website.', icon: Icon.link, tone: 'blue' },
   { to: '/knowledge-base', title: 'Tambah dokumen', desc: 'Regulasi BPJPH dan panduan internal KHB.', icon: Icon.doc, tone: '' },
   { to: '/khb-bandung', title: 'Chat edukasi publik', desc: 'Halaman chat siap dipasang di landing page.', icon: Icon.chat, tone: 'amber' },
-  { to: '/cs/inbox', title: 'Buka inbox agen', desc: 'Balas percakapan yang dieskalasi asisten.', icon: Icon.user, tone: 'violet' },
+  { to: '/history', title: 'Lihat riwayat percakapan', desc: 'Telusuri pertanyaan UMKM dan sumber jawabannya.', icon: Icon.user, tone: 'violet' },
 ];
 
 export default function GettingStartedPage() {

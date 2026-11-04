@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 
 interface NavItem {
   to: string;
@@ -33,8 +33,6 @@ const GROUPS: NavGroup[] = [
     label: 'WORKSPACE',
     items: [
       { to: '/customers', label: 'Pelanggan', icon: <><circle cx="8" cy="7" r="2.8" stroke="currentColor" strokeWidth="1.5" /><path d="M2 17c0-3 2.7-5 6-5s6 2 6 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /><path d="M14 5.2A2.8 2.8 0 0114 10.6M16 17c0-2.2-1-3.8-2.6-4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></> },
-      { to: '/team', label: 'Pengguna', icon: <><circle cx="10" cy="7" r="3" stroke="currentColor" strokeWidth="1.5" /><path d="M3 17c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></> },
-      { to: '/audit', label: 'Jejak Audit', icon: <><rect x="3" y="3" width="14" height="14" rx="2" stroke="currentColor" strokeWidth="1.5" /><path d="M6.5 8h7M6.5 11h5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" /></> },
       { to: '/getting-started', label: 'Panduan Mulai', icon: <path d="M10 2l2.4 5.2 5.6.6-4.2 3.8 1.2 5.6L10 14.4 5 17.2l1.2-5.6L2 7.8l5.6-.6L10 2z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" /> },
     ],
   },
@@ -47,19 +45,15 @@ const GROUPS: NavGroup[] = [
   },
 ];
 
-const LogoutIcon = () => (
-  <svg viewBox="0 0 20 20" fill="none"><path d="M8 3H4a1 1 0 00-1 1v12a1 1 0 001 1h4M13 14l4-4-4-4M17 10H7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>
-);
-
 interface SidebarProps {
   open?: boolean;
+  collapsed?: boolean;
   onClose?: () => void;
 }
 
-export default function Sidebar({ open = false, onClose }: SidebarProps) {
-  const navigate = useNavigate();
+export default function Sidebar({ open = false, collapsed = false, onClose }: SidebarProps) {
   return (
-    <aside className={'sidebar' + (open ? ' open' : '')} id="sidebar">
+    <aside className={'sidebar' + (open ? ' open' : '') + (collapsed ? ' collapsed' : '')} id="sidebar">
       <NavLink className="brand" to="/dashboard" aria-label="KHB Beranda">
         <div className="brand-mark">
           <svg viewBox="0 0 44 44" fill="none" aria-hidden="true">
@@ -78,7 +72,13 @@ export default function Sidebar({ open = false, onClose }: SidebarProps) {
           <div className="nav-group" key={group.label}>
             <div className="sidebar-section-label">{group.label}</div>
             {group.items.map((item) => (
-              <NavLink key={item.to} to={item.to} className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')}>
+              <NavLink
+                key={item.to}
+                to={item.to}
+                onClick={onClose}
+                title={item.label}
+                className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')}
+              >
                 <span className="nav-icon">
                   <svg viewBox="0 0 20 20" fill="none">{item.icon}</svg>
                 </span>
@@ -90,19 +90,6 @@ export default function Sidebar({ open = false, onClose }: SidebarProps) {
         ))}
       </nav>
 
-      <div className="sidebar-spacer"></div>
-
-      <NavLink className="profile" to="/edit-profile" id="profile-trigger">
-        <div className="avatar avatar-admin" id="sidebar-avatar">A</div>
-        <div className="profile-info">
-          <strong id="sidebar-name">Admin KHB</strong>
-          <small id="sidebar-role">Administrator</small>
-        </div>
-      </NavLink>
-      <button className="logout-btn" onClick={() => { onClose?.(); navigate('/login'); }} aria-label="Keluar">
-        <LogoutIcon />
-        <span>Keluar</span>
-      </button>
     </aside>
   );
 }

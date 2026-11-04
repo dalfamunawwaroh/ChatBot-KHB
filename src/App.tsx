@@ -25,22 +25,14 @@ import ProductFormPage from './pages/ProductFormPage';
 import KnowledgePage from './pages/KnowledgePage';
 import KnowledgeBuilderPage from './pages/KnowledgeBuilderPage';
 import CustomersPage from './pages/CustomersPage';
-import TeamListPage from './pages/TeamListPage';
-import MemberFormPage from './pages/MemberFormPage';
-import RegisterAdminPage from './pages/RegisterAdminPage';
-import AuditPage from './pages/AuditPage';
 import HistoryPage from './pages/HistoryPage';
 import NotificationsPage from './pages/NotificationsPage';
 import SettingsPage from './pages/SettingsPage';
 import EditProfilePage from './pages/EditProfilePage';
 import IntegrasiPage from './pages/IntegrasiPage';
 
-import CsQueuePage from './pages/CsQueuePage';
-import CsInboxPage from './pages/CsInboxPage';
-import CsAnalyticsPage from './pages/CsAnalyticsPage';
 
 import AppLayout from './components/AppLayout';
-import CsLayout from './components/CsLayout';
 
 export default function App() {
   return (
@@ -79,13 +71,6 @@ export default function App() {
         <Route path="/flows" element={<Navigate to="/knowledge" replace />} />
 
         <Route path="/customers" element={<CustomersPage />} />
-
-        <Route path="/team" element={<TeamListPage />} />
-        <Route path="/team/new" element={<MemberFormPage />} />
-        <Route path="/team/register-admin" element={<RegisterAdminPage />} />
-        <Route path="/team/:memberId/edit" element={<MemberFormPage />} />
-
-        <Route path="/audit" element={<AuditPage />} />
         <Route path="/integrasi" element={<IntegrasiPage />} />
         <Route path="/history" element={<HistoryPage />} />
         <Route path="/notifications" element={<NotificationsPage />} />
@@ -93,14 +78,12 @@ export default function App() {
         <Route path="/edit-profile" element={<EditProfilePage />} />
       </Route>
 
-      {/* Customer service */}
-      <Route path="/cs" element={<CsLayout />}>
-        <Route index element={<Navigate to="/cs/queue" replace />} />
-        <Route path="queue" element={<CsQueuePage />} />
-        <Route path="inbox" element={<CsInboxPage />} />
-        <Route path="analytics" element={<CsAnalyticsPage />} />
-      </Route>
-
+      {/* Halaman CS, pengguna, dan embed admin sudah dihapus */}
+      <Route path="/cs/*" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/cs" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/team/*" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/team" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/audit" element={<Navigate to="/dashboard" replace />} />
       {/* Halaman admin embed sudah dihapus; /embed dialihkan ke dashboard */}
       <Route path="/embed" element={<Navigate to="/dashboard" replace />} />
 
