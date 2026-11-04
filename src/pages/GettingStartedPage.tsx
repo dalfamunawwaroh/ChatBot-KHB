@@ -5,7 +5,7 @@ import { onboardingSteps } from '../data/omni';
 const QUICK_LINKS = [
   { to: '/channels', title: 'Hubungkan kanal', desc: 'WhatsApp, Instagram, atau widget website.', icon: Icon.link, tone: 'blue' },
   { to: '/knowledge-base', title: 'Tambah dokumen', desc: 'Regulasi BPJPH dan panduan internal KHB.', icon: Icon.doc, tone: '' },
-  { to: '/embed', title: 'Pasang di website', desc: 'Salin snippet embed siap pakai.', icon: Icon.chat, tone: 'amber' },
+  { to: '/khb-bandung', title: 'Chat edukasi publik', desc: 'Halaman chat siap dipasang di landing page.', icon: Icon.chat, tone: 'amber' },
   { to: '/cs/inbox', title: 'Buka inbox agen', desc: 'Balas percakapan yang dieskalasi asisten.', icon: Icon.user, tone: 'violet' },
 ];
 
@@ -66,9 +66,9 @@ export default function GettingStartedPage() {
                 <span className="row-copy"><strong>Atur nada jawaban</strong><span>Bahasa, gaya jawaban, dan eskalasi</span></span>
                 <span className="row-meta">2 menit</span>
               </Link>
-              <Link className="flat-row" to="/embed" style={{ textDecoration: 'none' }}>
+              <Link className="flat-row" to="/khb-bandung" style={{ textDecoration: 'none' }}>
                 <span className="row-icon blue">{Icon.chat}</span>
-                <span className="row-copy"><strong>Uji coba widget</strong><span>Kirim pertanyaan contoh ke asisten</span></span>
+                <span className="row-copy"><strong>Uji coba chat publik</strong><span>Kirim pertanyaan contoh ke asisten</span></span>
                 <span className="row-meta">3 menit</span>
               </Link>
             </div>

@@ -104,7 +104,6 @@ export const labels: Record<string, string> = {
   'team/new': 'Tambah Anggota',
   'team/register-admin': 'Daftarkan Admin',
   audit: 'Jejak Audit',
-  embed: 'Embed Website',
   history: 'Riwayat Percakapan',
   notifications: 'Notifikasi',
   integrasi: 'Integrasi Web',

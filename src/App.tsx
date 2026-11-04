@@ -29,7 +29,6 @@ import TeamListPage from './pages/TeamListPage';
 import MemberFormPage from './pages/MemberFormPage';
 import RegisterAdminPage from './pages/RegisterAdminPage';
 import AuditPage from './pages/AuditPage';
-import EmbedPage from './pages/EmbedPage';
 import HistoryPage from './pages/HistoryPage';
 import NotificationsPage from './pages/NotificationsPage';
 import SettingsPage from './pages/SettingsPage';
@@ -87,7 +86,6 @@ export default function App() {
         <Route path="/team/:memberId/edit" element={<MemberFormPage />} />
 
         <Route path="/audit" element={<AuditPage />} />
-        <Route path="/embed" element={<EmbedPage />} />
         <Route path="/integrasi" element={<IntegrasiPage />} />
         <Route path="/history" element={<HistoryPage />} />
         <Route path="/notifications" element={<NotificationsPage />} />
@@ -102,6 +100,9 @@ export default function App() {
         <Route path="inbox" element={<CsInboxPage />} />
         <Route path="analytics" element={<CsAnalyticsPage />} />
       </Route>
+
+      {/* Halaman admin embed sudah dihapus; /embed dialihkan ke dashboard */}
+      <Route path="/embed" element={<Navigate to="/dashboard" replace />} />
 
       {/* Halaman publik per organisasi, mis. /khb-bandung */}
       <Route path="/:slug" element={<StoreChatPage />} />
