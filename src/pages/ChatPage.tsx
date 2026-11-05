@@ -142,15 +142,9 @@ export default function ChatPage() {
                         <span className="message-time" style={{ display: 'block', marginTop: 6 }}>
                           {SOURCE_LABEL[message.source]}
                           {message.source === 'general' ? ' (di luar dokumen KHB)' : ''}
-                          {typeof message.confidence === 'number' ? ` · keyakinan ${Math.round(message.confidence * 100)}%` : ''}
                         </span>
                       ) : null}
                     </div>
-                    {message.citations && message.citations.length > 0 ? (
-                      <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 6 }}>
-                        Sumber: {message.citations.join(' · ')}
-                      </div>
-                    ) : null}
                   </div>
                 </div>
               ) : (

@@ -150,7 +150,6 @@ export default function EmbedChatPage() {
               {message.source ? (
                 <span style={{ display: 'block', marginTop: 4, fontSize: 10.5, opacity: 0.7 }}>
                   {SOURCE_LABEL[message.source]}
-                  {message.citations && message.citations.length > 0 ? ` · ${message.citations.join('; ')}` : ''}
                 </span>
               ) : null}
             </div>

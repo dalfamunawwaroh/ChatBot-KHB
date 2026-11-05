@@ -201,7 +201,6 @@ export default function HistoryPage() {
                   {message.senderType === 'bot' ? (
                     <span style={{ display: 'block', marginTop: 6, fontSize: 11, opacity: 0.75 }}>
                       {SOURCE_LABEL[message.source]}
-                      {message.citations.length > 0 ? ` · ${message.citations.join('; ')}` : ''}
                     </span>
                   ) : null}
                 </div>

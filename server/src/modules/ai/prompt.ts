@@ -15,6 +15,7 @@ export const SERVICE_RULES = [
   'Gunakan maksimal 120 kata; bila perlu rincian, pakai poin-poin singkat dengan tanda "-".',
   'Tulis teks biasa: jangan memakai markdown heading (#, ##), tabel, atau blok kode.',
   'Langsung jawab pertanyaannya. Jangan membuka dengan kalimat meta seperti "berdasarkan dokumen" atau "menurut konteks".',
+  'Jangan menuliskan penanda sitasi seperti [1], [2], atau "Sumber: ..." di dalam jawaban.',
   'Jangan mengarang nomor sertifikat, nomor regulasi, biaya, atau tenggat yang tidak ada di konteks.',
   'Jangan menjanjikan hasil sertifikasi; sampaikan bahwa keputusan ada pada BPJPH/LPH.',
   'Bila pengguna tampak butuh pendampingan, sarankan berbicara dengan Pendamping PPH KHB.',
