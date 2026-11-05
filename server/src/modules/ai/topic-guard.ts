@@ -74,9 +74,13 @@ const FOLLOWUP_TERMS: RegExp[] = [
   /\bapa saja/i,
 ];
 
+/** Istilah koding/artefak teknis: langsung ditolak walau menyebut "halal". */
+const CODE_TERMS =
+  /\b(?:coding(?:an)?|koding(?:an)?|source ?code|snippet|script|html|css|javascript|typescript|jsx|tsx|python|react|node\.?js|php|sql|program komputer|aplikasi web|website|landing page)\b/i;
+
 /** Permintaan membuat artefak teknis/kreatif — di luar layanan asisten. */
 const GENERATION_REQUEST =
-  /\b(?:buatkan|buat|tulis(?:kan)?|generate|susun(?:kan)?)\b[^.\n]{0,40}\b(?:file|html|css|javascript|js|python|kode|script|program|aplikasi|website|landing page|resep|puisi|cerpen|surat|makalah|laporan|ppt|excel)\b/i;
+  /\b(?:buatkan|buat|bikin(?:in|kan)?|tulis(?:kan)?|generate|susun(?:kan)?|berikan|kasih|minta|carikan)\b[^.\n]{0,40}\b(?:file|coding(?:an)?|koding(?:an)?|kode|html|css|javascript|js|python|script|program|aplikasi|website|landing page|resep|puisi|cerpen|surat|makalah|laporan|ppt|excel)\b/i;
 
 /** Sapaan/penutup singkat yang wajar dijawab tanpa topik halal. */
 const SMALL_TALK =
@@ -108,6 +112,7 @@ export function classifyTopic(
   const text = question.trim();
   if (text.length === 0) return 'smalltalk';
   if (SMALL_TALK.test(text)) return 'smalltalk';
+  if (CODE_TERMS.test(text)) return 'offtopic';
   if (GENERATION_REQUEST.test(text)) return 'offtopic';
 
   // Sebut istilah halal secara eksplisit → tetap dilayani, walau menyebut
