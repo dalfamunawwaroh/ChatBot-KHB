@@ -16,7 +16,7 @@ cd server
 npm install
 cp .env.example .env        # isi DATABASE_URL + LLM_*
 npx prisma db push          # buat tabel di MySQL
-npm run db:seed             # data contoh KHB + 6 dokumen rujukan
+npm run db:seed             # data KHB + 8 dokumen rujukan (unggah ke KMS)
 npm run dev                 # http://localhost:4000
 ```
 
@@ -125,7 +125,7 @@ server/
 ├── prisma/
 │   ├── schema.prisma        # 10 model: workspace, settings, dokumen, produk, kanal,
 │   │                        # pelanggan, percakapan, pesan, node alur, notifikasi
-│   └── seed.ts              # data contoh + 6 dokumen rujukan halal
+│   └── seed.ts              # data KHB (profil/layanan dari halalbandung.com) + unggah 8 dokumen ke KMS
 └── src/
     ├── app.ts               # helmet, cors, rate limit, pemasangan router
     ├── server.ts            # listen + graceful shutdown
@@ -161,7 +161,10 @@ meneruskan pertanyaan lain ke pendamping.
   jaring pengaman bila RAG tidak tersedia.
 - Isi dokumen dikirim ke KMS sebagai teks `.txt`. Jangan memberi nama `.pdf` untuk
   konten teks — KMS akan mencoba ekstraksi PDF dan status indeksnya `failed`.
-- Dokumen contoh ditulis ringkas dari regulasi publik (UU 33/2014, PP 39/2021,
-  alur BPJPH) dan bukan pengganti dokumen resmi.
+- Dokumen seed ditulis dari informasi resmi https://halalbandung.com/ (profil, kontak,
+  jam layanan, layanan, alur 6 langkah) + regulasi publik (UU 33/2014, PP 39/2021,
+  alur BPJPH). Bukan pengganti dokumen resmi.
+- `npm run db:seed` membersihkan dokumen lama di knowledge base KHB dulu (kecuali
+  "Info Project" milik KMS) supaya tidak menumpuk saat seed diulang.
 - Belum ada autentikasi, belum ada unggah PDF (kirim teks hasil ekstraksi ke
   `POST /api/v1/knowledge`).

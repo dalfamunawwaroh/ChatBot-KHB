@@ -101,7 +101,7 @@ npm run api:install          # install dependensi backend
 mysql -u root -e "CREATE DATABASE IF NOT EXISTS khb_chatbot CHARACTER SET utf8mb4"
 cp server/.env.example server/.env   # isi DATABASE_URL + LLM_*
 npm run api:db:push          # buat tabel
-npm run api:db:seed          # 6 dokumen rujukan + data contoh
+npm run api:db:seed          # data KHB + 8 dokumen rujukan (unggah ke KMS)
 npm run api:dev              # http://localhost:4000
 ```
 
