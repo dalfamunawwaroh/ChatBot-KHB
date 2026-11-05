@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { api, SOURCE_LABEL, type ChatBoot, type ProductRow } from '../services/api';
 import { MarkdownText } from '../components/ui/MarkdownText';
+import { MicButton } from '../components/MicButton';
 
 interface ChatMessage {
   id: string;
@@ -206,6 +207,9 @@ export default function StoreChatPage() {
                   onChange={(event) => setInput(event.target.value)}
                   placeholder="Tulis pertanyaan seputar halal..."
                   aria-label="Tulis pertanyaan"
+                />
+                <MicButton
+                  onText={(text) => setInput((prev) => (prev.trim().length > 0 ? `${prev.trim()} ${text}` : text))}
                 />
                 <button className="btn btn-primary btn-sm" type="submit" disabled={sending}>Kirim</button>
               </form>

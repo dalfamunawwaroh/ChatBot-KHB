@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { api, SOURCE_LABEL, type ChatBoot } from '../services/api';
 import { useToast } from '../components/Toast';
 import { MarkdownText } from '../components/ui/MarkdownText';
+import { MicButton } from '../components/MicButton';
 
 interface ChatMessage {
   id: string;
@@ -192,6 +193,10 @@ export default function ChatPage() {
                   void send(draft);
                 }
               }}
+            />
+            <MicButton
+              onText={(text) => setDraft((prev) => (prev.trim().length > 0 ? `${prev.trim()} ${text}` : text))}
+              onError={(message) => notify(message, 3600)}
             />
             <button className="send-button" type="submit" aria-label="Kirim pesan" disabled={sending}>
               <svg viewBox="0 0 20 20" fill="none"><path d="M4 10l12-6-6 12V10H4z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round"/></svg>

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { api, SOURCE_LABEL } from '../services/api';
 import { MarkdownText } from '../components/ui/MarkdownText';
+import { MicButton } from '../components/MicButton';
 
 interface ChatMessage {
   id: string;
@@ -165,6 +166,9 @@ export default function EmbedChatPage() {
             onChange={(event) => setInput(event.target.value)}
             placeholder="Tulis pertanyaan..."
             aria-label="Tulis pertanyaan"
+          />
+          <MicButton
+            onText={(text) => setInput((prev) => (prev.trim().length > 0 ? `${prev.trim()} ${text}` : text))}
           />
           <button className="btn btn-primary btn-sm" type="submit" disabled={sending}>Kirim</button>
         </form>
