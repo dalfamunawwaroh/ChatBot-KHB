@@ -7,7 +7,7 @@ interface ChatMessage {
   id: string;
   role: 'user' | 'bot';
   text: string;
-  source?: 'rag' | 'general' | 'handoff';
+  source?: 'rag' | 'general' | 'handoff' | 'none';
   citations?: string[];
   confidence?: number;
 }
@@ -139,7 +139,7 @@ export default function ChatPage() {
                     <span className="sender-name">{boot?.assistant.name ?? 'Asisten Halal KHB'}</span>
                     <div className="message-bubble">
                       <MarkdownText text={message.text} />
-                      {message.source ? (
+                      {message.source && message.source !== 'none' ? (
                         <span className="message-time" style={{ display: 'block', marginTop: 6 }}>
                           {SOURCE_LABEL[message.source]}
                         </span>

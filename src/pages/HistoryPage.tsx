@@ -199,7 +199,7 @@ export default function HistoryPage() {
                   style={{ maxWidth: '86%', marginLeft: message.senderType === 'customer' ? 'auto' : 0 }}
                 >
                   <MarkdownText text={message.text} />
-                  {message.senderType === 'bot' ? (
+                  {message.senderType === 'bot' && message.source !== 'none' ? (
                     <span style={{ display: 'block', marginTop: 6, fontSize: 11, opacity: 0.75 }}>
                       {SOURCE_LABEL[message.source]}
                     </span>

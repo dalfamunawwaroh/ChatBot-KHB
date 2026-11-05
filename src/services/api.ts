@@ -257,7 +257,7 @@ export interface ChatAnswer {
   conversationId: string;
   sessionKey: string;
   answer: string;
-  source: 'rag' | 'general' | 'handoff';
+  source: 'rag' | 'general' | 'handoff' | 'none';
   grounded: boolean;
   citations: string[];
   confidence: number;

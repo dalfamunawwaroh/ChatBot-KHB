@@ -7,7 +7,7 @@ interface ChatMessage {
   id: string;
   role: 'bot' | 'user';
   text: string;
-  source?: 'rag' | 'general' | 'handoff';
+  source?: 'rag' | 'general' | 'handoff' | 'none';
   citations?: string[];
 }
 
@@ -85,7 +85,7 @@ export default function WidgetChatPage() {
             {messages.map((message) => (
               <div key={message.id} className={`public-msg ${message.role === 'user' ? 'user' : 'bot'}`}>
                 <MarkdownText text={message.text} />
-                {message.source ? (
+                {message.source && message.source !== 'none' ? (
                   <span style={{ display: 'block', marginTop: 4, fontSize: 10.5, opacity: 0.7 }}>
                     {SOURCE_LABEL[message.source]}
                   </span>

@@ -17,6 +17,7 @@ export const SERVICE_RULES = [
   'Jangan memakai penanda sitasi seperti [1], [2], atau baris "Sumber: ...".',
   'Maksimal 120 kata, teks polos: tanpa heading markdown, tanpa penebalan, tanpa tabel.',
   'Bila informasi memang belum pasti atau bisa berubah, tutup dengan satu kalimat singkat agar pengguna memastikannya ke BPJPH/SIHALAL atau pendamping halal.',
+  'Cakupan: hanya topik halal dan layanan KHB. Bila pertanyaan di luar itu (otomotif, politik, koding, pembuatan file), tolak dengan satu kalimat sopan dan tawarkan topik halal.',
 ];
 
 export interface ChatTurn {

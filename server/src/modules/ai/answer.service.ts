@@ -5,8 +5,9 @@ import { queryRag } from '../rag-kms/rag.service';
 import { GROUNDED_THRESHOLD, retrieveLocally, toCitations, type RetrievedChunk } from './retrieval';
 import { UNHELPFUL_ANSWER as UNHELPFUL, sanitizeAnswer } from './reply-style';
 import { researchWeb } from './web-research';
+import { classifyTopic, OFF_TOPIC_MESSAGE } from './topic-guard';
 
-export type AnswerSource = 'rag' | 'general' | 'handoff';
+export type AnswerSource = 'rag' | 'general' | 'handoff' | 'none';
 
 export interface AnswerSettings {
   assistantName: string;
@@ -43,7 +44,7 @@ export interface AnswerResult {
   /** Catatan tambahan untuk UI (mis. penanda "jawaban umum"). */
   note?: string;
   /** Jalur yang dipakai: 'remote-rag' | 'local-rag' | 'web' | 'general' | 'handoff'. */
-  route: 'remote-rag' | 'local-rag' | 'web' | 'general' | 'handoff';
+  route: 'remote-rag' | 'local-rag' | 'web' | 'general' | 'handoff' | 'guard';
 }
 
 const HANDOFF_MESSAGE =
@@ -131,6 +132,30 @@ async function answerFromModel(settings: AnswerSettings, question: string, histo
  */
 export async function answerQuestion(context: AnswerContext): Promise<AnswerResult> {
   const { settings, question, history, documents } = context;
+
+  // 0) Batas topik: asisten hanya melayani pertanyaan halal/KHB.
+  const verdict = classifyTopic(question, history);
+  if (verdict === 'offtopic') {
+    return {
+      answer: OFF_TOPIC_MESSAGE,
+      source: 'none',
+      grounded: false,
+      citations: [],
+      confidence: 0,
+      note: 'di luar topik halal',
+      route: 'guard',
+    };
+  }
+  if (verdict === 'smalltalk') {
+    return {
+      answer: `Wa'alaikumussalam. Saya ${settings.assistantName} — silakan tanya soal sertifikasi halal, self declare, bahan produk, atau syarat dokumen.`,
+      source: 'none',
+      grounded: false,
+      citations: [],
+      confidence: 0,
+      route: 'guard',
+    };
+  }
 
   // 1) RAG eksternal — dokumen dikelola lewat KMS.
   const remote = await queryRag({ workspaceId: context.workspaceId, question, history });
