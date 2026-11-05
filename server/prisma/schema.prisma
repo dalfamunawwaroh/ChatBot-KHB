@@ -92,6 +92,10 @@ model Workspace {
   slug      String   @unique @db.VarChar(80)
   city      String?  @db.VarChar(80)
   tagline   String?  @db.VarChar(200)
+  /// Knowledge base layanan RAG (https://rag.aiones.app) yang dibaca chatbot.
+  ragKnowledgeBaseId String? @map("rag_knowledge_base_id") @db.VarChar(100)
+  /// Project organisasi di KMS (https://ragkms.aiones.app) untuk unggah dokumen.
+  kmsOrganizationId  String? @map("kms_organization_id") @db.VarChar(60)
   createdAt DateTime @default(now()) @map("created_at") @db.DateTime(3)
   updatedAt DateTime @updatedAt @map("updated_at") @db.DateTime(3)
 

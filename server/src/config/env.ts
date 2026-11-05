@@ -32,6 +32,13 @@ const envSchema = z.object({
   /** Layanan KMS penyimpan dokumen (cadangan bila RAG chat belum siap). */
   RAG_API_URL: z.string().trim().transform((v) => v.replace(/\/+$/, '')).default(''),
   RAG_API_KEY: z.string().default(''),
+  /** Project organisasi KMS untuk workspace ini (diisi otomatis bila kosong). */
+  KMS_ORGANIZATION_ID: z.string().trim().default(''),
+  /** Kategori dokumen yang ditempel pada setiap unggahan ke KMS. */
+  KMS_DOCUMENT_CATEGORY: z.string().trim().min(1).default('Panduan Halal'),
+  /** Pemilik project KMS (agar project muncul di panel knowbase). */
+  KMS_OWNER_EMAIL: z.string().trim().default(''),
+  KMS_OWNER_NAME: z.string().trim().default(''),
 
   /**
    * LLM umum (OpenAI-compatible) untuk pertanyaan di luar dokumen RAG.

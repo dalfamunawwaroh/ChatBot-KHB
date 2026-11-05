@@ -6,6 +6,7 @@
  * menggantikan dokumen resmi. Jalankan: npm run db:seed
  */
 import { PrismaClient } from '@prisma/client';
+import { storeDocument } from '../src/modules/rag-kms/rag.service';
 
 const prisma = new PrismaClient();
 
@@ -115,6 +116,8 @@ async function main() {
       slug: WORKSPACE_SLUG,
       city: 'Bandung',
       tagline: 'Asisten edukasi halal untuk UMKM Bandung',
+      ragKnowledgeBaseId: process.env.RAG_CHAT_KNOWLEDGE_BASE_ID?.trim() || null,
+      kmsOrganizationId: process.env.KMS_ORGANIZATION_ID?.trim() || null,
       settings: {
         create: {
           assistantName: 'Asisten Halal KHB',
@@ -136,7 +139,7 @@ async function main() {
 
   console.log('◇ Menanam dokumen rujukan…');
   for (const doc of DOCUMENTS) {
-    await prisma.knowledgeDocument.create({
+    const created = await prisma.knowledgeDocument.create({
       data: {
         workspaceId: workspace.id,
         title: doc.title,
@@ -151,6 +154,32 @@ async function main() {
         indexedAt: new Date(),
       },
     });
+
+    // Unggah ke knowledge base (KMS → layanan RAG) agar chatbot menjawab dari RAG.
+    try {
+      const stored = await storeDocument({
+        workspaceId: workspace.id,
+        title: doc.title,
+        content: doc.content,
+        category: doc.category,
+        fileName: doc.fileName,
+      });
+      await prisma.knowledgeDocument.update({
+        where: { id: created.id },
+        data: {
+          ragDocumentId: stored.documentId,
+          status: stored.status === 'failed' ? 'failed' : 'indexed',
+          chunkCount: stored.chunks ?? created.chunkCount,
+          indexedAt: new Date(),
+        },
+      });
+      console.log(`   ↳ ${doc.title.slice(0, 42)}… → ${stored.backend}:${stored.documentId}`);
+    } catch (error) {
+      console.warn(
+        `   ! ${doc.title.slice(0, 42)}… gagal diunggah ke RAG/KMS:`,
+        error instanceof Error ? error.message : error,
+      );
+    }
   }
 
   console.log('◇ Menanam kanal…');

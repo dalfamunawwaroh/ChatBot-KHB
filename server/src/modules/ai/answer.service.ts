@@ -1,7 +1,7 @@
 import { logger } from '../../common/utils/logger';
 import { GENERAL_DISCLAIMER, buildGeneralPrompt, buildGroundedPrompt } from './prompt';
 import { askLlm, isLlmEnabled } from './llm.client';
-import { isRemoteRagEnabled, queryRemoteRag, ragKnowledgeBaseId } from './rag.client';
+import { queryRag } from '../rag-kms/rag.service';
 import { GROUNDED_THRESHOLD, retrieveLocally, toCitations, type RetrievedChunk } from './retrieval';
 import { sanitizeAnswer } from './reply-style';
 
@@ -26,6 +26,7 @@ export interface AnswerDocument {
 
 export interface AnswerContext {
   settings: AnswerSettings;
+  workspaceId: string;
   workspaceSlug: string;
   question: string;
   history: Array<{ role: 'user' | 'assistant'; content: string }>;
@@ -69,41 +70,20 @@ function extractiveAnswer(chunks: RetrievedChunk[]): string {
 export async function answerQuestion(context: AnswerContext): Promise<AnswerResult> {
   const { settings, question, history, documents, workspaceSlug } = context;
 
-  // 1) Layanan RAG eksternal.
-  if (isRemoteRagEnabled()) {
-    try {
-      const remote = await queryRemoteRag({
-        query: question,
-        knowledgeBaseId: ragKnowledgeBaseId(workspaceSlug),
-        history,
-      });
-      if (remote.grounded && remote.answer.length > 0) {
-        const citations = remote.sources
-          .map((source) =>
-            source.document_name
-              ? source.page != null
-                ? `${source.document_name} hlm. ${source.page}`
-                : source.document_name
-              : (source.document_id ?? ''),
-          )
-          .filter((label) => label.length > 0)
-          .slice(0, 4);
-        return {
-          answer: remote.answer,
-          source: 'rag',
-          grounded: true,
-          citations,
-          confidence: 0.9,
-          route: 'remote-rag',
-        };
-      }
-      logger.info({ question, grounded: remote.grounded }, 'RAG eksternal tidak menemukan jawaban — lanjut retrieval lokal');
-    } catch (error) {
-      logger.warn(
-        { err: error instanceof Error ? error.message : error },
-        'Layanan RAG eksternal gagal — memakai retrieval lokal',
-      );
-    }
+  // 1) Layanan RAG eksternal (rag.aiones.app) — dokumen dikelola lewat KMS.
+  const remote = await queryRag({ workspaceId: context.workspaceId, question, history });
+  if (remote && remote.grounded && remote.answer.length > 0) {
+    return {
+      answer: sanitizeAnswer(remote.answer),
+      source: 'rag',
+      grounded: true,
+      citations: remote.citations,
+      confidence: 0.9,
+      route: 'remote-rag',
+    };
+  }
+  if (remote && !remote.grounded) {
+    logger.info({ question }, 'RAG tidak menemukan jawaban di dokumen — lanjut retrieval lokal / jawaban umum');
   }
 
   // 2) Retrieval lokal.

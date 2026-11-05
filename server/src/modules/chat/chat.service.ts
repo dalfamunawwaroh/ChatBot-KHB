@@ -131,6 +131,7 @@ export async function sendMessage(input: SendMessageInput): Promise<SendMessageR
 
   const result = await answerQuestion({
     settings: workspace.settings,
+    workspaceId: workspace.id,
     workspaceSlug: workspace.slug,
     question,
     history,
