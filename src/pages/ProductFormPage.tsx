@@ -1,120 +1,203 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { PageHead, Panel, Field, Badge, Icon } from '../components/ui/PageKit';
-import { products } from '../data/omni';
+import { api, HALAL_LABEL } from '../services/api';
 import { useToast } from '../components/Toast';
+
+const CATEGORIES = ['Makanan Ringan', 'Minuman', 'Bumbu', 'Madu', 'Katering', 'Kosmetik', 'Lainnya'];
 
 export default function ProductFormPage() {
   const { productId } = useParams();
   const navigate = useNavigate();
   const notify = useToast();
-  const existing = products.find((item) => item.id === productId);
-  const isEdit = Boolean(existing);
+  const isEdit = Boolean(productId);
 
   const [form, setForm] = useState({
-    name: existing?.name || '',
-    sku: existing?.sku || '',
-    category: existing?.category || 'Makanan Ringan',
-    price: existing?.price || '',
-    halal: existing?.halal || 'Belum',
+    name: '',
+    sku: '',
+    category: 'Makanan Ringan',
+    price: '',
+    halal: 'none' as 'certified' | 'process' | 'none',
     description: '',
   });
+  const [loading, setLoading] = useState(isEdit);
+  const [saving, setSaving] = useState(false);
 
-  const submit = (event: React.FormEvent) => {
+  useEffect(() => {
+    if (!productId) return;
+    void (async () => {
+      try {
+        const { rows } = await api.products.list({ perPage: 100 });
+        const found = rows.find((row) => row.id === productId);
+        if (found) {
+          setForm({
+            name: found.name,
+            sku: found.sku ?? '',
+            category: found.category,
+            price: found.price ?? '',
+            halal: found.halal,
+            description: found.description ?? '',
+          });
+        }
+      } catch {
+        notify('Gagal memuat produk');
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [productId, notify]);
+
+  const submit = async (event: React.FormEvent) => {
     event.preventDefault();
-    notify(isEdit ? 'Produk diperbarui' : 'Produk ditambahkan');
-    navigate('/products');
+    setSaving(true);
+    try {
+      const payload = {
+        name: form.name.trim(),
+        sku: form.sku.trim() || undefined,
+        category: form.category,
+        price: form.price.trim() || undefined,
+        halal: form.halal,
+        description: form.description.trim() || undefined,
+      };
+      if (productId) {
+        await api.products.update(productId, payload);
+        notify('Produk diperbarui');
+      } else {
+        await api.products.create(payload);
+        notify('Produk ditambahkan');
+      }
+      navigate('/products');
+    } catch (error) {
+      notify(error instanceof Error ? error.message : 'Gagal menyimpan produk');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
     <section className="view active" id="view-product-form">
-      <PageHead
-        eyebrow="KATALOG UMKM"
-        title={isEdit ? 'Edit produk' : 'Tambah produk'}
-        subtitle="Data produk dipakai sebagai konteks jawaban asisten."
-      >
+      <div className="page-title-row">
+        <div>
+          <div className="eyebrow"><span className="eyebrow-dot"></span> KATALOG UMKM</div>
+          <h1>{isEdit ? 'Edit produk' : 'Tambah produk'}</h1>
+          <p className="subheading">Data produk dipakai sebagai konteks jawaban asisten.</p>
+        </div>
         <Link className="btn btn-secondary" to="/products">Kembali</Link>
-      </PageHead>
+      </div>
 
       <div className="grid-2-1">
-        <Panel title="Informasi produk" subtitle="Lengkapi data agar asisten bisa menjawab pertanyaan produk">
-          <form onSubmit={submit}>
-            <Field label="Nama produk">
-              <input
-                className="settings-input"
-                required
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                placeholder="Contoh: Kopi Arabika Preanger 200g"
-              />
-            </Field>
-
-            <div className="form-row-two">
-              <Field label="SKU">
-                <input className="settings-input" value={form.sku} onChange={(e) => setForm({ ...form, sku: e.target.value })} placeholder="KHB-KOP-01" />
-              </Field>
-              <Field label="Kategori">
-                <select className="settings-select" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}>
-                  <option>Makanan Ringan</option>
-                  <option>Minuman</option>
-                  <option>Bumbu</option>
-                  <option>Madu</option>
-                  <option>Katering</option>
-                </select>
-              </Field>
+        <div className="panel" style={{ padding: 22 }}>
+          <div className="panel-heading">
+            <div>
+              <h2>Informasi produk</h2>
+              <p>Lengkapi data agar asisten bisa menjawab pertanyaan produk</p>
             </div>
+          </div>
 
-            <div className="form-row-two">
-              <Field label="Harga">
-                <input className="settings-input" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} placeholder="Rp45.000" />
-              </Field>
-              <Field label="Status halal">
-                <select
-                  className="settings-select"
-                  value={form.halal}
-                  onChange={(e) => setForm({ ...form, halal: e.target.value as typeof form.halal })}
-                >
-                  <option>Tersertifikasi</option>
-                  <option>Proses</option>
-                  <option>Belum</option>
-                </select>
-              </Field>
+          {loading ? (
+            <p className="knowledge-note">Memuat produk…</p>
+          ) : (
+            <form onSubmit={submit}>
+              <div className="settings-field">
+                <label htmlFor="product-name">Nama produk</label>
+                <input
+                  id="product-name"
+                  className="settings-input"
+                  required
+                  value={form.name}
+                  onChange={(event) => setForm({ ...form, name: event.target.value })}
+                  placeholder="Contoh: Kopi Arabika Preanger 200g"
+                />
+              </div>
+
+              <div className="form-row-two">
+                <div className="settings-field">
+                  <label htmlFor="product-sku">SKU</label>
+                  <input
+                    id="product-sku"
+                    className="settings-input"
+                    value={form.sku}
+                    onChange={(event) => setForm({ ...form, sku: event.target.value })}
+                    placeholder="KHB-KOP-01"
+                  />
+                </div>
+                <div className="settings-field">
+                  <label htmlFor="product-category">Kategori</label>
+                  <select
+                    id="product-category"
+                    className="settings-select"
+                    value={form.category}
+                    onChange={(event) => setForm({ ...form, category: event.target.value })}
+                  >
+                    {CATEGORIES.map((item) => <option key={item}>{item}</option>)}
+                  </select>
+                </div>
+              </div>
+
+              <div className="form-row-two">
+                <div className="settings-field">
+                  <label htmlFor="product-price">Harga</label>
+                  <input
+                    id="product-price"
+                    className="settings-input"
+                    value={form.price}
+                    onChange={(event) => setForm({ ...form, price: event.target.value })}
+                    placeholder="Rp45.000"
+                  />
+                </div>
+                <div className="settings-field">
+                  <label htmlFor="product-halal">Status halal</label>
+                  <select
+                    id="product-halal"
+                    className="settings-select"
+                    value={form.halal}
+                    onChange={(event) => setForm({ ...form, halal: event.target.value as typeof form.halal })}
+                  >
+                    <option value="certified">Tersertifikasi</option>
+                    <option value="process">Proses</option>
+                    <option value="none">Belum</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="settings-field">
+                <label htmlFor="product-desc">Deskripsi</label>
+                <textarea
+                  id="product-desc"
+                  className="settings-textarea"
+                  rows={4}
+                  value={form.description}
+                  onChange={(event) => setForm({ ...form, description: event.target.value })}
+                  placeholder="Bahan utama dan proses produksi…"
+                />
+              </div>
+
+              <div className="settings-actions">
+                <button type="button" className="btn btn-secondary" onClick={() => navigate('/products')}>Batal</button>
+                <button type="submit" className="btn btn-primary" disabled={saving}>
+                  {saving ? 'Menyimpan…' : isEdit ? 'Simpan Perubahan' : 'Tambah Produk'}
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
+
+        <div className="panel" style={{ padding: 22 }}>
+          <div className="panel-heading">
+            <div>
+              <h2>Ringkasan</h2>
+              <p>Pratinjau data produk</p>
             </div>
-
-            <Field label="Deskripsi" hint="Bahan utama dan proses produksi membantu asisten menjawab pertanyaan.">
-              <textarea
-                className="settings-textarea"
-                value={form.description}
-                onChange={(e) => setForm({ ...form, description: e.target.value })}
-                placeholder="Bahan: kopi arabika, tanpa tambahan gula..."
-              />
-            </Field>
-
-            <div className="settings-actions">
-              <button type="button" className="btn btn-secondary" onClick={() => navigate('/products')}>Batal</button>
-              <button type="submit" className="btn btn-primary">{Icon.check} {isEdit ? 'Simpan Perubahan' : 'Tambah Produk'}</button>
-            </div>
-          </form>
-        </Panel>
-
-        <Panel title="Ringkasan" subtitle="Pratinjau data produk">
+          </div>
           <div className="kv">
             <div className="kv-row"><span>Nama</span><strong>{form.name || '—'}</strong></div>
             <div className="kv-row"><span>SKU</span><strong>{form.sku || '—'}</strong></div>
             <div className="kv-row"><span>Kategori</span><strong>{form.category}</strong></div>
             <div className="kv-row"><span>Harga</span><strong>{form.price || '—'}</strong></div>
-            <div className="kv-row"><span>Status halal</span><strong><Badge tone={form.halal === 'Tersertifikasi' ? 'green' : form.halal === 'Proses' ? 'amber' : 'slate'} dot>{form.halal}</Badge></strong></div>
+            <div className="kv-row"><span>Status halal</span><strong>{HALAL_LABEL[form.halal]}</strong></div>
           </div>
-          <p className="knowledge-note">
-            Produk berstatus “Tersertifikasi” akan ditandai pada halaman publik dan katalog UMKM.
-          </p>
-        </Panel>
+          <p className="knowledge-note">Perubahan tersimpan langsung ke tabel <code>products</code>.</p>
+        </div>
       </div>
-
-      <footer className="page-footer">
-        <span>© 2025 Komunitas Halal Bandung</span>
-        <span>Form produk <i>●</i> Prototipe PKM</span>
-      </footer>
     </section>
   );
 }

@@ -106,7 +106,19 @@ npm run api:dev              # http://localhost:4000
 ```
 
 Vite sudah memproksi `/api/*` ke `http://localhost:4000`, jadi React cukup
-memanggil `fetch('/api/v1/...')`.
+memanggil `fetch('/api/v1/...')` lewat klien terpusat di `src/services/api.ts`.
+
+### Halaman yang sudah memakai data database
+
+Dashboard, Panduan Mulai, Chatbot AI (baca/tulis pengaturan), Knowledge Base
+(daftar/tambah/hapus dokumen), Flow Builder, Produk (daftar/tambah/ubah/hapus),
+Channels (daftar/tambah/ubah/hapus), Pelanggan, Riwayat Percakapan (termasuk
+detail & sumber jawaban), Notifikasi (baca/tandai), Chat Edukasi, halaman publik
+`/:slug`, `/chat/:slug`, dan `/embed/:slug`, serta badge notifikasi di topbar.
+
+Masih lokal (menunggu backend login): halaman Pengaturan profil, Edit Profil, dan
+data pengguna di halaman Register — sesuai permintaan karena backend login belum
+dibuat.
 
 AI menjawab berlapis: **RAG eksternal → retrieval dokumen lokal → LLM umum
 (pengetahuan di luar dokumen) → handoff**. Jawaban selalu membawa `source`

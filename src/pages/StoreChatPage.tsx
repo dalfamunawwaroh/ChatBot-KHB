@@ -1,38 +1,62 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { products } from '../data/omni';
-import { Icon } from '../components/ui/PageKit';
+import { api, SOURCE_LABEL, type ChatBoot, type ProductRow } from '../services/api';
 
 interface ChatMessage {
-  from: 'bot' | 'user';
+  id: string;
+  role: 'bot' | 'user';
   text: string;
+  source?: 'rag' | 'general' | 'handoff';
+  citations?: string[];
 }
 
-const ANSWERS: Array<{ keys: string[]; text: string }> = [
-  { keys: ['self declare', 'self-declare'], text: 'Self declare adalah jalur gratis untuk usaha mikro dan kecil dengan produk berisiko rendah. Pengajuan lewat SIHALAL dan didampingi Pendamping PPH.' },
-  { keys: ['dokumen', 'syarat', 'berkas'], text: 'Siapkan NIB, KTP, daftar produk & bahan, alur produksi, denah lokasi, foto produk, dan surat pernyataan.' },
-  { keys: ['biaya', 'gratis', 'bayar'], text: 'Untuk UMK jalur self declare, biaya PNBP Rp0 (gratis). Jalur reguler dikenakan tarif sesuai ketentuan BPJPH.' },
-  { keys: ['lama', 'berapa hari', 'proses'], text: 'Self declare umumnya selesai sekitar 21 hari kerja setelah berkas dinyatakan lengkap.' },
-  { keys: ['produk', 'katalog', 'jual'], text: 'Produk yang sudah tersertifikasi halal ditandai pada katalog. Produk berstatus “Proses” masih menunggu penetapan BPJPH.' },
-];
+const SESSION_KEY = 'khb-session-store';
 
-const answerFor = (text: string): string => {
-  const lower = text.toLowerCase();
-  const found = ANSWERS.find((item) => item.keys.some((key) => lower.includes(key)));
-  return found
-    ? found.text
-    : 'Pertanyaan itu belum ada di basis pengetahuan saya. Saya teruskan ke Pendamping PPH agar dijawab langsung oleh petugas.';
+const HALAL_TONE: Record<ProductRow['halal'], string> = {
+  certified: 'badge-green',
+  process: 'badge-amber',
+  none: 'badge-slate',
 };
 
 export default function StoreChatPage() {
   const { slug } = useParams();
   const store = slug || 'khb-bandung';
 
+  const [boot, setBoot] = useState<ChatBoot | null>(null);
+  const [stats, setStats] = useState({ conversations: 0, customers: 0, documents: 0 });
+  const [products, setProducts] = useState<ProductRow[]>([]);
   const [profile, setProfile] = useState({ name: '', contact: '' });
   const [started, setStarted] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
-  const [typing, setTyping] = useState(false);
+  const [sending, setSending] = useState(false);
+  const sessionKey = useRef(localStorage.getItem(SESSION_KEY) ?? '');
+  const bottom = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    void (async () => {
+      try {
+        const [bootData, summary, productList] = await Promise.all([
+          api.chat.boot(store),
+          api.dashboard.summary(),
+          api.products.list({ perPage: 4 }),
+        ]);
+        setBoot(bootData);
+        setStats({
+          conversations: summary.stats.conversations30d,
+          customers: summary.stats.customers,
+          documents: summary.stats.documents,
+        });
+        setProducts(productList.rows);
+      } catch {
+        // halaman publik tetap tampil walau backend belum siap
+      }
+    })();
+  }, [store]);
+
+  useEffect(() => {
+    bottom.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  }, [messages, sending]);
 
   const start = (event: React.FormEvent) => {
     event.preventDefault();
@@ -40,23 +64,55 @@ export default function StoreChatPage() {
     setStarted(true);
     setMessages([
       {
-        from: 'bot',
-        text: `Halo ${profile.name.split(' ')[0]}! Saya Asisten Halal KHB. Silakan tanya seputar sertifikasi halal, dokumen, atau produk di katalog.`,
+        id: 'greeting',
+        role: 'bot',
+        text:
+          boot?.assistant.greeting ??
+          `Halo ${profile.name.split(' ')[0]}! Saya asisten halal KHB. Silakan tanya seputar sertifikasi halal.`,
       },
     ]);
   };
 
-  const send = (event: React.FormEvent) => {
-    event.preventDefault();
-    const text = input.trim();
-    if (!text || typing) return;
-    setMessages((prev) => [...prev, { from: 'user', text }]);
+  const send = async (event?: React.FormEvent, preset?: string) => {
+    event?.preventDefault();
+    const text = (preset ?? input).trim();
+    if (!text || sending) return;
+
+    setMessages((prev) => [...prev, { id: `u-${Date.now()}`, role: 'user', text }]);
     setInput('');
-    setTyping(true);
-    setTimeout(() => {
-      setMessages((prev) => [...prev, { from: 'bot', text: answerFor(text) }]);
-      setTyping(false);
-    }, 550);
+    setSending(true);
+
+    try {
+      const answer = await api.chat.send({
+        message: text,
+        slug: store,
+        sessionKey: sessionKey.current || undefined,
+        customerName: profile.name.trim() || undefined,
+      });
+      sessionKey.current = answer.sessionKey;
+      localStorage.setItem(SESSION_KEY, answer.sessionKey);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `b-${Date.now()}`,
+          role: 'bot',
+          text: answer.answer,
+          source: answer.source,
+          citations: answer.citations,
+        },
+      ]);
+    } catch {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `e-${Date.now()}`,
+          role: 'bot',
+          text: 'Maaf, asisten sedang tidak dapat dihubungi. Silakan coba lagi sebentar lagi.',
+        },
+      ]);
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -81,12 +137,13 @@ export default function StoreChatPage() {
           <h1>Tanya halal, jawabannya bersumber dokumen resmi.</h1>
           <p>
             Asisten edukasi halal Komunitas Halal Bandung membantu pelaku UMKM memahami sertifikasi halal,
-            self declare, dan kelengkapan dokumen — gratis, tanpa perlu membuat akun.
+            self declare, dan kelengkapan dokumen. Bila dokumen belum memuat jawabannya, asisten menjawab
+            dari pengetahuan umum dan menandainya secara jelas.
           </p>
           <div className="store-stats">
-            <div><strong>1.284</strong><span>percakapan</span></div>
-            <div><strong>847</strong><span>UMKM terbantu</span></div>
-            <div><strong>38</strong><span>dokumen BPJPH</span></div>
+            <div><strong>{stats.conversations.toLocaleString('id-ID')}</strong><span>percakapan</span></div>
+            <div><strong>{stats.customers.toLocaleString('id-ID')}</strong><span>UMKM terbantu</span></div>
+            <div><strong>{stats.documents}</strong><span>dokumen rujukan</span></div>
           </div>
         </section>
 
@@ -94,8 +151,8 @@ export default function StoreChatPage() {
           <div className="store-chat-head">
             <span className="store-chat-avatar">✦</span>
             <div>
-              <strong>Asisten Halal KHB</strong>
-              <span><i></i>Online · balas &lt; 2 detik</span>
+              <strong>{boot?.assistant.name ?? 'Asisten Halal KHB'}</strong>
+              <span><i></i>{sending ? 'Menyusun jawaban…' : 'Siap membantu'}</span>
             </div>
           </div>
 
@@ -129,23 +186,28 @@ export default function StoreChatPage() {
           ) : (
             <>
               <div className="store-chat-body">
-                {messages.map((message, index) => (
-                  <div key={index} className={`public-msg ${message.from}`}>{message.text}</div>
-                ))}
-                {typing ? (
-                  <div className="public-msg bot" style={{ width: 60 }}>
-                    <span className="dot-typing" style={{ animation: 'none' }}>•••</span>
+                {messages.map((message) => (
+                  <div key={message.id} className={`public-msg ${message.role === 'user' ? 'user' : 'bot'}`}>
+                    {message.text}
+                    {message.source ? (
+                      <span style={{ display: 'block', marginTop: 4, fontSize: 10.5, opacity: 0.7 }}>
+                        {SOURCE_LABEL[message.source]}
+                        {message.citations && message.citations.length > 0 ? ` · ${message.citations.join('; ')}` : ''}
+                      </span>
+                    ) : null}
                   </div>
-                ) : null}
+                ))}
+                {sending ? <div className="public-msg bot" style={{ width: 60 }}>•••</div> : null}
+                <div ref={bottom}></div>
               </div>
-              <form className="store-chat-input" onSubmit={send}>
+              <form className="store-chat-input" onSubmit={(event) => void send(event)}>
                 <input
                   value={input}
                   onChange={(event) => setInput(event.target.value)}
                   placeholder="Tulis pertanyaan seputar halal..."
                   aria-label="Tulis pertanyaan"
                 />
-                <button className="btn btn-primary btn-sm" type="submit">Kirim</button>
+                <button className="btn btn-primary btn-sm" type="submit" disabled={sending}>Kirim</button>
               </form>
             </>
           )}
@@ -155,20 +217,21 @@ export default function StoreChatPage() {
       <section className="store-products">
         <div className="store-products-head">
           <h2>Produk UMKM binaan</h2>
-          <span>{products.length} produk contoh</span>
+          <span>{products.length} produk terdaftar</span>
         </div>
         <div className="panel" style={{ padding: '4px 18px' }}>
           <div className="flat-list">
-            {products.slice(0, 4).map((product) => (
+            {products.map((product) => (
               <div className="flat-row" key={product.id}>
-                <span className="row-icon">{Icon.store}</span>
+                <span className="row-icon">▣</span>
                 <span className="row-copy">
                   <strong>{product.name}</strong>
-                  <span>{product.category} · {product.price} · {product.sku}</span>
+                  <span>{product.category} · {product.price ?? '—'} · {product.sku ?? '—'}</span>
                 </span>
                 <span className="row-meta">
-                  <span className={`badge-pill ${product.halal === 'Tersertifikasi' ? 'badge-green' : 'badge-amber'}`}>
-                    <i></i>{product.halal}
+                  <span className={`badge-pill ${HALAL_TONE[product.halal]}`}>
+                    <i></i>
+                    {product.halal === 'certified' ? 'Tersertifikasi' : product.halal === 'process' ? 'Proses' : 'Belum'}
                   </span>
                 </span>
               </div>

@@ -1,40 +1,66 @@
-import { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import { api, SOURCE_LABEL, type ChatBoot } from '../services/api';
 
-const ANSWERS = [
-  { keys: ['self declare', 'self-declare'], text: 'Self declare adalah jalur gratis untuk usaha mikro/kecil dengan produk berisiko rendah. Pengajuan lewat SIHALAL dan didampingi Pendamping PPH.' },
-  { keys: ['dokumen', 'syarat', 'berkas'], text: 'Siapkan NIB, KTP, daftar produk & bahan, alur produksi, denah lokasi, foto produk, dan surat pernyataan.' },
-  { keys: ['biaya', 'gratis', 'bayar'], text: 'Untuk UMK jalur self declare, biaya PNBP Rp0 (gratis). Jalur reguler dikenakan tarif sesuai ketentuan BPJPH.' },
-  { keys: ['lama', 'berapa hari', 'proses'], text: 'Self declare umumnya selesai sekitar 21 hari kerja setelah berkas dinyatakan lengkap.' },
-];
-
-const STARTERS = ['Apa itu self declare?', 'Dokumen yang perlu disiapkan', 'Biaya sertifikasi halal'];
+interface ChatMessage {
+  id: string;
+  role: 'bot' | 'user';
+  text: string;
+  source?: 'rag' | 'general' | 'handoff';
+  citations?: string[];
+}
 
 export default function WidgetChatPage() {
   const { slug } = useParams();
-  const [messages, setMessages] = useState([
-    { from: 'bot', text: "Assalamu'alaikum! Saya Asisten Halal KHB. Silakan tanya seputar sertifikasi halal." },
-  ]);
+  const store = slug || 'khb-bandung';
+
+  const [boot, setBoot] = useState<ChatBoot | null>(null);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
+  const [sending, setSending] = useState(false);
+  const [sessionKey, setSessionKey] = useState('');
 
-  const answer = (text: string) => {
-    const lower = text.toLowerCase();
-    const found = ANSWERS.find((item) => item.keys.some((key) => lower.includes(key)));
-    return found
-      ? found.text
-      : 'Pertanyaan itu belum ada di basis pengetahuan saya. Saya teruskan ke Pendamping PPH agar dijawab langsung oleh petugas.';
-  };
+  useEffect(() => {
+    void (async () => {
+      try {
+        const data = await api.chat.boot(store);
+        setBoot(data);
+        setMessages([{ id: 'greeting', role: 'bot', text: data.assistant.greeting }]);
+      } catch {
+        setMessages([
+          { id: 'greeting', role: 'bot', text: "Assalamu'alaikum! Saya Asisten Halal KHB. Silakan tanya seputar sertifikasi halal." },
+        ]);
+      }
+    })();
+  }, [store]);
 
-  const send = (event: React.FormEvent | null, preset?: string) => {
+  const send = async (event?: React.FormEvent | null, preset?: string) => {
     event?.preventDefault();
-    const text = (preset || input).trim();
-    if (!text) return;
-    setMessages((prev) => [...prev, { from: 'user', text }]);
+    const text = (preset ?? input).trim();
+    if (!text || sending) return;
+
+    setMessages((prev) => [...prev, { id: `u-${Date.now()}`, role: 'user', text }]);
     setInput('');
-    setTimeout(() => {
-      setMessages((prev) => [...prev, { from: 'bot', text: answer(text) }]);
-    }, 500);
+    setSending(true);
+
+    try {
+      const answer = await api.chat.send({ message: text, slug: store, sessionKey: sessionKey || undefined });
+      setSessionKey(answer.sessionKey);
+      setMessages((prev) => [
+        ...prev,
+        { id: `b-${Date.now()}`, role: 'bot', text: answer.answer, source: answer.source, citations: answer.citations },
+      ]);
+    } catch {
+      setMessages((prev) => [
+        ...prev,
+        { id: `e-${Date.now()}`, role: 'bot', text: 'Maaf, asisten sedang tidak dapat dihubungi.' },
+      ]);
+    } finally {
+      setSending(false);
+    }
   };
+
+  const starters = boot?.starters ?? [];
 
   return (
     <div className="public-shell">
@@ -49,28 +75,43 @@ export default function WidgetChatPage() {
               <svg viewBox="0 0 24 24" fill="none" width="18" height="18"><path d="M12 3l7 3v6c0 5-3.3 7.8-7 9-3.7-1.2-7-4-7-9V6l7-3z" stroke="#fff" strokeWidth="1.6" strokeLinejoin="round" /><path d="M8.5 12l2.5 2.5 4.5-5" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
             </div>
             <div>
-              <strong>Asisten Halal KHB</strong>
-              <span>Online · {slug || 'khb-bandung'}</span>
+              <strong>{boot?.assistant.name ?? 'Asisten Halal KHB'}</strong>
+              <span>{sending ? 'Menyusun jawaban…' : `Online · ${store}`}</span>
             </div>
           </div>
 
           <div className="public-body">
-            {messages.map((msg, index) => (
-              <div key={index} className={`public-msg ${msg.from}`}>{msg.text}</div>
+            {messages.map((message) => (
+              <div key={message.id} className={`public-msg ${message.role === 'user' ? 'user' : 'bot'}`}>
+                {message.text}
+                {message.source ? (
+                  <span style={{ display: 'block', marginTop: 4, fontSize: 10.5, opacity: 0.7 }}>
+                    {SOURCE_LABEL[message.source]}
+                  </span>
+                ) : null}
+              </div>
             ))}
+            {sending ? <div className="public-msg bot" style={{ width: 54 }}>•••</div> : null}
           </div>
 
-          <div style={{ padding: '0 14px 10px' }}>
-            <div className="chip-row">
-              {STARTERS.map((starter) => (
-                <button key={starter} className="chip" onClick={() => send(null, starter)}>{starter}</button>
-              ))}
+          {starters.length > 0 ? (
+            <div style={{ padding: '0 14px 10px' }}>
+              <div className="chip-row">
+                {starters.map((starter) => (
+                  <button key={starter} className="chip" onClick={() => void send(null, starter)}>{starter}</button>
+                ))}
+              </div>
             </div>
-          </div>
+          ) : null}
 
-          <form className="public-input" onSubmit={(event) => send(event)}>
-            <input value={input} onChange={(event) => setInput(event.target.value)} placeholder="Tulis pertanyaan..." aria-label="Pertanyaan" />
-            <button type="submit">Kirim</button>
+          <form className="public-input" onSubmit={(event) => void send(event)}>
+            <input
+              value={input}
+              onChange={(event) => setInput(event.target.value)}
+              placeholder="Tulis pertanyaan..."
+              aria-label="Pertanyaan"
+            />
+            <button type="submit" disabled={sending}>Kirim</button>
           </form>
         </div>
 

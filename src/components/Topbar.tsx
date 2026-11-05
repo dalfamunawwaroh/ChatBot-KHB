@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { labels } from '../data/khb';
+import { api } from '../services/api';
 
 const pathKey = (p: string): string => p.replace('/', '') || 'dashboard';
 
@@ -46,7 +47,15 @@ export default function Topbar({ onMenu, onToggleSidebar, sidebarCollapsed = fal
   const navigate = useNavigate();
   const title = resolveLabel(pathKey(pathname));
   const [open, setOpen] = useState(false);
+  const [unread, setUnread] = useState(0);
   const wrap = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    void api.notifications
+      .list()
+      .then((data) => setUnread(data.unread))
+      .catch(() => setUnread(0));
+  }, [pathname]);
 
   useEffect(() => {
     if (!open) return;
@@ -93,7 +102,7 @@ export default function Topbar({ onMenu, onToggleSidebar, sidebarCollapsed = fal
         <span className="prototype-badge"><i></i> PROTOTIPE</span>
         <Link className="icon-btn notification-btn" to="/notifications" aria-label="Notifikasi">
           <svg viewBox="0 0 20 20" fill="none"><path d="M10 2a6 6 0 016 6c0 3 .8 5 1.5 6H2.5C3.2 13 4 11 4 8a6 6 0 016-6z" stroke="currentColor" strokeWidth="1.5" /><path d="M8 16a2 2 0 004 0" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg>
-          <span className="notif-badge" id="notif-badge">3</span>
+          {unread > 0 ? <span className="notif-badge" id="notif-badge">{unread}</span> : null}
         </Link>
         <div className="topbar-pop-wrap" ref={wrap}>
           <button

@@ -1,33 +1,49 @@
 import { Link } from 'react-router-dom';
-import { PageHead, Panel, Badge, Icon } from '../components/ui/PageKit';
-import { onboardingSteps } from '../data/omni';
+import { api } from '../services/api';
+import { useResource } from '../hooks/useApi';
+
+const STEPS = [
+  { title: 'Lengkapi profil komunitas', desc: 'Nama organisasi, kontak, dan jam layanan.', done: true },
+  { title: 'Hubungkan kanal percakapan', desc: 'WhatsApp, Instagram, atau widget website.', done: true },
+  { title: 'Unggah dokumen rujukan', desc: 'Regulasi BPJPH dan panduan internal KHB.', done: true },
+  { title: 'Atur nada jawaban asisten', desc: 'Bahasa, gaya jawaban, dan aturan eskalasi.', done: false },
+  { title: 'Uji coba di halaman chat', desc: 'Kirim pertanyaan contoh dan periksa sumber jawaban.', done: false },
+];
 
 const QUICK_LINKS = [
-  { to: '/channels', title: 'Hubungkan kanal', desc: 'WhatsApp, Instagram, atau widget website.', icon: Icon.link, tone: 'blue' },
-  { to: '/knowledge-base', title: 'Tambah dokumen', desc: 'Regulasi BPJPH dan panduan internal KHB.', icon: Icon.doc, tone: '' },
-  { to: '/khb-bandung', title: 'Chat edukasi publik', desc: 'Halaman chat siap dipasang di landing page.', icon: Icon.chat, tone: 'amber' },
-  { to: '/history', title: 'Lihat riwayat percakapan', desc: 'Telusuri pertanyaan UMKM dan sumber jawabannya.', icon: Icon.user, tone: 'violet' },
+  { to: '/channels', title: 'Hubungkan kanal', desc: 'WhatsApp, Instagram, atau widget website.', tone: '' },
+  { to: '/knowledge-base', title: 'Tambah dokumen', desc: 'Regulasi BPJPH dan panduan internal KHB.', tone: 'blue' },
+  { to: '/chatbot', title: 'Atur jawaban umum', desc: 'Izinkan asisten menjawab di luar dokumen.', tone: 'amber' },
+  { to: '/history', title: 'Lihat riwayat percakapan', desc: 'Telusuri pertanyaan UMKM dan sumber jawabannya.', tone: 'violet' },
 ];
 
 export default function GettingStartedPage() {
-  const done = onboardingSteps.filter((step) => step.done).length;
-  const percent = Math.round((done / onboardingSteps.length) * 100);
+  const { data } = useResource(() => api.dashboard.summary(), []);
+  const stats = data?.stats;
 
   return (
     <section className="view active" id="view-getting-started">
-      <PageHead
-        eyebrow="PANDUAN AWAL"
-        title="Mulai dari sini"
-        subtitle="Siapkan asisten halal KHB dalam lima langkah singkat."
-      />
+      <div className="page-title-row">
+        <div>
+          <div className="eyebrow"><span className="eyebrow-dot"></span> PANDUAN AWAL</div>
+          <h1>Mulai dari sini</h1>
+          <p className="subheading">Siapkan asisten halal KHB dalam lima langkah singkat.</p>
+        </div>
+      </div>
 
       <div className="grid-2-1">
-        <Panel title="Checklist persiapan" subtitle={`${done} dari ${onboardingSteps.length} langkah selesai`}>
+        <div className="panel" style={{ padding: 22 }}>
+          <div className="panel-heading">
+            <div>
+              <h2>Checklist persiapan</h2>
+              <p>3 dari 5 langkah selesai</p>
+            </div>
+          </div>
           <div className="progress-track" style={{ marginTop: 2, marginBottom: 16 }}>
-            <span style={{ width: `${percent}%` }}></span>
+            <span style={{ width: '60%' }}></span>
           </div>
           <div className="steps">
-            {onboardingSteps.map((step, index) => (
+            {STEPS.map((step, index) => (
               <div className={`step-item${step.done ? ' done' : ''}`} key={step.title}>
                 <span className="step-num">{step.done ? '✓' : index + 1}</span>
                 <div style={{ flex: 1 }}>
@@ -35,58 +51,53 @@ export default function GettingStartedPage() {
                   <p>{step.desc}</p>
                 </div>
                 <span className="step-badge">
-                  <Badge tone={step.done ? 'green' : 'amber'}>{step.done ? 'Selesai' : 'Belum'}</Badge>
+                  <span className={`badge-pill ${step.done ? 'badge-green' : 'badge-amber'}`}>
+                    <i></i>{step.done ? 'Selesai' : 'Belum'}
+                  </span>
                 </span>
               </div>
             ))}
           </div>
           <div className="settings-actions" style={{ justifyContent: 'flex-start' }}>
-            <Link className="btn btn-primary" to="/chatbot">
-              {Icon.bolt}
-              Lanjut atur asisten
-            </Link>
+            <Link className="btn btn-primary" to="/chatbot">Lanjut atur asisten</Link>
           </div>
-        </Panel>
+        </div>
 
-        <Panel title="Status singkat" subtitle="Ringkasan kesiapan asisten">
-          <div className="kv">
-            <div className="kv-row"><span>Kanal aktif</span><strong>3 dari 4</strong></div>
-            <div className="kv-row"><span>Dokumen terindeks</span><strong>38 dokumen</strong></div>
-            <div className="kv-row"><span>Percakapan 30 hari</span><strong>1.284</strong></div>
-            <div className="kv-row"><span>Akurasi jawaban</span><strong>96,4%</strong></div>
-            <div className="kv-row"><span>Rata-rata respons</span><strong>1,8 detik</strong></div>
-            <div className="kv-row"><span>Versi asisten</span><strong>v2.0 · prototipe</strong></div>
-          </div>
-
-          <div style={{ marginTop: 18, paddingTop: 4 }}>
-            <div className="eyebrow" style={{ marginBottom: 6 }}><span className="eyebrow-dot"></span> LANGKAH BERIKUTNYA</div>
-            <div className="flat-list">
-              <Link className="flat-row" to="/chatbot" style={{ textDecoration: 'none' }}>
-                <span className="row-icon">{Icon.bolt}</span>
-                <span className="row-copy"><strong>Atur nada jawaban</strong><span>Bahasa, gaya jawaban, dan eskalasi</span></span>
-                <span className="row-meta">2 menit</span>
-              </Link>
-              <Link className="flat-row" to="/khb-bandung" style={{ textDecoration: 'none' }}>
-                <span className="row-icon blue">{Icon.chat}</span>
-                <span className="row-copy"><strong>Uji coba chat publik</strong><span>Kirim pertanyaan contoh ke asisten</span></span>
-                <span className="row-meta">3 menit</span>
-              </Link>
+        <div className="panel" style={{ padding: 22 }}>
+          <div className="panel-heading">
+            <div>
+              <h2>Status singkat</h2>
+              <p>Ringkasan kesiapan asisten (dari database)</p>
             </div>
           </div>
-        </Panel>
+          <div className="kv">
+            <div className="kv-row"><span>Kanal aktif</span><strong>{stats?.channelsActive ?? '—'} dari {stats?.channelsTotal ?? '—'}</strong></div>
+            <div className="kv-row"><span>Dokumen terindeks</span><strong>{stats?.documentsIndexed ?? '—'} dokumen</strong></div>
+            <div className="kv-row"><span>Percakapan 30 hari</span><strong>{(stats?.conversations30d ?? 0).toLocaleString('id-ID')}</strong></div>
+            <div className="kv-row"><span>Dijawab dari dokumen</span><strong>{stats?.accuracy ?? 0}%</strong></div>
+            <div className="kv-row"><span>UMKM terlayani</span><strong>{stats?.customers ?? 0}</strong></div>
+            <div className="kv-row"><span>Versi asisten</span><strong>{data?.assistant.version ?? '—'}</strong></div>
+          </div>
+        </div>
       </div>
 
-      <Panel title="Aksi cepat" subtitle="Pintasan konfigurasi yang sering dipakai" className="panel" >
+      <div className="panel" style={{ padding: 22 }}>
+        <div className="panel-heading">
+          <div>
+            <h2>Aksi cepat</h2>
+            <p>Pintasan konfigurasi yang sering dipakai</p>
+          </div>
+        </div>
         <div className="flat-rows-2" style={{ marginTop: 14 }}>
           {QUICK_LINKS.map((item) => (
             <Link key={item.to} to={item.to} className="flat-row" style={{ textDecoration: 'none' }}>
-              <span className={`row-icon ${item.tone}`}>{item.icon}</span>
+              <span className={`row-icon ${item.tone}`}>{item.title.charAt(0)}</span>
               <span className="row-copy"><strong>{item.title}</strong><span>{item.desc}</span></span>
               <span className="row-meta">Buka →</span>
             </Link>
           ))}
         </div>
-      </Panel>
+      </div>
 
       <footer className="page-footer">
         <span>© 2025 Komunitas Halal Bandung</span>

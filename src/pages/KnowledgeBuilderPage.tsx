@@ -1,93 +1,174 @@
-import { useState } from 'react';
-import { PageHead, Panel, Field, Badge, Icon } from '../components/ui/PageKit';
+import { useEffect, useState } from 'react';
+import { api, type FlowNodeRow } from '../services/api';
+import { useResource } from '../hooks/useApi';
 import { useToast } from '../components/Toast';
 
-const NODES = [
-  { id: 'n1', kind: 'Sapaan', title: 'Pesan pembuka', desc: "Assalamu'alaikum! Ada yang bisa dibantu soal sertifikasi halal?" },
-  { id: 'n2', kind: 'Pertanyaan', title: 'Topik apa yang ingin ditanyakan?', desc: 'Self declare · Dokumen · Biaya · Status pengajuan' },
-  { id: 'n3', kind: 'Jawaban AI', title: 'Jawab dari basis pengetahuan', desc: 'Cari di 38 dokumen BPJPH & panduan KHB.' },
-  { id: 'n4', kind: 'Eskalasi', title: 'Teruskan ke Pendamping PPH', desc: 'Jika keyakinan < 70% atau topik bahan kritis.' },
-];
+const KIND_LABEL: Record<FlowNodeRow['kind'], string> = {
+  greeting: 'Sapaan',
+  question: 'Pertanyaan',
+  answer: 'Jawaban AI',
+  escalation: 'Eskalasi',
+};
 
 export default function KnowledgeBuilderPage() {
   const notify = useToast();
-  const [nodes, setNodes] = useState(NODES);
-  const [selected, setSelected] = useState(NODES[0].id);
-  const [label, setLabel] = useState(NODES[0].title);
+  const { data, loading, error, reload } = useResource(() => api.flows.list(), []);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [form, setForm] = useState({ title: '', description: '', kind: 'question' as FlowNodeRow['kind'] });
+  const [saving, setSaving] = useState(false);
 
-  const activeNode = nodes.find((node) => node.id === selected) || nodes[0];
+  const nodes = data ?? [];
+  const selected = nodes.find((node) => node.id === selectedId) ?? null;
 
-  const save = () => {
-    setNodes((prev) => prev.map((node) => (node.id === selected ? { ...node, title: label } : node)));
-    notify('Alur percakapan disimpan');
+  useEffect(() => {
+    if (selected) {
+      setForm({ title: selected.title, description: selected.description, kind: selected.kind });
+    }
+  }, [selectedId, selected]);
+
+  const save = async () => {
+    if (!selected) return;
+    setSaving(true);
+    try {
+      await api.flows.update(selected.id, form);
+      notify('Node alur disimpan ke database');
+      await reload();
+    } catch (err) {
+      notify(err instanceof Error ? err.message : 'Gagal menyimpan node');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const addNode = async () => {
+    setSaving(true);
+    try {
+      const created = await api.flows.create({
+        kind: 'question',
+        title: 'Pertanyaan baru',
+        description: 'Tulis pertanyaan pemulai di sini.',
+        sortOrder: nodes.length,
+      });
+      notify('Node ditambahkan');
+      await reload();
+      setSelectedId(created.id);
+    } catch (err) {
+      notify(err instanceof Error ? err.message : 'Gagal menambah node');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const remove = async () => {
+    if (!selected) return;
+    if (!window.confirm(`Hapus node "${selected.title}"?`)) return;
+    try {
+      await api.flows.remove(selected.id);
+      notify('Node dihapus');
+      setSelectedId(null);
+      await reload();
+    } catch (err) {
+      notify(err instanceof Error ? err.message : 'Gagal menghapus node');
+    }
   };
 
   return (
     <section className="view active" id="view-knowledge-builder">
-      <PageHead
-        eyebrow="PENGELOLAAN DATA AI"
-        title="Flow Builder"
-        subtitle="Susun alur sapaan, pertanyaan umum, dan eskalasi asisten."
-      >
-        <div style={{ display: 'flex', gap: 8 }}>
-          <button className="btn btn-secondary" onClick={() => notify('Pratinjau alur dibuka (demo)')}>Pratinjau</button>
-          <button className="btn btn-primary" onClick={() => notify('Alur dipublikasikan')}>{Icon.check} Publikasikan</button>
+      <div className="page-title-row">
+        <div>
+          <div className="eyebrow"><span className="eyebrow-dot"></span> PENGELOLAAN DATA AI</div>
+          <h1>Flow Builder</h1>
+          <p className="subheading">Pertanyaan pemulai dan node eskalasi yang tampil di widget publik.</p>
         </div>
-      </PageHead>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button className="btn btn-secondary" onClick={() => void addNode()} disabled={saving}>Tambah Node</button>
+          <button className="btn btn-primary" onClick={() => void save()} disabled={!selected || saving}>
+            {saving ? 'Menyimpan…' : 'Simpan Node'}
+          </button>
+        </div>
+      </div>
 
       <div className="grid-2-1">
-        <Panel title="Kanvas alur" subtitle="Klik node untuk mengedit">
+        <div className="panel" style={{ padding: 22 }}>
+          <div className="panel-heading">
+            <div>
+              <h2>Kanvas alur</h2>
+              <p>Klik node untuk mengedit</p>
+            </div>
+          </div>
+          {loading ? <p className="knowledge-note">Memuat alur…</p> : null}
+          {error ? <p className="knowledge-note" style={{ color: '#b91c1c' }}>{error}</p> : null}
           <div className="flow-canvas">
             {nodes.map((node, index) => (
               <div key={node.id}>
                 <button
                   type="button"
-                  className={`flow-node${selected === node.id ? ' active' : ''}`}
-                  onClick={() => { setSelected(node.id); setLabel(node.title); }}
+                  className={`flow-node${selectedId === node.id ? ' active' : ''}`}
+                  onClick={() => setSelectedId(node.id)}
                 >
-                  <span className="flow-kind">{node.kind}</span>
+                  <span className="flow-kind">{KIND_LABEL[node.kind]}</span>
                   <strong>{node.title}</strong>
-                  <span>{node.desc}</span>
+                  <span>{node.description}</span>
                 </button>
                 {index < nodes.length - 1 ? <div className="flow-link"></div> : null}
               </div>
             ))}
+            {!loading && nodes.length === 0 ? <div className="empty-state">Belum ada node alur.</div> : null}
           </div>
-        </Panel>
+        </div>
 
-        <Panel title="Editor node" subtitle={activeNode.kind}>
-          <Field label="Judul node">
-            <input className="settings-input" value={label} onChange={(event) => setLabel(event.target.value)} />
-          </Field>
-          <Field label="Tipe node">
-            <select className="settings-select" defaultValue={activeNode.kind}>
-              <option>Sapaan</option>
-              <option>Pertanyaan</option>
-              <option>Jawaban AI</option>
-              <option>Eskalasi</option>
-            </select>
-          </Field>
-          <Field label="Deskripsi">
-            <textarea className="settings-textarea" defaultValue={activeNode.desc} />
-          </Field>
-
-          <div className="kv" style={{ marginTop: 4 }}>
-            <div className="kv-row"><span>Status alur</span><strong><Badge tone="amber" dot>Draf</Badge></strong></div>
-            <div className="kv-row"><span>Node aktif</span><strong>{activeNode.title}</strong></div>
-            <div className="kv-row"><span>Terakhir diubah</span><strong>Hari ini, 09:42</strong></div>
+        <div className="panel" style={{ padding: 22 }}>
+          <div className="panel-heading">
+            <div>
+              <h2>Editor node</h2>
+              <p>{selected ? KIND_LABEL[selected.kind] : 'Pilih node di kanvas'}</p>
+            </div>
           </div>
 
-          <div className="settings-actions">
-            <button className="btn btn-secondary" onClick={() => setLabel(activeNode.title)}>Reset</button>
-            <button className="btn btn-primary" onClick={save}>{Icon.check} Simpan Node</button>
-          </div>
-        </Panel>
+          {selected ? (
+            <>
+              <div className="settings-field">
+                <label htmlFor="node-title">Judul node</label>
+                <input
+                  id="node-title"
+                  className="settings-input"
+                  value={form.title}
+                  onChange={(event) => setForm({ ...form, title: event.target.value })}
+                />
+              </div>
+              <div className="settings-field">
+                <label htmlFor="node-kind">Tipe node</label>
+                <select
+                  id="node-kind"
+                  className="settings-select"
+                  value={form.kind}
+                  onChange={(event) => setForm({ ...form, kind: event.target.value as FlowNodeRow['kind'] })}
+                >
+                  {(Object.keys(KIND_LABEL) as Array<FlowNodeRow['kind']>).map((key) => (
+                    <option key={key} value={key}>{KIND_LABEL[key]}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="settings-field">
+                <label htmlFor="node-desc">Deskripsi</label>
+                <textarea
+                  id="node-desc"
+                  className="settings-textarea"
+                  rows={4}
+                  value={form.description}
+                  onChange={(event) => setForm({ ...form, description: event.target.value })}
+                />
+              </div>
+              <div className="settings-actions">
+                <button className="btn btn-danger-outline" onClick={() => void remove()}>Hapus</button>
+                <button className="btn btn-primary" onClick={() => void save()} disabled={saving}>Simpan</button>
+              </div>
+            </>
+          ) : (
+            <p className="knowledge-note">Node bertipe “Pertanyaan” otomatis muncul sebagai tombol topik di widget publik.</p>
+          )}
+        </div>
       </div>
-
-      <footer className="page-footer">
-        <span>© 2025 Komunitas Halal Bandung</span>
-        <span>Flow builder <i>●</i> Prototipe PKM</span>
-      </footer>
     </section>
   );
 }

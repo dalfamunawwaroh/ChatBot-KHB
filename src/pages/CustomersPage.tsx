@@ -1,97 +1,115 @@
-import { useMemo, useState } from 'react';
-import { PageHead, Panel, Stat, StatsGrid, Badge, Icon, Empty } from '../components/ui/PageKit';
-import { customers } from '../data/omni';
+import { useState } from 'react';
+import { api } from '../services/api';
+import { formatDateTime, initials, useResource } from '../hooks/useApi';
 
 export default function CustomersPage() {
   const [query, setQuery] = useState('');
-  const [segment, setSegment] = useState('Semua');
+  const [status, setStatus] = useState('');
 
-  const rows = useMemo(() => {
-    const term = query.trim().toLowerCase();
-    return customers.filter((row) => {
-      const matchSegment = segment === 'Semua' || row.status === segment;
-      const matchQuery = !term || row.name.toLowerCase().includes(term) || row.business.toLowerCase().includes(term);
-      return matchSegment && matchQuery;
-    });
-  }, [query, segment]);
+  const { data, loading, error, reload } = useResource(
+    async () => {
+      const [list, summary] = await Promise.all([
+        api.customers.list({ q: query || undefined, status: status || undefined, perPage: 50 }),
+        api.dashboard.summary(),
+      ]);
+      return { ...list, stats: summary.stats };
+    },
+    [query, status],
+  );
+
+  const rows = data?.rows ?? [];
+  const stats = data?.stats;
 
   return (
     <section className="view active" id="view-customers">
-      <PageHead eyebrow="DATA UMKM" title="Pelanggan" subtitle="Pelaku usaha yang berinteraksi dengan asisten halal.">
-        <button className="btn btn-secondary" onClick={() => window.print()}>{Icon.download} Ekspor Data</button>
-      </PageHead>
+      <div className="page-title-row">
+        <div>
+          <div className="eyebrow"><span className="eyebrow-dot"></span> DATA UMKM</div>
+          <h1>Pelanggan</h1>
+          <p className="subheading">Pelaku usaha yang berinteraksi dengan asisten halal (dari tabel customers).</p>
+        </div>
+        <button className="btn btn-secondary" onClick={() => void reload()}>Muat ulang</button>
+      </div>
 
-      <StatsGrid>
-        <Stat label="Total UMKM" value="847" icon={Icon.user} tone="green" foot={<span className="history-trend">↗ 38 bulan ini</span>} />
-        <Stat label="Percakapan" value="1.284" icon={Icon.chat} tone="blue" foot={<span>30 hari terakhir</span>} />
-        <Stat label="Pelanggan baru" value="38" icon={Icon.bolt} tone="orange" foot={<span>bulan ini</span>} />
-        <Stat label="Sudah bersertifikat" value="312" icon={Icon.check} tone="purple" foot={<span>37% dari total</span>} />
-      </StatsGrid>
+      <div className="stats-grid">
+        <article className="stat-card">
+          <div className="stat-top"><span>Total UMKM</span><span className="stat-icon green">◍</span></div>
+          <div className="stat-value">{stats?.customers ?? 0}</div>
+          <div className="stat-foot"><span className="stat-muted">tercatat dari percakapan</span></div>
+        </article>
+        <article className="stat-card">
+          <div className="stat-top"><span>Percakapan 30 hari</span><span className="stat-icon blue">▤</span></div>
+          <div className="stat-value">{(stats?.conversations30d ?? 0).toLocaleString('id-ID')}</div>
+          <div className="stat-foot"><span className="stat-muted">{stats?.messages30d ?? 0} pesan</span></div>
+        </article>
+        <article className="stat-card">
+          <div className="stat-top"><span>Dijawab dari dokumen</span><span className="stat-icon orange">✓</span></div>
+          <div className="stat-value">{stats?.accuracy ?? 0}<span className="stat-unit">%</span></div>
+          <div className="stat-foot"><span className="stat-muted">sisanya jawaban umum</span></div>
+        </article>
+        <article className="stat-card">
+          <div className="stat-top"><span>Produk terdaftar</span><span className="stat-icon purple">▣</span></div>
+          <div className="stat-value">{stats?.products ?? 0}</div>
+          <div className="stat-foot"><span className="stat-muted">{stats?.productsCertified ?? 0} tersertifikasi</span></div>
+        </article>
+      </div>
 
-      <Panel padding={false}>
+      <div className="panel" style={{ padding: 0 }}>
         <div className="history-toolbar">
           <div>
             <h2>Daftar pelanggan</h2>
-            <p>{rows.length} UMKM ditampilkan</p>
+            <p>{rows.length} dari {data?.total ?? 0} UMKM</p>
           </div>
           <div className="history-filters">
-            <div className="filter-tabs" style={{ height: 36 }}>
-              {['Semua', 'Aktif', 'Baru'].map((item) => (
-                <button key={item} className={`filter-tab${segment === item ? ' selected' : ''}`} onClick={() => setSegment(item)}>
-                  {item}
-                </button>
-              ))}
-            </div>
+            <select className="settings-select" style={{ height: 36, fontSize: 12 }} value={status} onChange={(event) => setStatus(event.target.value)}>
+              <option value="">Semua status</option>
+              <option value="Aktif">Aktif</option>
+              <option value="Baru">Baru</option>
+            </select>
             <label className="search-box">
-              {Icon.search}
-              <input type="search" placeholder="Cari nama atau usaha..." value={query} onChange={(e) => setQuery(e.target.value)} />
+              <svg viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="5.5" stroke="currentColor" strokeWidth="1.5"/><path d="M15 15l-2.5-2.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+              <input type="search" placeholder="Cari nama atau usaha..." value={query} onChange={(event) => setQuery(event.target.value)} />
             </label>
           </div>
         </div>
 
         <div className="table-wrap">
           <table className="data-table">
-            <thead>
-              <tr><th>NAMA</th><th>USAHA</th><th>KOTA</th><th>PERCAKAPAN</th><th>TERAKHIR</th><th>STATUS</th></tr>
-            </thead>
+            <thead><tr><th>NAMA</th><th>USAHA</th><th>KOTA</th><th>PERCAKAPAN</th><th>TERAKHIR AKTIF</th><th>STATUS</th></tr></thead>
             <tbody>
               {rows.map((row) => (
                 <tr key={row.id}>
                   <td>
                     <div className="user-cell">
-                      <span className="avatar avatar-soft-green" style={{ width: 30, height: 30, fontSize: 11 }}>{row.name.charAt(0)}</span>
-                      <div><strong>{row.name}</strong><small>{row.city}</small></div>
+                      <span className="avatar avatar-soft-green" style={{ width: 30, height: 30, fontSize: 11 }}>{initials(row.name)}</span>
+                      <div>
+                        <strong>{row.name}</strong>
+                        <small>{row.city ?? '—'}</small>
+                      </div>
                     </div>
                   </td>
-                  <td>{row.business}</td>
-                  <td>{row.city}</td>
+                  <td>{row.business ?? '—'}</td>
+                  <td>{row.city ?? '—'}</td>
                   <td>{row.chats}</td>
-                  <td>{row.last}</td>
-                  <td><Badge tone={row.status === 'Baru' ? 'blue' : 'green'} dot>{row.status}</Badge></td>
+                  <td>{formatDateTime(row.lastSeenAt)}</td>
+                  <td>
+                    <span className={`badge-pill ${row.status === 'Baru' ? 'badge-blue' : 'badge-green'}`}>
+                      <i></i>{row.status}
+                    </span>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
-          {rows.length === 0 ? <Empty text="Tidak ada pelanggan yang cocok." /> : null}
+          {loading ? <p className="knowledge-note" style={{ padding: '0 18px' }}>Memuat pelanggan…</p> : null}
+          {error ? <p className="knowledge-note" style={{ padding: '0 18px', color: '#b91c1c' }}>{error}</p> : null}
+          {!loading && !error && rows.length === 0 ? <div className="empty-state">Belum ada data pelanggan.</div> : null}
         </div>
 
         <div className="table-footer">
-          <span>Menampilkan <strong>{rows.length}</strong> dari <strong>847</strong> UMKM</span>
-          <div className="pagination">
-            <button className="current-page" aria-current="page">1</button>
-            <button>2</button>
-            <button>3</button>
-            <span className="page-gap">…</span>
-            <button>170</button>
-            <button className="page-nav">Next ›</button>
-          </div>
+          <span>Menampilkan <strong>{rows.length}</strong> dari <strong>{data?.total ?? 0}</strong> UMKM</span>
         </div>
-      </Panel>
-
-      <footer className="page-footer">
-        <span>© 2025 Komunitas Halal Bandung</span>
-        <span>Data pelanggan <i>●</i> Prototipe PKM</span>
-      </footer>
+      </div>
     </section>
   );
 }
