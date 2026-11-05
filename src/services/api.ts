@@ -26,6 +26,33 @@ interface Envelope<T> {
   meta?: unknown;
 }
 
+/**
+ * Baca balasan JSON dengan aman. Saat backend mati, Vite hanya meneruskan
+ * halaman HTML/proxy error — `response.json()` akan melempar SyntaxError yang
+ * tidak informatif ("Terjadi kesalahan saat memuat data"). Di sini diubah
+ * menjadi ApiError yang jelas penyebabnya.
+ */
+async function readJson<T>(response: Response): Promise<T> {
+  const type = response.headers.get('content-type') ?? '';
+  const raw = await response.text();
+  if (!type.includes('application/json') && !raw.trim().startsWith('{')) {
+    throw new ApiError(
+      'Server mengembalikan balasan tidak valid. Pastikan backend berjalan (npm run dev).',
+      response.status,
+      'BAD_RESPONSE',
+    );
+  }
+  try {
+    return JSON.parse(raw) as T;
+  } catch {
+    throw new ApiError(
+      'Balasan server tidak dapat dibaca. Coba muat ulang halaman.',
+      response.status,
+      'BAD_RESPONSE',
+    );
+  }
+}
+
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   let response: Response;
   try {
@@ -55,7 +82,7 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
 
   if (response.status === 204) return undefined as T;
 
-  const payload = (await response.json()) as Envelope<T> & T;
+  const payload = (await readJson<Envelope<T> & T>(response));
   return (payload as Envelope<T>).data ?? (payload as T);
 }
 
@@ -100,7 +127,29 @@ export interface ChatbotSettings {
   generalDisclaimer: boolean;
   model: string | null;
   temperature: number;
-  capabilities: { llmConfigured: boolean; ragChatConfigured: boolean; canAnswerGeneral: boolean };
+  capabilities: {
+    llmConfigured: boolean;
+    ragChatConfigured: boolean;
+    knowledgeBaseId: string | null;
+    kmsOrganizationId: string | null;
+    ragBackend: 'kms' | 'rag-chat' | 'none';
+    canAnswerGeneral: boolean;
+  };
+}
+
+export interface RagOverview {
+  knowledgeBaseId: string | null;
+  organizationId: string | null;
+  backend: 'kms' | 'rag-chat' | 'none';
+  documents: Array<{ id: string; title: string; status: string; chunks: number | null; error: string | null }>;
+  integration: {
+    ragChatUrl: string | null;
+    ragChatConfigured: boolean;
+    kmsUrl: string | null;
+    kmsConfigured: boolean;
+    defaultKnowledgeBaseId: string | null;
+  };
+  error?: string;
 }
 
 export interface DocumentRow {
@@ -227,6 +276,32 @@ export interface ChatBoot {
 
 /* ── Endpoint per domain ──────────────────────────────────────── */
 
+/**
+ * fetch yang tidak pernah membiarkan error mentah keluar: kegagalan jaringan
+ * menjadi ApiError('Tidak dapat menghubungi server…'), status non-2xx menjadi
+ * ApiError berisi pesan backend.
+ */
+async function safeFetch(url: string): Promise<Response> {
+  let response: Response;
+  try {
+    response = await fetch(url);
+  } catch {
+    throw new ApiError('Tidak dapat menghubungi server. Pastikan backend berjalan (npm run dev).', 0, 'NETWORK');
+  }
+  if (!response.ok) {
+    const text = await response.text().catch(() => '');
+    let message = `Permintaan gagal (${response.status})`;
+    try {
+      const parsed = JSON.parse(text) as { error?: { message?: string } };
+      if (parsed.error?.message) message = parsed.error.message;
+    } catch {
+      if (text.trim().length > 0 && !text.trim().startsWith('<')) message = text.slice(0, 200);
+    }
+    throw new ApiError(message, response.status, 'HTTP_ERROR');
+  }
+  return response;
+}
+
 const query = (params: Record<string, string | number | undefined>): string => {
   const search = new URLSearchParams();
   for (const [key, value] of Object.entries(params)) {
@@ -249,15 +324,16 @@ export const api = {
 
   knowledge: {
     list: async (params: { q?: string; category?: string; page?: number; perPage?: number } = {}) => {
-      const response = await fetch(`${BASE}/knowledge${query(params)}`);
-      if (!response.ok) throw new ApiError('Gagal memuat dokumen', response.status, 'HTTP_ERROR');
-      const payload = (await response.json()) as {
+      const response = await safeFetch(`${BASE}/knowledge${query(params)}`);
+      const payload = await readJson<{
         data: DocumentRow[];
         meta: { page: number; perPage: number; total: number; totalPages: number };
-      };
-      return { rows: payload.data, total: payload.meta.total };
+      }>(response);
+      return { rows: payload.data, total: payload.meta?.total ?? payload.data.length };
     },
     stats: () => request<KnowledgeStats>('/knowledge/stats'),
+    rag: () => request<RagOverview>('/knowledge/rag'),
+    reindex: (id: string) => request<DocumentRow>(`/knowledge/${id}/reindex`, { method: 'POST' }),
     create: (body: { title: string; category: string; content: string; kind?: string; pages?: number }) =>
       request<DocumentRow>('/knowledge', { method: 'POST', body: JSON.stringify(body) }),
     remove: (id: string) => request<{ id: string }>(`/knowledge/${id}`, { method: 'DELETE' }),
@@ -265,13 +341,16 @@ export const api = {
 
   products: {
     list: async (params: { q?: string; halal?: string; page?: number; perPage?: number } = {}) => {
-      const response = await fetch(`${BASE}/products${query(params)}`);
-      if (!response.ok) throw new ApiError('Gagal memuat produk', response.status, 'HTTP_ERROR');
-      const payload = (await response.json()) as {
+      const response = await safeFetch(`${BASE}/products${query(params)}`);
+      const payload = await readJson<{
         data: ProductRow[];
-        meta: { total: number; counts: { certified: number; process: number; none: number } };
+        meta?: { total: number; counts: { certified: number; process: number; none: number } };
+      }>(response);
+      return {
+        rows: payload.data,
+        total: payload.meta?.total ?? payload.data.length,
+        counts: payload.meta?.counts ?? { certified: 0, process: 0, none: 0 },
       };
-      return { rows: payload.data, total: payload.meta.total, counts: payload.meta.counts };
     },
     create: (body: Partial<ProductRow>) =>
       request<ProductRow>('/products', { method: 'POST', body: JSON.stringify(body) }),
@@ -291,19 +370,17 @@ export const api = {
 
   customers: {
     list: async (params: { q?: string; status?: string; page?: number; perPage?: number } = {}) => {
-      const response = await fetch(`${BASE}/customers${query(params)}`);
-      if (!response.ok) throw new ApiError('Gagal memuat pelanggan', response.status, 'HTTP_ERROR');
-      const payload = (await response.json()) as { data: CustomerRow[]; meta: { total: number } };
-      return { rows: payload.data, total: payload.meta.total };
+      const response = await safeFetch(`${BASE}/customers${query(params)}`);
+      const payload = await readJson<{ data: CustomerRow[]; meta?: { total: number } }>(response);
+      return { rows: payload.data, total: payload.meta?.total ?? payload.data.length };
     },
   },
 
   conversations: {
     list: async (params: { q?: string; status?: string; source?: string; page?: number; perPage?: number } = {}) => {
-      const response = await fetch(`${BASE}/conversations${query(params)}`);
-      if (!response.ok) throw new ApiError('Gagal memuat percakapan', response.status, 'HTTP_ERROR');
-      const payload = (await response.json()) as { data: ConversationRow[]; meta: { total: number } };
-      return { rows: payload.data, total: payload.meta.total };
+      const response = await safeFetch(`${BASE}/conversations${query(params)}`);
+      const payload = await readJson<{ data: ConversationRow[]; meta?: { total: number } }>(response);
+      return { rows: payload.data, total: payload.meta?.total ?? payload.data.length };
     },
     detail: (id: string) => request<ConversationDetail>(`/conversations/${id}`),
     remove: (id: string) => request<{ id: string }>(`/conversations/${id}`, { method: 'DELETE' }),

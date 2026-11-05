@@ -102,7 +102,14 @@ export default function CustomersPage() {
             </tbody>
           </table>
           {loading ? <p className="knowledge-note" style={{ padding: '0 18px' }}>Memuat pelanggan…</p> : null}
-          {error ? <p className="knowledge-note" style={{ padding: '0 18px', color: '#b91c1c' }}>{error}</p> : null}
+          {error ? (
+            <div style={{ padding: '0 18px', color: '#b91c1c' }} className="knowledge-note">
+              {error}{' '}
+              <button className="btn btn-secondary btn-sm" style={{ marginLeft: 8 }} onClick={() => void reload()}>
+                Coba lagi
+              </button>
+            </div>
+          ) : null}
           {!loading && !error && rows.length === 0 ? <div className="empty-state">Belum ada data pelanggan.</div> : null}
         </div>
 

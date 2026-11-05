@@ -23,8 +23,29 @@ export function useResource<T>(loader: () => Promise<T>, deps: unknown[] = []) {
       setState({ data, loading: false, error: null });
       return data;
     } catch (error) {
+      // Satu percobaan ulang untuk gangguan sesaat (backend baru restart,
+      // koneksi putus sebentar). Kegagalan nyata tetap dilaporkan apa adanya.
+      const transient = error instanceof ApiError && (error.status === 0 || error.status >= 500);
+      if (transient) {
+        await new Promise((resolve) => setTimeout(resolve, 1_200));
+        try {
+          const retry = await loaderRef.current();
+          setState({ data: retry, loading: false, error: null });
+          return retry;
+        } catch (retryError) {
+          const retryMessage =
+            retryError instanceof Error && retryError.message.length > 0
+              ? retryError.message
+              : 'Terjadi kesalahan saat memuat data.';
+          setState({ data: null, loading: false, error: retryMessage });
+          return null;
+        }
+      }
+
       const message =
-        error instanceof ApiError ? error.message : 'Terjadi kesalahan saat memuat data.';
+        error instanceof Error && error.message.length > 0
+          ? error.message
+          : 'Terjadi kesalahan saat memuat data.';
       setState({ data: null, loading: false, error: message });
       return null;
     }

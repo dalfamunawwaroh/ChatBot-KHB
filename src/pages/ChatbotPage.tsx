@@ -240,8 +240,16 @@ export default function ChatbotPage() {
                 <strong>{form.capabilities.llmConfigured ? form.model ?? 'aktif' : 'belum diatur'}</strong>
               </div>
               <div className="kv-row">
-                <span>Layanan RAG eksternal</span>
-                <strong>{form.capabilities.ragChatConfigured ? 'terhubung' : 'retrieval lokal'}</strong>
+                <span>Layanan RAG</span>
+                <strong>{form.capabilities.ragChatConfigured ? 'rag.aiones.app' : 'retrieval lokal'}</strong>
+              </div>
+              <div className="kv-row">
+                <span>Knowledge base</span>
+                <strong>{form.capabilities.knowledgeBaseId ?? '—'}</strong>
+              </div>
+              <div className="kv-row">
+                <span>Unggah dokumen</span>
+                <strong>{form.capabilities.ragBackend === 'kms' ? 'KMS' : form.capabilities.ragBackend === 'rag-chat' ? 'Layanan RAG' : '—'}</strong>
               </div>
               <div className="kv-row">
                 <span>Bisa jawab umum</span>

@@ -24,8 +24,11 @@ export default function KnowledgePage() {
     [query, category],
   );
 
+  const ragState = useResource(() => api.knowledge.rag(), []);
+
   const rows: DocumentRow[] = data?.rows ?? [];
   const stats = data?.stats;
+  const rag = ragState.data;
   const categories = useMemo(() => ['Semua', ...(stats?.categories.map((item) => item.label) ?? [])], [stats]);
 
   const submit = async (event: React.FormEvent) => {
@@ -50,6 +53,16 @@ export default function KnowledgePage() {
       notify(error instanceof Error ? error.message : 'Gagal menyimpan dokumen');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const reindex = async (row: DocumentRow) => {
+    try {
+      await api.knowledge.reindex(row.id);
+      notify('Dokumen diunggah ulang ke knowledge base');
+      await Promise.all([reload(), ragState.reload()]);
+    } catch (error) {
+      notify(error instanceof Error ? error.message : 'Gagal mengunggah ulang');
     }
   };
 
@@ -155,6 +168,38 @@ export default function KnowledgePage() {
         </div>
       </div>
 
+      <div className="panel" style={{ padding: 22, marginBottom: 18 }}>
+        <div className="panel-heading">
+          <div>
+            <h2>Status knowledge base RAG</h2>
+            <p>Sumber jawaban asisten: {rag?.integration.ragChatUrl ?? '—'}</p>
+          </div>
+          <button className="btn btn-secondary btn-sm" onClick={() => void ragState.reload()}>Muat ulang</button>
+        </div>
+        <div className="kv">
+          <div className="kv-row"><span>Knowledge base</span><strong>{rag?.knowledgeBaseId ?? '—'}</strong></div>
+          <div className="kv-row"><span>Project KMS</span><strong>{rag?.organizationId ?? '—'}</strong></div>
+          <div className="kv-row">
+            <span>Jalur unggahan</span>
+            <strong>{rag?.backend === 'kms' ? 'KMS (ragkms.aiones.app)' : rag?.backend === 'rag-chat' ? 'Layanan RAG' : '—'}</strong>
+          </div>
+          <div className="kv-row"><span>Dokumen terindeks di RAG</span><strong>{rag?.documents.filter((doc) => doc.status === 'completed').length ?? 0}</strong></div>
+        </div>
+        {ragState.error ? <p className="knowledge-note" style={{ color: '#b91c1c' }}>{ragState.error}</p> : null}
+        <div className="flat-list" style={{ marginTop: 10 }}>
+          {(rag?.documents ?? []).slice(0, 8).map((doc) => (
+            <div className="flat-row" key={doc.id}>
+              <span className="row-icon">{doc.status === 'completed' ? '✓' : doc.status === 'failed' ? '!' : '…'}</span>
+              <span className="row-copy">
+                <strong>{doc.title}</strong>
+                <span>{doc.status}{doc.chunks ? ` · ${doc.chunks} chunk` : ''}</span>
+              </span>
+              <span className="row-meta">{doc.id.slice(0, 14)}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
       <div className="panel document-panel">
         <div className="document-toolbar">
           <div className="filter-tabs">
@@ -203,7 +248,10 @@ export default function KnowledgePage() {
                   </td>
                   <td>{formatDateTime(doc.indexedAt)}</td>
                   <td>
-                    <button className="dots-btn" aria-label="Hapus dokumen" onClick={() => void remove(doc)}>×</button>
+                    <div className="row-actions">
+                      <button className="icon-action" aria-label="Unggah ulang ke RAG" onClick={() => void reindex(doc)}>↻</button>
+                      <button className="icon-action danger" aria-label="Hapus dokumen" onClick={() => void remove(doc)}>×</button>
+                    </div>
                   </td>
                 </tr>
               ))}

@@ -93,7 +93,12 @@ export default function NotificationsPage() {
         ))}
 
         {loading ? <p className="knowledge-note">Memuat notifikasi…</p> : null}
-        {error ? <p className="knowledge-note" style={{ color: '#b91c1c' }}>{error}</p> : null}
+        {error ? (
+          <div className="knowledge-note" style={{ color: '#b91c1c' }}>
+            {error}{' '}
+            <button className="btn btn-secondary btn-sm" style={{ marginLeft: 8 }} onClick={() => void reload()}>Coba lagi</button>
+          </div>
+        ) : null}
         {!loading && !error && rows.length === 0 ? <div className="empty-state">Tidak ada notifikasi pada filter ini.</div> : null}
       </div>
     </section>

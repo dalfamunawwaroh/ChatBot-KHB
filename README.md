@@ -120,7 +120,10 @@ Masih lokal (menunggu backend login): halaman Pengaturan profil, Edit Profil, da
 data pengguna di halaman Register — sesuai permintaan karena backend login belum
 dibuat.
 
-AI menjawab berlapis: **RAG eksternal → retrieval dokumen lokal → LLM umum
+AI memakai **layanan RAG `https://rag.aiones.app`** sebagai penjawab dan **KMS
+`https://ragkms.aiones.app`** untuk repositori unggahan dokumen (pola sama dengan
+AiOnesCare/omnicare). Knowledge base KHB: `kb_khb_halal_bandung_3cqm`, project KMS
+`org-1793839982638`. Lapisan jawaban: **RAG → retrieval dokumen lokal → LLM umum
 (pengetahuan di luar dokumen) → handoff**. Jawaban selalu membawa `source`
 (`rag`/`general`/`handoff`), `citations`, dan `confidence`, dan mode umum bisa
 dimatikan admin lewat `allowGeneralKnowledge`. Rincian endpoint + cara kerja:
