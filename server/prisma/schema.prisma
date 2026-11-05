@@ -87,17 +87,17 @@ enum NotificationType {
 }
 
 model Workspace {
-  id        String   @id @default(uuid()) @db.Char(36)
-  name      String   @db.VarChar(150)
-  slug      String   @unique @db.VarChar(80)
-  city      String?  @db.VarChar(80)
-  tagline   String?  @db.VarChar(200)
+  id                 String   @id @default(uuid()) @db.Char(36)
+  name               String   @db.VarChar(150)
+  slug               String   @unique @db.VarChar(80)
+  city               String?  @db.VarChar(80)
+  tagline            String?  @db.VarChar(200)
   /// Knowledge base layanan RAG (https://rag.aiones.app) yang dibaca chatbot.
-  ragKnowledgeBaseId String? @map("rag_knowledge_base_id") @db.VarChar(100)
+  ragKnowledgeBaseId String?  @map("rag_knowledge_base_id") @db.VarChar(100)
   /// Project organisasi di KMS (https://ragkms.aiones.app) untuk unggah dokumen.
-  kmsOrganizationId  String? @map("kms_organization_id") @db.VarChar(60)
-  createdAt DateTime @default(now()) @map("created_at") @db.DateTime(3)
-  updatedAt DateTime @updatedAt @map("updated_at") @db.DateTime(3)
+  kmsOrganizationId  String?  @map("kms_organization_id") @db.VarChar(60)
+  createdAt          DateTime @default(now()) @map("created_at") @db.DateTime(3)
+  updatedAt          DateTime @updatedAt @map("updated_at") @db.DateTime(3)
 
   settings      ChatbotSetting?
   channels      Channel[]
@@ -106,6 +106,7 @@ model Workspace {
   conversations Conversation[]
   documents     KnowledgeDocument[]
   flowNodes     FlowNode[]
+  flowEdges     FlowEdge[]
   notifications Notification[]
 
   @@map("workspaces")
@@ -113,16 +114,16 @@ model Workspace {
 
 /// Pengaturan asisten: identitas, gaya jawaban, dan kebijakan jawaban AI.
 model ChatbotSetting {
-  id        String   @id @default(uuid()) @db.Char(36)
+  id          String @id @default(uuid()) @db.Char(36)
   workspaceId String @unique @map("workspace_id") @db.Char(36)
 
-  assistantName String @default("Asisten Halal KHB") @map("assistant_name") @db.VarChar(120)
-  greeting      String @db.Text
-  language      String @default("Bahasa Indonesia") @db.VarChar(60)
-  tone          String @default("Ramah & ringkas") @db.VarChar(60)
-  fallbackMode  String @default("Eskalasi ke Pendamping PPH") @map("fallback_mode") @db.VarChar(60)
-  showSources   Boolean @default(true) @map("show_sources")
-  autoEscalate  Boolean @default(true) @map("auto_escalate")
+  assistantName  String  @default("Asisten Halal KHB") @map("assistant_name") @db.VarChar(120)
+  greeting       String  @db.Text
+  language       String  @default("Bahasa Indonesia") @db.VarChar(60)
+  tone           String  @default("Ramah & ringkas") @db.VarChar(60)
+  fallbackMode   String  @default("Eskalasi ke Pendamping PPH") @map("fallback_mode") @db.VarChar(60)
+  showSources    Boolean @default(true) @map("show_sources")
+  autoEscalate   Boolean @default(true) @map("auto_escalate")
   requestContact Boolean @default(false) @map("request_contact")
 
   /// Fitur utama KHB: boleh menjawab pertanyaan umum di luar dokumen RAG.
@@ -142,21 +143,21 @@ model ChatbotSetting {
 }
 
 model KnowledgeDocument {
-  id          String          @id @default(uuid()) @db.Char(36)
-  workspaceId String          @map("workspace_id") @db.Char(36)
-  title       String          @db.VarChar(200)
-  fileName    String?         @map("file_name") @db.VarChar(200)
-  kind        KnowledgeKind   @default(text)
-  category    String          @default("Umum") @db.VarChar(80)
+  id            String          @id @default(uuid()) @db.Char(36)
+  workspaceId   String          @map("workspace_id") @db.Char(36)
+  title         String          @db.VarChar(200)
+  fileName      String?         @map("file_name") @db.VarChar(200)
+  kind          KnowledgeKind   @default(text)
+  category      String          @default("Umum") @db.VarChar(80)
   /// Teks lengkap dokumen — dipakai sebagai konteks retrieval lokal.
-  content     String          @db.LongText
-  sizeKb      Int             @default(0) @map("size_kb")
-  pages       Int?
-  chunkCount  Int             @default(0) @map("chunk_count")
-  status      KnowledgeStatus @default(indexed)
+  content       String          @db.LongText
+  sizeKb        Int             @default(0) @map("size_kb")
+  pages         Int?
+  chunkCount    Int             @default(0) @map("chunk_count")
+  status        KnowledgeStatus @default(indexed)
   /// ID dokumen di layanan RAG/KMS bila sudah disinkronkan.
-  ragDocumentId String?       @map("rag_document_id") @db.VarChar(80)
-  indexedAt   DateTime?       @map("indexed_at") @db.DateTime(3)
+  ragDocumentId String?         @map("rag_document_id") @db.VarChar(80)
+  indexedAt     DateTime?       @map("indexed_at") @db.DateTime(3)
 
   createdAt DateTime @default(now()) @map("created_at") @db.DateTime(3)
   updatedAt DateTime @updatedAt @map("updated_at") @db.DateTime(3)
@@ -188,14 +189,14 @@ model Product {
 }
 
 model Channel {
-  id          String        @id @default(uuid()) @db.Char(36)
-  workspaceId String        @map("workspace_id") @db.Char(36)
-  platform    ChannelPlatform
-  name        String        @db.VarChar(120)
-  handle      String?       @db.VarChar(120)
-  status      ChannelStatus @default(draft)
-  lastSyncAt  DateTime?     @map("last_sync_at") @db.DateTime(3)
-  messageCount Int          @default(0) @map("message_count")
+  id           String          @id @default(uuid()) @db.Char(36)
+  workspaceId  String          @map("workspace_id") @db.Char(36)
+  platform     ChannelPlatform
+  name         String          @db.VarChar(120)
+  handle       String?         @db.VarChar(120)
+  status       ChannelStatus   @default(draft)
+  lastSyncAt   DateTime?       @map("last_sync_at") @db.DateTime(3)
+  messageCount Int             @default(0) @map("message_count")
 
   createdAt DateTime @default(now()) @map("created_at") @db.DateTime(3)
   updatedAt DateTime @updatedAt @map("updated_at") @db.DateTime(3)
@@ -208,14 +209,14 @@ model Channel {
 }
 
 model Customer {
-  id          String   @id @default(uuid()) @db.Char(36)
-  workspaceId String   @map("workspace_id") @db.Char(36)
-  name        String   @db.VarChar(150)
-  business    String?  @db.VarChar(150)
-  city        String?  @db.VarChar(80)
-  chatCount   Int      @default(0) @map("chat_count")
+  id          String    @id @default(uuid()) @db.Char(36)
+  workspaceId String    @map("workspace_id") @db.Char(36)
+  name        String    @db.VarChar(150)
+  business    String?   @db.VarChar(150)
+  city        String?   @db.VarChar(80)
+  chatCount   Int       @default(0) @map("chat_count")
   /// "Aktif" | "Baru" — disimpan sebagai teks agar mudah diubah tim KHB.
-  status      String   @default("Baru") @db.VarChar(20)
+  status      String    @default("Baru") @db.VarChar(20)
   lastSeenAt  DateTime? @map("last_seen_at") @db.DateTime(3)
 
   createdAt DateTime @default(now()) @map("created_at") @db.DateTime(3)
@@ -229,22 +230,22 @@ model Customer {
 }
 
 model Conversation {
-  id          String             @id @default(uuid()) @db.Char(36)
-  workspaceId String             @map("workspace_id") @db.Char(36)
-  channelId   String?            @map("channel_id") @db.Char(36)
-  customerId  String?            @map("customer_id") @db.Char(36)
-  customerName String?           @map("customer_name") @db.VarChar(150)
+  id            String             @id @default(uuid()) @db.Char(36)
+  workspaceId   String             @map("workspace_id") @db.Char(36)
+  channelId     String?            @map("channel_id") @db.Char(36)
+  customerId    String?            @map("customer_id") @db.Char(36)
+  customerName  String?            @map("customer_name") @db.VarChar(150)
   /// Kunci sesi dari widget (localStorage) agar riwayat tidak tercampur.
-  sessionKey  String?            @map("session_key") @db.VarChar(80)
-  status      ConversationStatus @default(bot)
-  lastMessageAt DateTime?        @map("last_message_at") @db.DateTime(3)
+  sessionKey    String?            @map("session_key") @db.VarChar(80)
+  status        ConversationStatus @default(bot)
+  lastMessageAt DateTime?          @map("last_message_at") @db.DateTime(3)
 
   createdAt DateTime @default(now()) @map("created_at") @db.DateTime(3)
   updatedAt DateTime @updatedAt @map("updated_at") @db.DateTime(3)
 
-  workspace Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  channel   Channel?   @relation(fields: [channelId], references: [id], onDelete: SetNull)
-  customer  Customer?  @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  channel   Channel?  @relation(fields: [channelId], references: [id], onDelete: SetNull)
+  customer  Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
   messages  Message[]
 
   @@index([workspaceId, lastMessageAt(sort: Desc)], map: "idx_conversations_workspace_recent")
@@ -253,12 +254,12 @@ model Conversation {
 }
 
 model Message {
-  id             String      @id @default(uuid()) @db.Char(36)
-  conversationId String      @map("conversation_id") @db.Char(36)
-  senderType     SenderType  @map("sender_type")
-  text           String      @db.LongText
+  id             String        @id @default(uuid()) @db.Char(36)
+  conversationId String        @map("conversation_id") @db.Char(36)
+  senderType     SenderType    @map("sender_type")
+  text           String        @db.LongText
   source         MessageSource @default(none)
-  grounded       Boolean     @default(false)
+  grounded       Boolean       @default(false)
   /// Skor keyakinan 0–1: 0.9 dari RAG grounded, ~0.55 untuk jawaban umum.
   confidence     Float?
   /// Daftar sitasi dokumen yang dipakai (JSON array of string).
@@ -280,14 +281,38 @@ model FlowNode {
   description String       @db.Text
   sortOrder   Int          @default(0) @map("sort_order")
   isActive    Boolean      @default(true) @map("is_active")
+  /// Posisi kartu di kanvas Flow Builder.
+  positionX   Float        @default(0) @map("position_x")
+  positionY   Float        @default(0) @map("position_y")
 
   createdAt DateTime @default(now()) @map("created_at") @db.DateTime(3)
   updatedAt DateTime @updatedAt @map("updated_at") @db.DateTime(3)
 
-  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  workspace Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  outgoing  FlowEdge[] @relation("flow_edge_source")
+  incoming  FlowEdge[] @relation("flow_edge_target")
 
   @@index([workspaceId, sortOrder], map: "idx_flow_nodes_order")
   @@map("flow_nodes")
+}
+
+/// Garis penghubung antar kartu di kanvas Flow Builder.
+model FlowEdge {
+  id          String  @id @default(uuid()) @db.Char(36)
+  workspaceId String  @map("workspace_id") @db.Char(36)
+  sourceId    String  @map("source_id") @db.Char(36)
+  targetId    String  @map("target_id") @db.Char(36)
+  label       String? @db.VarChar(80)
+
+  createdAt DateTime @default(now()) @map("created_at") @db.DateTime(3)
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  source    FlowNode  @relation("flow_edge_source", fields: [sourceId], references: [id], onDelete: Cascade)
+  target    FlowNode  @relation("flow_edge_target", fields: [targetId], references: [id], onDelete: Cascade)
+
+  @@unique([sourceId, targetId], map: "uq_flow_edges_pair")
+  @@index([workspaceId], map: "idx_flow_edges_workspace")
+  @@map("flow_edges")
 }
 
 model Notification {

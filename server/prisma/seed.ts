@@ -345,11 +345,36 @@ async function main() {
   );
 
   console.log('◇ Menanam alur percakapan…');
-  await Promise.all(
+  const flowNodes = await Promise.all(
     FLOW_NODES.map((node, index) =>
-      prisma.flowNode.create({ data: { workspaceId: workspace.id, sortOrder: index, ...node } }),
+      prisma.flowNode.create({
+        data: {
+          workspaceId: workspace.id,
+          sortOrder: index,
+          // Tata letak awal kanvas: 3 kolom.
+          positionX: 48 + (index % 3) * 280,
+          positionY: 48 + Math.floor(index / 3) * 168,
+          ...node,
+        },
+      }),
     ),
   );
+
+  // Garis alur: pembuka → tiap pertanyaan, tiap pertanyaan → jawaban AI.
+  const greetingNode = flowNodes.find((node) => node.kind === 'greeting');
+  const answerNode = flowNodes.find((node) => node.kind === 'answer');
+  const questionNodes = flowNodes.filter((node) => node.kind === 'question');
+  const edgePairs: Array<{ sourceId: string; targetId: string }> = [];
+  questionNodes.forEach((question) => {
+    if (greetingNode) edgePairs.push({ sourceId: greetingNode.id, targetId: question.id });
+    if (answerNode) edgePairs.push({ sourceId: question.id, targetId: answerNode.id });
+  });
+  if (edgePairs.length > 0) {
+    await prisma.flowEdge.createMany({
+      data: edgePairs.map((pair) => ({ workspaceId: workspace.id, ...pair })),
+      skipDuplicates: true,
+    });
+  }
 
   console.log('◇ Menanam percakapan contoh…');
   interface SeedMessage {

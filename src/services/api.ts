@@ -251,6 +251,16 @@ export interface FlowNodeRow {
   description: string;
   sortOrder: number;
   isActive: boolean;
+  /** Posisi kartu di kanvas Flow Builder. */
+  positionX: number;
+  positionY: number;
+}
+
+export interface FlowEdgeRow {
+  id: string;
+  sourceId: string;
+  targetId: string;
+  label: string | null;
 }
 
 export interface ChatAnswer {
@@ -396,11 +406,23 @@ export const api = {
 
   flows: {
     list: () => request<FlowNodeRow[]>('/flows'),
-    create: (body: { kind: string; title: string; description: string; sortOrder?: number }) =>
-      request<FlowNodeRow>('/flows', { method: 'POST', body: JSON.stringify(body) }),
+    create: (body: {
+      kind: string;
+      title: string;
+      description: string;
+      sortOrder?: number;
+      positionX?: number;
+      positionY?: number;
+    }) => request<FlowNodeRow>('/flows', { method: 'POST', body: JSON.stringify(body) }),
     update: (id: string, body: Partial<FlowNodeRow>) =>
       request<FlowNodeRow>(`/flows/${id}`, { method: 'PATCH', body: JSON.stringify(body) }),
     remove: (id: string) => request<{ id: string }>(`/flows/${id}`, { method: 'DELETE' }),
+    edges: {
+      list: () => request<FlowEdgeRow[]>('/flows/edges'),
+      create: (body: { sourceId: string; targetId: string }) =>
+        request<FlowEdgeRow>('/flows/edges', { method: 'POST', body: JSON.stringify(body) }),
+      remove: (id: string) => request<{ id: string }>(`/flows/edges/${id}`, { method: 'DELETE' }),
+    },
   },
 
   chat: {
