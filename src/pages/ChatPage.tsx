@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { api, SOURCE_LABEL, type ChatBoot } from '../services/api';
 import { useToast } from '../components/Toast';
+import { MarkdownText } from '../components/ui/MarkdownText';
 
 interface ChatMessage {
   id: string;
@@ -136,12 +137,11 @@ export default function ChatPage() {
                   <div className="message-avatar">{BOT_AVATAR}</div>
                   <div className="message-content">
                     <span className="sender-name">{boot?.assistant.name ?? 'Asisten Halal KHB'}</span>
-                    <div className="message-bubble" style={{ whiteSpace: 'pre-wrap' }}>
-                      {message.text}
+                    <div className="message-bubble">
+                      <MarkdownText text={message.text} />
                       {message.source ? (
                         <span className="message-time" style={{ display: 'block', marginTop: 6 }}>
                           {SOURCE_LABEL[message.source]}
-                          {message.source === 'general' ? ' (di luar dokumen KHB)' : ''}
                         </span>
                       ) : null}
                     </div>
@@ -150,7 +150,7 @@ export default function ChatPage() {
               ) : (
                 <div className="message-row user-row" key={message.id}>
                   <div className="message-content" style={{ marginLeft: 'auto' }}>
-                    <div className="message-bubble" style={{ whiteSpace: 'pre-wrap' }}>{message.text}</div>
+                    <div className="message-bubble"><MarkdownText text={message.text} /></div>
                   </div>
                 </div>
               ),

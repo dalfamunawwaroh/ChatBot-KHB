@@ -127,6 +127,58 @@ export interface RagQueryResult {
 }
 
 /**
+ * Cache jawaban grounded (paritas dengan omnicare): 60 detik, maksimal 200 entri.
+ * Hanya dipakai untuk pertanyaan tanpa riwayat percakapan.
+ */
+const ANSWER_CACHE_TTL_MS = 60_000;
+const ANSWER_CACHE_MAX = 200;
+const answerCache = new Map<string, { at: number; value: RagQueryResult }>();
+
+function readCachedAnswer(key: string): RagQueryResult | null {
+  const entry = answerCache.get(key);
+  if (!entry) return null;
+  if (Date.now() - entry.at > ANSWER_CACHE_TTL_MS) {
+    answerCache.delete(key);
+    return null;
+  }
+  return entry.value;
+}
+
+function writeCachedAnswer(key: string, value: RagQueryResult): void {
+  if (answerCache.size >= ANSWER_CACHE_MAX) {
+    const oldest = answerCache.keys().next().value;
+    if (oldest !== undefined) answerCache.delete(oldest);
+  }
+  answerCache.set(key, { at: Date.now(), value });
+}
+
+/** Satu percobaan ulang untuk galat sementara (5xx / koneksi), seperti omnicare. */
+async function queryWithRetry(
+  knowledgeBaseId: string,
+  question: string,
+  history: RagChatHistoryTurn[],
+): Promise<{ answer: string; grounded: boolean; sources: Array<{ document_id?: string; document_name?: string; page?: number | null; score?: number }>; model: string | null }> {
+  const attempt = () => ragQueryChat({ knowledgeBaseId, query: question, history });
+
+  try {
+    return await attempt();
+  } catch (error) {
+    const retryable =
+      error instanceof Error &&
+      (('status' in error && typeof (error as { status?: unknown }).status === 'number'
+        ? ((error as { status: number }).status >= 500)
+        : true));
+    if (!retryable) throw error;
+    logger.warn(
+      { err: error instanceof Error ? error.message : error },
+      'Layanan RAG gagal sementara — mencoba sekali lagi',
+    );
+    await new Promise((resolve) => setTimeout(resolve, 1_000));
+    return attempt();
+  }
+}
+
+/**
  * Tanya layanan RAG untuk satu workspace.
  * `null` = integrasi tidak dikonfigurasi/gagal → pemanggil memakai retrieval lokal.
  */
@@ -153,12 +205,16 @@ export async function queryRag(input: {
     .slice(-6)
     .map((turn) => ({ role: turn.role, content: turn.content.slice(0, 500) }));
 
+  // Cache jawaban grounded tanpa riwayat (paritas dengan omnicare): TTL pendek agar
+  // perubahan dokumen tetap cepat terpakai.
+  const cacheKey = `${target.knowledgeBaseId}::${input.question.trim().toLowerCase()}`;
+  if (history.length === 0) {
+    const cached = readCachedAnswer(cacheKey);
+    if (cached) return cached;
+  }
+
   try {
-    const result = await ragQueryChat({
-      knowledgeBaseId: target.knowledgeBaseId,
-      query: input.question,
-      history,
-    });
+    const result = await queryWithRetry(target.knowledgeBaseId, input.question, history);
 
     const citations = result.sources
       .map((source) =>
@@ -171,7 +227,17 @@ export async function queryRag(input: {
       .filter((label, index, all) => label.length > 0 && all.indexOf(label) === index)
       .slice(0, 4);
 
-    return { answer: result.answer, grounded: result.grounded, citations, model: result.model };
+    const answer: RagQueryResult = {
+      answer: result.answer,
+      grounded: result.grounded,
+      citations,
+      model: result.model,
+    };
+
+    if (history.length === 0 && answer.grounded && answer.answer.length > 0) {
+      writeCachedAnswer(cacheKey, answer);
+    }
+    return answer;
   } catch (error) {
     logger.warn(
       {

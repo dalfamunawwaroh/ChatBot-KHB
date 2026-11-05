@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { api, SOURCE_LABEL, type ConversationDetail, type ConversationRow } from '../services/api';
 import { formatDateTime, initials, useResource } from '../hooks/useApi';
+import { MarkdownText } from '../components/ui/MarkdownText';
 
 const STATUS_LABEL: Record<string, string> = {
   bot: 'Chatbot',
@@ -197,7 +198,7 @@ export default function HistoryPage() {
                   className={`public-msg ${message.senderType === 'customer' ? 'user' : 'bot'}`}
                   style={{ maxWidth: '86%', marginLeft: message.senderType === 'customer' ? 'auto' : 0 }}
                 >
-                  {message.text}
+                  <MarkdownText text={message.text} />
                   {message.senderType === 'bot' ? (
                     <span style={{ display: 'block', marginTop: 6, fontSize: 11, opacity: 0.75 }}>
                       {SOURCE_LABEL[message.source]}

@@ -1,77 +1,107 @@
 /**
- * Penegakan gaya jawaban secara deterministik.
+ * Perapian jawaban asisten.
  *
- * Prompt saja tidak cukup: model kadang tetap memakai heading markdown,
- * penebalan, tabel, atau penanda sitasi. Fungsi ini merapikan keluaran LLM/RAG
- * supaya konsisten dengan tampilan chat KHB: teks polos dan TANPA sitasi.
+ * Aturan produk:
+ * - Format (heading, **bold**, list, tabel) DIPERTAHANKAN seperti jawaban RAG —
+ *   UI merender markdown supaya tampilannya sama dengan panel RAG.
+ * - Sitasi dibuang: penanda [1]/[2], nama berkas dokumen, dan baris "Sumber: …".
+ * - Basa-basi pembuka ("dokumen tidak memuat…", "berikut penjelasan dari
+ *   pengetahuan umum…") dibuang agar jawaban langsung ke inti.
  */
-export function sanitizeAnswer(raw: string): string {
+
+/** Kalimat yang menolak/menyebut keterbatasan dokumen dianggap tidak menjawab. */
+export const UNHELPFUL_ANSWER =
+  /tidak ada informasi|tidak (?:memuat|membahas|menjelaskan)|tidak bisa menjawab|belum ada di materi|di luar (?:dokumen|konteks)/i;
+
+/** Pola kalimat yang hanya membicarakan proses/sumber, bukan isi jawaban. */
+const META_SENTENCE: RegExp[] = [
+  /\b(?:dokumen\s*(?:KHB|rujukan|acuan|ini)|konteks|basis pengetahuan|materi\s*KHB)\b[^.]{0,90}\b(?:hanya|tidak|belum|secara spesifik|secara eksplisit)\b/i,
+  /\b(?:dokumen\s*(?:KHB|rujukan|acuan|ini)|konteks|basis pengetahuan|materi\s*KHB)\b.{0,80}\b(?:membahas|memuat|menyebut|menjelaskan|mendefinisikan|mencakup|mengatur)\b/i,
+  /^tidak ada informasi\b/i,
+  /^jadi,?\s*saya tidak bisa menjawab\b/i,
+  /\b(?:hasil|dari)\s+pencarian\b/i,
+  /\bsumber yang (?:ada|tersedia)\b/i,
+  /\b(?:artikel|halaman)\s+wikipedia\b/i,
+  /(?:jawaban|penjelasan) ini (?:bersumber|berasal|diambil)\b/i,
+  /^karena itu,?\s*berikut\b/i,
+  /^berikut (?:penjelasan|jawaban|uraian)\b/i,
+  /^\(?dokumen\s*(?:rujukan|\d+)\b/i,
+];
+
+/** Klausa pembuka meta di awal baris prosa. */
+const LEADING_META: RegExp[] = [
+  /^\s*(?:berdasarkan|menurut|merujuk pada|mengacu pada|mengutip)\s+(?:dokumen|basis pengetahuan|sumber|referensi)[^,.:\n]*[,:]\s*/i,
+  /^\s*(?:berdasarkan|menurut|merujuk pada|mengacu pada|mengutip)\s+(?!saya|kami|pendapat|beliau)[^,.:\n]{0,60}[,:]\s*/i,
+  /^\s*karena itu,?\s*berikut[^:\n]{0,140}:\s*/i,
+  /^\s*berikut (?:penjelasan|jawaban|uraian)[^:\n]{0,120}:\s*/i,
+];
+
+/** Baris struktural markdown — isinya tidak boleh digabung/dipangkas. */
+function isStructural(line: string): boolean {
+  return /^\s*(#{1,6}\s|[-*+]\s|\d+[.)]\s|\||>|```)/.test(line);
+}
+
+/** Buang kalimat meta dari satu baris prosa. */
+function stripMetaSentences(line: string): string {
+  const sentences = line.split(/(?<=[.!?])\s+/);
+  const kept = sentences.filter((sentence) => {
+    const trimmed = sentence.trim();
+    if (trimmed.length === 0) return false;
+    return !META_SENTENCE.some((pattern) => pattern.test(trimmed));
+  });
+  return kept.join(' ').trim();
+}
+
+export function sanitizeAnswer(raw: string, fallback = ''): string {
   let text = raw.replace(/\r\n/g, '\n');
 
-  // ── 1. Buang sitasi ──────────────────────────────────────────
-  // Penanda [1], [2][3], [doc-…], dan baris "Sumber:/Referensi: …".
+  // ── 1. Sitasi ────────────────────────────────────────────────
   text = text.replace(/\[\s*\d+(?:\s*[,–-]\s*\d+)*\s*\]/g, '');
   text = text.replace(/\[\s*doc[^\]]*\]/gi, '');
-  text = text
-    .split('\n')
-    .filter((line) => !/^\s*(sumber|referensi|rujukan|sources?)\s*[:\-]/i.test(line.trim()))
-    .join('\n');
-  // Nama berkas dokumen (mis. "Alur_Sertifikasi_KHB.txt").
+  // Nama berkas dokumen, mis. `Layanan_KHB.txt` atau Layanan_KHB.txt
   text = text.replace(/\b[\w-]+\.(?:txt|pdf|docx?|xlsx?|csv)\b/gi, '');
-  // Pembuka meta: "Berdasarkan dokumen X," / "Menurut FAQ_KHB," → dibuang.
-  text = text.replace(
-    /(^|\n)\s*(?:berdasarkan|menurut|merujuk pada|mengacu pada)\s+(?:dokumen|basis pengetahuan|sumber|referensi)[^,.:\n]*[,:]\s*/gi,
-    '$1',
-  );
-  // Sisa pembuka meta tanpa objek ("Menurut :", "Berdasarkan ,").
-  text = text.replace(/(^|\n)\s*(?:berdasarkan|menurut|merujuk pada|mengacu pada)\s*[,:]\s*/gi, '$1');
-  // Pembuka meta dengan objek lain (nama dokumen/profil): "Berdasarkan Profil KHB," → dibuang.
-  text = text.replace(
-    /(^|\n)\s*(?:berdasarkan|menurut|merujuk pada|mengacu pada|mengutip)\s+(?!saya|kami|pendapat|beliau)[^,.:\n]{0,60}[,:]\s*/gi,
-    '$1',
-  );
-  // Sisa backtick tunggal.
-  text = text.replace(/`/g, '');
+  // Backtick dibiarkan sebagai penanda kode inline hanya bila isinya bermakna;
+  // sisa backtick kosong dibuang.
+  text = text.replace(/`\s*`/g, '');
 
-  // ── 2. Rapikan tanda baca & kapitalisasi ─────────────────────
-  text = text
-    .replace(/[ \t]{2,}/g, ' ')
-    .replace(/\s+([.,;:!?])/g, '$1')
-    .replace(/([,.;:])\s*([,.;:])/g, '$1')
-    .replace(/(^|\n)(\s*)([a-z])/g, (_m, lead: string, space: string, ch: string) => `${lead}${space}${ch.toUpperCase()}`);
+  // ── 2. Per baris: buang baris/klausa meta, pertahankan struktur ──
+  const output: string[] = [];
+  for (const rawLine of text.split('\n')) {
+    const line = rawLine.replace(/[ \t]+$/, '');
 
-  // ── 3. Markdown → teks polos ─────────────────────────────────
-  text = text.replace(/^#{1,6}\s*(.+)$/gm, (_, title: string) => title.trim());
-  text = text.replace(/\*\*([^*]+)\*\*/g, '$1');
-  text = text.replace(/(^|[\s(])\*([^*\n]+)\*(?=[\s).,:;!?]|$)/g, '$1$2');
-  text = text.replace(/`([^`]+)`/g, '$1');
-  text = text.replace(/(^|[\s(])_([^_\n]+)_(?=[\s).,:;!?]|$)/g, '$1$2');
-  text = text.replace(/```[a-z]*\n?/gi, '').replace(/```/g, '');
+    // Baris sumber/referensi dibuang total.
+    if (/^\s*(sumber|referensi|rujukan|sources?)\s*[:\-]/i.test(line)) continue;
 
-  // ── 4. Tabel markdown → poin ─────────────────────────────────
-  text = text
-    .split('\n')
-    .filter((line) => !/^\s*\|?[\s:-]*-{2,}[\s:|-]*\|?\s*$/.test(line))
-    .map((line) => {
-      if (/^\s*\|.*\|\s*$/.test(line)) {
-        const cells = line
-          .split('|')
-          .map((cell) => cell.trim())
-          .filter((cell) => cell.length > 0);
-        if (cells.length === 0) return '';
-        if (/^\d+$/.test(cells[0] ?? '')) return `${cells[0]}. ${cells.slice(1).join(' — ')}`;
-        return '';
-      }
-      return line;
-    })
-    .join('\n');
+    if (isStructural(line)) {
+      output.push(line);
+      continue;
+    }
 
-  // ── 5. Spasi akhir ───────────────────────────────────────────
-  text = text.replace(/^\s*[-*+]\s+/gm, '- ');
+    let prose = line;
+    for (const pattern of LEADING_META) prose = prose.replace(pattern, '');
+    prose = stripMetaSentences(prose);
+
+    if (prose.trim().length === 0) {
+      // Baris kosong tetap dipertahankan sebagai pemisah paragraf.
+      if (line.trim().length === 0) output.push('');
+      continue;
+    }
+    output.push(prose);
+  }
+
+  text = output.join('\n');
+
+  // ── 3. Rapikan tanpa merusak markdown ────────────────────────
+  text = text.replace(/[ \t]{2,}/g, ' ');
+  text = text.replace(/[ \t]+([:,;!?])/g, '$1');
   text = text.replace(/\n{3,}/g, '\n\n');
-  text = text.replace(/[ \t]+$/gm, '');
+  // Kapitalisasi awal paragraf (bukan baris list/heading).
+  text = text.replace(/(^|\n)([a-z])/g, (_m, lead: string, ch: string) => `${lead}${ch.toUpperCase()}`);
+  text = text.replace(/^\s*[-*+]\s*$/gm, '');
 
-  return text.trim();
+  const cleaned = text.trim();
+  if (cleaned.length < 25 && fallback.length > 0) return fallback;
+  return cleaned;
 }
 
 /** Perkiraan jumlah kata (dipakai untuk log & pengujian gaya). */

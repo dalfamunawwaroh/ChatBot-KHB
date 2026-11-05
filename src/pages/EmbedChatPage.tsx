@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { api, SOURCE_LABEL } from '../services/api';
+import { MarkdownText } from '../components/ui/MarkdownText';
 
 interface ChatMessage {
   id: string;
@@ -146,7 +147,7 @@ export default function EmbedChatPage() {
         <div className="embed-body">
           {messages.map((message) => (
             <div key={message.id} className={`public-msg ${message.role === 'user' ? 'user' : 'bot'}`}>
-              {message.text}
+              <MarkdownText text={message.text} />
               {message.source ? (
                 <span style={{ display: 'block', marginTop: 4, fontSize: 10.5, opacity: 0.7 }}>
                   {SOURCE_LABEL[message.source]}

@@ -1,57 +1,57 @@
 /**
- * Prompt untuk model bahasa.
+ * Penyusunan prompt untuk Asisten Halal KHB.
  *
- * Dua mode yang sengaja dipisah tegas:
- * 1. GROUNDED — jawaban wajib bertumpu pada potongan dokumen yang dilampirkan.
- * 2. GENERAL  — pertanyaan di luar dokumen KHB; model boleh memakai pengetahuan
- *    umumnya sendiri (fiqh halal dasar, prosedur BPJPH, dsb.) dengan batasan:
- *    tidak mengarang nomor regulasi/harga, mengaku bila ragu, dan tidak
- *    mengaku sebagai dokumen resmi KHB.
+ * Tiga mode:
+ *  - grounded : jawaban dari dokumen KHB (RAG).
+ *  - web      : jawaban dari hasil pencarian internet (pertanyaan umum).
+ *  - general  : jawaban dari pengetahuan model (cadangan saat web tidak tersedia).
+ *
+ * Semua mode memakai SERVICE_RULES yang sama: ringkas, teks polos, tanpa sitasi,
+ * dan TANPA basa-basi pembuka (pengguna ingin jawaban langsung).
  */
-import type { RetrievedChunk } from './retrieval';
 
 export const SERVICE_RULES = [
   'Jawab dalam Bahasa Indonesia yang ramah, ringkas, dan mudah dipahami pelaku UMKM.',
-  'Gunakan maksimal 120 kata; bila perlu rincian, pakai poin-poin singkat dengan tanda "-".',
-  'Tulis teks biasa: jangan memakai markdown heading (#, ##), tabel, atau blok kode.',
-  'Langsung jawab pertanyaannya. Jangan membuka dengan kalimat meta seperti "berdasarkan dokumen" atau "menurut konteks".',
-  'Jangan menuliskan penanda sitasi seperti [1], [2], atau "Sumber: ..." di dalam jawaban.',
-  'Jangan mengarang nomor sertifikat, nomor regulasi, biaya, atau tenggat yang tidak ada di konteks.',
-  'Jangan menjanjikan hasil sertifikasi; sampaikan bahwa keputusan ada pada BPJPH/LPH.',
-  'Bila pengguna tampak butuh pendampingan, sarankan berbicara dengan Pendamping PPH KHB.',
+  'LANGSUNG jawab pertanyaannya pada kalimat pertama. Dilarang membuka dengan penjelasan proses, mis. "dokumen tidak memuat...", "berikut penjelasan dari pengetahuan umum...", "karena itu...", "baik, saya jelaskan...".',
+  'Jangan menyebut dokumen, basis pengetahuan, pencarian, model, atau sumber internal apa pun.',
+  'Jangan memakai penanda sitasi seperti [1], [2], atau baris "Sumber: ...".',
+  'Maksimal 120 kata, teks polos: tanpa heading markdown, tanpa penebalan, tanpa tabel.',
+  'Bila informasi memang belum pasti atau bisa berubah, tutup dengan satu kalimat singkat agar pengguna memastikannya ke BPJPH/SIHALAL atau pendamping halal.',
 ];
 
+export interface ChatTurn {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
+function historyBlock(history: ChatTurn[]): string {
+  return history
+    .slice(-6)
+    .map((turn) => `${turn.role === 'user' ? 'Pengguna' : 'Asisten'}: ${turn.content}`)
+    .join('\n');
+}
+
+/** Mode RAG: jawaban hanya dari konteks dokumen KHB. */
 export function buildGroundedPrompt(params: {
   assistantName: string;
   tone: string;
   question: string;
-  chunks: RetrievedChunk[];
-  history: Array<{ role: 'user' | 'assistant'; content: string }>;
+  history: ChatTurn[];
+  context: string;
 }): { system: string; user: string } {
-  const { assistantName, tone, question, chunks, history } = params;
-  const context = chunks
-    .map((chunk, index) => {
-      const label = chunk.page != null ? `${chunk.documentTitle} (hlm. ${chunk.page})` : chunk.documentTitle;
-      return `[DOKUMEN ${index + 1} — ${label}]\n${chunk.text}`;
-    })
-    .join('\n\n');
+  const { assistantName, tone, question, history, context } = params;
 
   const system = [
-    `Kamu adalah ${assistantName}, asisten edukasi halal untuk Komunitas Halal Bandung.`,
-    `Gaya jawaban yang diminta admin: ${tone}.`,
+    `Kamu adalah ${assistantName}, asisten edukasi halal untuk Komunitas Halal Bandung (KHB).`,
+    `Gaya jawaban: ${tone}.`,
     ...SERVICE_RULES,
-    'ATURAN MODE DOKUMEN: jawab HANYA berdasarkan potongan dokumen di bawah.',
-    'Bila dokumen tidak memuat jawabannya, katakan terus terang bahwa informasinya belum ada di dokumen KHB, lalu sarankan langkah berikutnya (tanya Pendamping PPH atau cek SIHALAL).',
+    'Gunakan hanya informasi pada konteks dokumen. Jangan mengarang angka, biaya, atau tenggat.',
+    'Bila konteks tidak cukup, katakan singkat bahwa informasi itu belum ada di materi KHB dan arahkan menghubungi admin KHB.',
   ].join('\n');
 
-  const historyBlock = history
-    .slice(-6)
-    .map((turn) => `${turn.role === 'user' ? 'Pengguna' : 'Asisten'}: ${turn.content}`)
-    .join('\n');
-
   const user = [
-    context.length > 0 ? `Potongan dokumen rujukan:\n${context}` : 'Tidak ada dokumen rujukan yang cocok.',
-    historyBlock ? `Riwayat singkat:\n${historyBlock}` : '',
+    `Konteks dokumen KHB:\n${context}`,
+    history.length > 0 ? `Riwayat singkat:\n${historyBlock(history)}` : '',
     `Pertanyaan pengguna: ${question}`,
   ]
     .filter((part) => part.length > 0)
@@ -60,38 +60,55 @@ export function buildGroundedPrompt(params: {
   return { system, user };
 }
 
+/** Mode WEB: jawaban memakai hasil pencarian internet. */
+export function buildWebPrompt(params: {
+  assistantName: string;
+  tone: string;
+  question: string;
+  history: ChatTurn[];
+  webContext: string;
+}): { system: string; user: string } {
+  const { assistantName, tone, question, history, webContext } = params;
+
+  const system = [
+    `Kamu adalah ${assistantName}, asisten edukasi halal untuk Komunitas Halal Bandung (KHB).`,
+    `Gaya jawaban: ${tone}.`,
+    ...SERVICE_RULES,
+    'Pakai hasil pencarian internet di bawah sebagai bahan utama jawaban.',
+    'Tulis jawaban final seolah kamu sudah tahu jawabannya: jangan menulis "berdasarkan hasil pencarian", jangan menyebut nama situs, jangan menyalin daftar hasil.',
+    'Bila hasil pencarian tidak relevan dengan pertanyaan, jangan menceritakan isinya. Jawab maksimal dua kalimat: informasinya belum tersedia dan sarankan cara mengeceknya (mis. pasar/BPJPH/SIHALAL).',
+  ].join('\n');
+
+  const user = [
+    `Hasil pencarian internet (bahan internal, jangan dikutip mentah):\n${webContext}`,
+    history.length > 0 ? `Riwayat singkat:\n${historyBlock(history)}` : '',
+    `Pertanyaan pengguna: ${question}`,
+  ]
+    .filter((part) => part.length > 0)
+    .join('\n\n');
+
+  return { system, user };
+}
+
+/** Mode GENERAL: cadangan saat dokumen & web tidak memberi bahan. */
 export function buildGeneralPrompt(params: {
   assistantName: string;
   tone: string;
   question: string;
-  history: Array<{ role: 'user' | 'assistant'; content: string }>;
-  knownTopics: string[];
+  history: ChatTurn[];
 }): { system: string; user: string } {
-  const { assistantName, tone, question, history, knownTopics } = params;
+  const { assistantName, tone, question, history } = params;
 
   const system = [
-    `Kamu adalah ${assistantName}, asisten edukasi halal untuk Komunitas Halal Bandung.`,
-    `Gaya jawaban yang diminta admin: ${tone}.`,
+    `Kamu adalah ${assistantName}, asisten edukasi halal untuk Komunitas Halal Bandung (KHB).`,
+    `Gaya jawaban: ${tone}.`,
     ...SERVICE_RULES,
-    'ATURAN MODE UMUM: pertanyaan ini tidak terjawab oleh dokumen internal KHB.',
-    'Jangan menyebut atau mengutip dokumen KHB sama sekali; jangan menjelaskan bahwa dokumen tidak membahasnya.',
-    'Kamu BOLEH menjawab dengan pengetahuan umum tentang sertifikasi halal di Indonesia (BPJPH, LPH, SIHALAL, self declare, bahan kritis, tahapan sertifikasi, dokumen yang biasanya diminta).',
-    'Jangan mengaku kutipan dari dokumen KHB. Bila ragu atau informasi bisa berubah (biaya, tenggat, aturan terbaru), katakan bahwa pengguna sebaiknya memastikan ke BPJPH/SIHALAL atau Pendamping PPH KHB.',
-    'Jangan memberi fatwa fiqh yang tegas; untuk kasus bahan/penyembelihan yang rumit, arahkan ke pendamping.',
+    'Jawab dengan pengetahuan umum yang kamu yakini benar.',
+    'Jangan menyatakan bahwa kamu menjawab "di luar dokumen" atau meminta maaf karena keterbatasan sumber.',
   ].join('\n');
 
-  const historyBlock = history
-    .slice(-6)
-    .map((turn) => `${turn.role === 'user' ? 'Pengguna' : 'Asisten'}: ${turn.content}`)
-    .join('\n');
-
   const user = [
-    knownTopics.length > 0
-      ? `Catatan internal (jangan disebut ke pengguna): dokumen KHB hanya membahas ${knownTopics
-          .slice(0, 8)
-          .join(', ')}. Pertanyaan ini di luar cakupan itu, jadi jawab dengan pengetahuan umum yang meyakinkan.`
-      : '',
-    historyBlock ? `Riwayat singkat:\n${historyBlock}` : '',
+    history.length > 0 ? `Riwayat singkat:\n${historyBlock(history)}` : '',
     `Pertanyaan pengguna: ${question}`,
   ]
     .filter((part) => part.length > 0)
@@ -99,6 +116,3 @@ export function buildGeneralPrompt(params: {
 
   return { system, user };
 }
-
-export const GENERAL_DISCLAIMER =
-  'Jawaban ini bersumber dari pengetahuan umum, bukan dari dokumen resmi KHB. Untuk keputusan resmi, cek SIHALAL atau tanyakan ke Pendamping PPH.';
