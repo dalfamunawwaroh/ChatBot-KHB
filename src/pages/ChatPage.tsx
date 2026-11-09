@@ -19,6 +19,15 @@ const BOT_AVATAR = (
   <svg viewBox="0 0 20 20" fill="none"><path d="M10 1.6a1 1 0 011 1v1.1a4 4 0 013.9 4v3.1l1.2 2a.8.8 0 01-.7 1.2H3.6a.8.8 0 01-.7-1.2l1.2-2V7.7A4 4 0 018.9 3.7V2.6a1 1 0 011-1zM8.2 8.6a.9.9 0 100 1.8.9.9 0 000-1.8zM11.8 8.6a.9.9 0 100 1.8.9.9 0 000-1.8zM8.4 12.2h3.2" stroke="currentColor" strokeWidth="1.5"/><path d="M8 16a2 2 0 004 0" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
 );
 
+/* Ikon topik bergiliran supaya tiap kartu topik tidak tampak identik. */
+const TOPIC_ICONS = [
+  { tone: 'topic-green', icon: <><path d="M10 2l2.4 5.2 5.6.6-4.2 3.8 1.2 5.6L10 14.4 5 17.2l1.2-5.6L2 7.8l5.6-.6L10 2z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" /></> },
+  { tone: 'topic-blue', icon: <><rect x="3" y="2" width="14" height="16" rx="2" stroke="currentColor" strokeWidth="1.4" /><path d="M7 7h6M7 10h6M7 13h4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" /></> },
+  { tone: 'topic-orange', icon: <><path d="M4 2h9l4 4v12H4V2z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" /><path d="M13 2v4h4" stroke="currentColor" strokeWidth="1.4" /><path d="M7 10h6M7 13h4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" /></> },
+  { tone: 'topic-purple', icon: <><circle cx="10" cy="10" r="7" stroke="currentColor" strokeWidth="1.4" /><path d="M10 7v3l2 2" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" /></> },
+  { tone: 'topic-teal', icon: <><path d="M3 10l7-7 7 7v7a1 1 0 01-1 1H4a1 1 0 01-1-1v-7z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" /><path d="M8 18v-5h4v5" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" /></> },
+];
+
 export default function ChatPage() {
   const notify = useToast();
   const [boot, setBoot] = useState<ChatBoot | null>(null);
@@ -86,6 +95,14 @@ export default function ChatPage() {
     }
   };
 
+  const resetChat = () => {
+    sessionKey.current = '';
+    localStorage.removeItem(SESSION_KEY);
+    setMessages(boot ? [{ id: 'greeting', role: 'bot', text: boot.assistant.greeting }] : []);
+    setDraft('');
+    notify('Percakapan baru dimulai');
+  };
+
   const starters = boot?.starters ?? [
     'Bagaimana cara mengajukan sertifikasi halal untuk UMKM?',
     'Apa itu self declare?',
@@ -100,7 +117,13 @@ export default function ChatPage() {
           <h1>Chat Edukasi Halal</h1>
           <p className="subheading">Jawaban dari dokumen KHB; pertanyaan di luar itu dijawab dari pengetahuan umum.</p>
         </div>
-        <span className="online-pill"><i></i> {sending ? 'Mengetik…' : 'Asisten online'}</span>
+        <div className="chat-head-actions">
+          <span className="online-pill"><i></i> {sending ? 'Mengetik…' : 'Asisten online'}</span>
+          <button className="btn btn-secondary btn-sm" onClick={resetChat} title="Mulai percakapan baru">
+            <svg viewBox="0 0 20 20" fill="none"><path d="M4 10a6 6 0 106-6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" /><path d="M10 1.5V5h3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>
+            Percakapan baru
+          </button>
+        </div>
       </div>
 
       <div className="chat-layout">
@@ -109,13 +132,18 @@ export default function ChatPage() {
             <h3>Topik populer</h3>
           </div>
           <p>Pilih topik untuk memulai percakapan</p>
-          {starters.map((starter) => (
-            <button key={starter} className="topic-btn" onClick={() => void send(starter)}>
-              <span className="topic-icon topic-green">{BOT_AVATAR}</span>
-              <span><strong>{starter}</strong><small>Kirim sebagai pertanyaan</small></span>
-              <b>→</b>
-            </button>
-          ))}
+          {starters.map((starter, index) => {
+            const look = TOPIC_ICONS[index % TOPIC_ICONS.length];
+            return (
+              <button key={`${index}-${starter}`} className="topic-btn" onClick={() => void send(starter)}>
+                <span className={`topic-icon ${look.tone}`}>
+                  <svg viewBox="0 0 20 20" fill="none">{look.icon}</svg>
+                </span>
+                <span><strong>{starter}</strong><small>Kirim sebagai pertanyaan</small></span>
+                <b>→</b>
+              </button>
+            );
+          })}
           <div className="chat-disclaimer">
             ⓘ Jawaban AI bersifat edukatif. Untuk informasi resmi, rujuk BPJPH/SIHALAL.
           </div>

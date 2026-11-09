@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { api, SOURCE_LABEL, type ConversationDetail, type ConversationRow } from '../services/api';
 import { formatDateTime, initials, useResource } from '../hooks/useApi';
 import { MarkdownText } from '../components/ui/MarkdownText';
@@ -14,6 +14,12 @@ const SOURCE_BADGE: Record<string, string> = {
   general: 'badge-blue',
   handoff: 'badge-amber',
   none: 'badge-slate',
+};
+
+/** Bungkus sel CSV: kutip bila mengandung koma/kutip/baris baru. */
+const csvCell = (value: unknown): string => {
+  const text = value === null || value === undefined ? '' : String(value);
+  return /[",\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
 };
 
 export default function HistoryPage() {
@@ -49,13 +55,19 @@ export default function HistoryPage() {
   };
 
   const exportCsv = () => {
-    const header = 'id,pengguna,kanal,status,sumber_terakhir,pesan,terakhir\n';
-    const body = rows
-      .map((row) =>
-        [row.id, row.customerName ?? '', row.channel ?? '', row.status, row.lastSource ?? '', row.messageCount, row.lastMessageAt ?? ''].join(','),
-      )
-      .join('\n');
-    const blob = new Blob([header + body], { type: 'text/csv;charset=utf-8' });
+    const header = ['id', 'pengguna', 'kanal', 'status', 'sumber_terakhir', 'pesan', 'terakhir'];
+    const body = rows.map((row) => [
+      row.id,
+      row.customerName ?? '',
+      row.channel ?? '',
+      row.status,
+      row.lastSource ?? '',
+      row.messageCount,
+      row.lastMessageAt ?? '',
+    ]);
+    const csv = [header, ...body].map((line) => line.map(csvCell).join(',')).join('\r\n');
+    // BOM supaya Excel membaca UTF-8 dengan benar.
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
@@ -63,6 +75,16 @@ export default function HistoryPage() {
     link.click();
     URL.revokeObjectURL(url);
   };
+
+  /* Modal detail bisa ditutup dengan Escape. */
+  useEffect(() => {
+    if (!detail) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setDetail(null);
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [detail]);
 
   return (
     <section className="view active" id="view-history">
@@ -113,13 +135,13 @@ export default function HistoryPage() {
               <svg viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="5.5" stroke="currentColor" strokeWidth="1.5"/><path d="M15 15l-2.5-2.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
               <input type="search" placeholder="Cari pengguna..." value={query} onChange={(event) => setQuery(event.target.value)} />
             </label>
-            <select className="settings-select" style={{ height: 36, fontSize: 12 }} value={status} onChange={(event) => setStatus(event.target.value)}>
+            <select className="settings-select compact" value={status} onChange={(event) => setStatus(event.target.value)}>
               <option value="">Semua status</option>
               <option value="bot">Chatbot</option>
               <option value="pending_human">Perlu pendamping</option>
               <option value="resolved">Selesai</option>
             </select>
-            <select className="settings-select" style={{ height: 36, fontSize: 12 }} value={source} onChange={(event) => setSource(event.target.value)}>
+            <select className="settings-select compact" value={source} onChange={(event) => setSource(event.target.value)}>
               <option value="">Semua sumber</option>
               <option value="rag">Dokumen KHB</option>
               <option value="general">Pengetahuan umum</option>
@@ -146,9 +168,13 @@ export default function HistoryPage() {
                   <td>{row.channel ?? 'Widget'}</td>
                   <td>{row.messageCount}</td>
                   <td>
-                    <span className={`badge-pill ${SOURCE_BADGE[row.lastSource ?? 'none']}`}>
-                      <i></i>{SOURCE_LABEL[row.lastSource ?? 'none']}
-                    </span>
+                    {row.lastSource && row.lastSource !== 'none' ? (
+                      <span className={`badge-pill ${SOURCE_BADGE[row.lastSource] ?? 'badge-slate'}`}>
+                        <i></i>{SOURCE_LABEL[row.lastSource]}
+                      </span>
+                    ) : (
+                      <span className="text-muted">Belum dijawab</span>
+                    )}
                   </td>
                   <td>{formatDateTime(row.lastMessageAt)}</td>
                   <td>
@@ -182,8 +208,14 @@ export default function HistoryPage() {
       </div>
 
       {detail || detailLoading ? (
-        <div className="modal" style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,.45)', display: 'grid', placeItems: 'center', zIndex: 60, padding: 20 }}>
-          <div className="panel" style={{ width: 'min(640px, 100%)', maxHeight: '80vh', overflowY: 'auto', padding: 22 }}>
+        <div
+          className="modal"
+          style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,.45)', display: 'grid', placeItems: 'center', zIndex: 60, padding: 20 }}
+          onClick={(event) => {
+            if (event.target === event.currentTarget) setDetail(null);
+          }}
+        >
+          <div className="panel" style={{ width: 'min(640px, 100%)', maxHeight: '80vh', overflowY: 'auto', padding: 22 }} role="dialog" aria-modal="true" aria-label="Detail percakapan">
             <div className="panel-heading">
               <div>
                 <h2>{detail?.customerName ?? 'Detail percakapan'}</h2>

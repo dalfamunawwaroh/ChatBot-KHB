@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePrefs } from '../context/PrefsContext';
 import type { TextSize, ThemeMode } from '../context/PrefsContext';
+import { useApp } from '../context/AppContext';
 import { useToast } from '../components/Toast';
 
 const TABS = [
@@ -41,8 +42,63 @@ const TEXT_SIZES: Array<{ id: TextSize; label: string }> = [
 export default function SettingsPage() {
   const [tab, setTab] = useState('account');
   const { theme, textSize, setTheme, setTextSize } = usePrefs();
+  const { user, saveUser } = useApp();
   const notify = useToast();
   const navigate = useNavigate();
+
+  /* Zona waktu & bahasa: disimpan supaya tombol "Simpan Perubahan" bermakna. */
+  const [timezone, setTimezone] = useState('Asia/Jakarta (WIB, GMT+7)');
+  const [language, setLanguage] = useState('Bahasa Indonesia');
+
+  /* Keamanan */
+  const [pw, setPw] = useState({ current: '', next: '' });
+  const [showPw, setShowPw] = useState({ current: false, next: false });
+
+  /* Preferensi notifikasi */
+  const [notifPrefs, setNotifPrefs] = useState({
+    chat: true,
+    docs: true,
+    weekly: false,
+    system: true,
+    email: false,
+  });
+
+  /* Konfigurasi chatbot */
+  const [bot, setBot] = useState({
+    language: 'Bahasa Indonesia',
+    style: 'Formal & informatif',
+    sources: true,
+    suggestions: true,
+  });
+
+  /* Sesi aktif (bisa dikeluarkan) */
+  const [sessions, setSessions] = useState([
+    { id: 'this', device: 'Windows · Chrome', meta: 'Bandung, Indonesia · Sekarang (Sesi ini)', current: true, mobile: false },
+    { id: 'android', device: 'Android · Chrome', meta: 'Bandung, Indonesia · 2 hari lalu', current: false, mobile: true },
+  ]);
+
+  const saveAccount = () => {
+    saveUser({ timezone, language });
+    notify('Zona waktu & bahasa disimpan');
+  };
+
+  const changePassword = () => {
+    if (pw.current.trim().length === 0) {
+      notify('Masukkan kata sandi saat ini');
+      return;
+    }
+    if (pw.next.trim().length < 8) {
+      notify('Kata sandi baru minimal 8 karakter');
+      return;
+    }
+    setPw({ current: '', next: '' });
+    notify('Kata sandi diperbarui');
+  };
+
+  const saveBot = () => {
+    saveUser({ botLanguage: bot.language, botStyle: bot.style, botSources: bot.sources, botSuggestions: bot.suggestions });
+    notify('Konfigurasi chatbot disimpan');
+  };
 
   const pickTheme = (mode: ThemeMode) => {
     setTheme(mode);
@@ -95,29 +151,39 @@ export default function SettingsPage() {
                   <div><h3>Informasi Akun</h3><p>Detail dasar akun Anda</p></div>
                   <button className="btn btn-secondary btn-sm settings-edit-cta" onClick={() => navigate('/edit-profile')}>Edit Profil</button>
                 </div>
-                <div className="settings-field"><label>Nama Lengkap</label><div className="settings-value">Admin KHB</div></div>
-                <div className="settings-field"><label>Email</label><div className="settings-value">admin@khb.or.id</div></div>
-                <div className="settings-field"><label>Peran</label><div className="settings-value"><span className="role-badge">Administrator</span></div></div>
+                <div className="settings-field"><label>Nama Lengkap</label><div className="settings-value">{`${user.firstName} ${user.lastName}`.trim()}</div></div>
+                <div className="settings-field"><label>Email</label><div className="settings-value">{user.email}</div></div>
+                <div className="settings-field"><label>Peran</label><div className="settings-value"><span className="role-badge">{user.role}</span></div></div>
                 <div className="settings-field"><label>Bergabung sejak</label><div className="settings-value">1 Januari 2024</div></div>
               </div>
               <div className="settings-card panel">
                 <div className="settings-card-header"><h3>Zona Waktu &amp; Bahasa</h3><p>Sesuaikan regional Anda</p></div>
                 <div className="settings-field">
-                  <label>Zona waktu</label>
-                  <select className="settings-select" defaultValue="Asia/Jakarta (WIB, GMT+7)">
+                  <label htmlFor="set-timezone">Zona waktu</label>
+                  <select
+                    id="set-timezone"
+                    className="settings-select"
+                    value={timezone}
+                    onChange={(event) => setTimezone(event.target.value)}
+                  >
                     <option>Asia/Jakarta (WIB, GMT+7)</option>
                     <option>Asia/Makassar (WITA, GMT+8)</option>
                     <option>Asia/Jayapura (WIT, GMT+9)</option>
                   </select>
                 </div>
                 <div className="settings-field">
-                  <label>Bahasa antarmuka</label>
-                  <select className="settings-select" defaultValue="Bahasa Indonesia">
+                  <label htmlFor="set-language">Bahasa antarmuka</label>
+                  <select
+                    id="set-language"
+                    className="settings-select"
+                    value={language}
+                    onChange={(event) => setLanguage(event.target.value)}
+                  >
                     <option>Bahasa Indonesia</option>
                     <option>English</option>
                   </select>
                 </div>
-                <div className="settings-actions"><button className="btn btn-primary btn-sm">Simpan Perubahan</button></div>
+                <div className="settings-actions"><button className="btn btn-primary btn-sm" onClick={saveAccount}>Simpan Perubahan</button></div>
               </div>
             </div>
 
@@ -172,41 +238,30 @@ export default function SettingsPage() {
               <div className="settings-card panel">
                 <div className="settings-card-header"><h3>Preferensi Notifikasi</h3><p>Atur kapan Anda ingin diberitahu</p></div>
                 <div className="settings-toggle-list">
-                  <div className="settings-toggle-item">
-                    <div><strong>Pesan chat baru</strong><small>Notifikasi saat ada pertanyaan masuk</small></div>
-                    <label className="toggle-switch">
-                      <input type="checkbox" defaultChecked />
-                      <span className="toggle-slider"></span>
-                    </label>
-                  </div>
-                  <div className="settings-toggle-item">
-                    <div><strong>Pembaruan dokumen</strong><small>Notifikasi saat dokumen diperbarui</small></div>
-                    <label className="toggle-switch">
-                      <input type="checkbox" defaultChecked />
-                      <span className="toggle-slider"></span>
-                    </label>
-                  </div>
-                  <div className="settings-toggle-item">
-                    <div><strong>Laporan mingguan</strong><small>Ringkasan aktivitas setiap Senin</small></div>
-                    <label className="toggle-switch">
-                      <input type="checkbox" />
-                      <span className="toggle-slider"></span>
-                    </label>
-                  </div>
-                  <div className="settings-toggle-item">
-                    <div><strong>Peringatan sistem</strong><small>Notifikasi kritis tentang status sistem</small></div>
-                    <label className="toggle-switch">
-                      <input type="checkbox" defaultChecked />
-                      <span className="toggle-slider"></span>
-                    </label>
-                  </div>
-                  <div className="settings-toggle-item">
-                    <div><strong>Notifikasi email</strong><small>Kirim notifikasi ke email terdaftar</small></div>
-                    <label className="toggle-switch">
-                      <input type="checkbox" />
-                      <span className="toggle-slider"></span>
-                    </label>
-                  </div>
+                  {[
+                    ['chat', 'Pesan chat baru', 'Notifikasi saat ada pertanyaan masuk'],
+                    ['docs', 'Pembaruan dokumen', 'Notifikasi saat dokumen diperbarui'],
+                    ['weekly', 'Laporan mingguan', 'Ringkasan aktivitas setiap Senin'],
+                    ['system', 'Peringatan sistem', 'Notifikasi kritis tentang status sistem'],
+                    ['email', 'Notifikasi email', 'Kirim notifikasi ke email terdaftar'],
+                  ].map(([key, title, desc]) => (
+                    <div className="settings-toggle-item" key={key}>
+                      <div><strong>{title}</strong><small>{desc}</small></div>
+                      <label className="toggle-switch">
+                        <input
+                          type="checkbox"
+                          checked={notifPrefs[key as keyof typeof notifPrefs]}
+                          onChange={(event) => {
+                            const next = { ...notifPrefs, [key]: event.target.checked };
+                            setNotifPrefs(next);
+                            notify(`${title}: ${event.target.checked ? 'aktif' : 'nonaktif'}`);
+                          }}
+                          aria-label={title}
+                        />
+                        <span className="toggle-slider"></span>
+                      </label>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
@@ -219,42 +274,65 @@ export default function SettingsPage() {
                   <label htmlFor="sec-current-pw">Kata Sandi Saat Ini</label>
                   <div className="input-wrap">
                     <span className="input-icon"><svg viewBox="0 0 20 20" fill="none"><rect x="3" y="9" width="14" height="9" rx="2" stroke="currentColor" strokeWidth="1.4"/><path d="M7 9V6a3 3 0 016 0v3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/></svg></span>
-                    <input type="password" id="sec-current-pw" placeholder="Kata sandi saat ini" />
-                    <button type="button" className="input-toggle-pw" data-target="sec-current-pw" aria-label="Tampilkan"><svg viewBox="0 0 20 20" fill="none"><path d="M2 10s3-6 8-6 8 6 8 6-3 6-8 6-8-6-8-6z" stroke="currentColor" strokeWidth="1.4"/><circle cx="10" cy="10" r="2.5" stroke="currentColor" strokeWidth="1.4"/></svg></button>
+                    <input
+                      type={showPw.current ? 'text' : 'password'}
+                      id="sec-current-pw"
+                      placeholder="Kata sandi saat ini"
+                      value={pw.current}
+                      onChange={(event) => setPw({ ...pw, current: event.target.value })}
+                    />
+                    <button type="button" className="input-toggle-pw" aria-label="Tampilkan" onClick={() => setShowPw({ ...showPw, current: !showPw.current })}><svg viewBox="0 0 20 20" fill="none"><path d="M2 10s3-6 8-6 8 6 8 6-3 6-8 6-8-6-8-6z" stroke="currentColor" strokeWidth="1.4"/><circle cx="10" cy="10" r="2.5" stroke="currentColor" strokeWidth="1.4"/></svg></button>
                   </div>
                 </div>
                 <div className="form-group">
                   <label htmlFor="sec-new-pw">Kata Sandi Baru</label>
                   <div className="input-wrap">
                     <span className="input-icon"><svg viewBox="0 0 20 20" fill="none"><rect x="3" y="9" width="14" height="9" rx="2" stroke="currentColor" strokeWidth="1.4"/><path d="M7 9V6a3 3 0 016 0v3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/></svg></span>
-                    <input type="password" id="sec-new-pw" placeholder="Min. 8 karakter" />
-                    <button type="button" className="input-toggle-pw" data-target="sec-new-pw" aria-label="Tampilkan"><svg viewBox="0 0 20 20" fill="none"><path d="M2 10s3-6 8-6 8 6 8 6-3 6-8 6-8-6-8-6z" stroke="currentColor" strokeWidth="1.4"/><circle cx="10" cy="10" r="2.5" stroke="currentColor" strokeWidth="1.4"/></svg></button>
+                    <input
+                      type={showPw.next ? 'text' : 'password'}
+                      id="sec-new-pw"
+                      placeholder="Min. 8 karakter"
+                      value={pw.next}
+                      onChange={(event) => setPw({ ...pw, next: event.target.value })}
+                    />
+                    <button type="button" className="input-toggle-pw" aria-label="Tampilkan" onClick={() => setShowPw({ ...showPw, next: !showPw.next })}><svg viewBox="0 0 20 20" fill="none"><path d="M2 10s3-6 8-6 8 6 8 6-3 6-8 6-8-6-8-6z" stroke="currentColor" strokeWidth="1.4"/><circle cx="10" cy="10" r="2.5" stroke="currentColor" strokeWidth="1.4"/></svg></button>
                   </div>
                 </div>
-                <div className="settings-actions"><button className="btn btn-primary btn-sm" id="change-pw-btn">Ubah Kata Sandi</button></div>
+                <div className="settings-actions"><button className="btn btn-primary btn-sm" id="change-pw-btn" onClick={changePassword}>Ubah Kata Sandi</button></div>
               </div>
               <div className="settings-card panel">
                 <div className="settings-card-header"><h3>Sesi Aktif</h3><p>Kelola perangkat yang masuk</p></div>
-                <div className="session-item">
-                  <div className="session-icon">
-                    <svg viewBox="0 0 20 20" fill="none"><rect x="2" y="4" width="16" height="11" rx="2" stroke="currentColor" strokeWidth="1.4"/><path d="M7 17h6" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/><circle cx="10" cy="9.5" r="1" fill="currentColor"/></svg>
+                {sessions.map((session) => (
+                  <div className="session-item" key={session.id}>
+                    <div className="session-icon">
+                      {session.mobile ? (
+                        <svg viewBox="0 0 20 20" fill="none"><rect x="5" y="2" width="10" height="16" rx="2" stroke="currentColor" strokeWidth="1.4"/><circle cx="10" cy="15" r="1" fill="currentColor"/></svg>
+                      ) : (
+                        <svg viewBox="0 0 20 20" fill="none"><rect x="2" y="4" width="16" height="11" rx="2" stroke="currentColor" strokeWidth="1.4"/><path d="M7 17h6" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/><circle cx="10" cy="9.5" r="1" fill="currentColor"/></svg>
+                      )}
+                    </div>
+                    <div className="session-info">
+                      <strong>{session.device}</strong>
+                      <small>{session.meta}</small>
+                    </div>
+                    {session.current ? (
+                      <span className="session-badge current">Aktif</span>
+                    ) : (
+                      <button
+                        className="btn btn-danger-outline btn-sm"
+                        onClick={() => {
+                          setSessions((prev) => prev.filter((item) => item.id !== session.id));
+                          notify(`Sesi ${session.device} dikeluarkan`);
+                        }}
+                      >
+                        Hapus
+                      </button>
+                    )}
                   </div>
-                  <div className="session-info">
-                    <strong>Windows · Chrome</strong>
-                    <small>Bandung, Indonesia · Sekarang (Sesi ini)</small>
-                  </div>
-                  <span className="session-badge current">Aktif</span>
-                </div>
-                <div className="session-item">
-                  <div className="session-icon">
-                    <svg viewBox="0 0 20 20" fill="none"><rect x="5" y="2" width="10" height="16" rx="2" stroke="currentColor" strokeWidth="1.4"/><circle cx="10" cy="15" r="1" fill="currentColor"/></svg>
-                  </div>
-                  <div className="session-info">
-                    <strong>Android · Chrome</strong>
-                    <small>Bandung, Indonesia · 2 hari lalu</small>
-                  </div>
-                  <button className="btn btn-danger-outline btn-sm">Hapus</button>
-                </div>
+                ))}
+                {sessions.length <= 1 ? (
+                  <p className="knowledge-note" style={{ marginTop: 10 }}>Hanya sesi ini yang aktif.</p>
+                ) : null}
               </div>
             </div>
 
@@ -263,16 +341,26 @@ export default function SettingsPage() {
               <div className="settings-card panel">
                 <div className="settings-card-header"><h3>Konfigurasi Asisten AI</h3><p>Atur perilaku chatbot Anda</p></div>
                 <div className="form-group">
-                  <label>Bahasa respons chatbot</label>
-                  <select className="settings-select" defaultValue="Bahasa Indonesia">
+                  <label htmlFor="bot-language">Bahasa respons chatbot</label>
+                  <select
+                    id="bot-language"
+                    className="settings-select"
+                    value={bot.language}
+                    onChange={(event) => setBot({ ...bot, language: event.target.value })}
+                  >
                     <option>Bahasa Indonesia</option>
                     <option>English</option>
                     <option>Bilingual (ID/EN)</option>
                   </select>
                 </div>
                 <div className="form-group">
-                  <label>Gaya respons</label>
-                  <select className="settings-select" defaultValue="Formal & informatif">
+                  <label htmlFor="bot-style">Gaya respons</label>
+                  <select
+                    id="bot-style"
+                    className="settings-select"
+                    value={bot.style}
+                    onChange={(event) => setBot({ ...bot, style: event.target.value })}
+                  >
                     <option>Formal &amp; informatif</option>
                     <option>Santai &amp; ramah</option>
                     <option>Singkat &amp; padat</option>
@@ -282,19 +370,19 @@ export default function SettingsPage() {
                   <div className="settings-toggle-item">
                     <div><strong>Tampilkan sumber referensi</strong><small>Cantumkan sumber dokumen dalam jawaban</small></div>
                     <label className="toggle-switch">
-                      <input type="checkbox" defaultChecked />
+                      <input type="checkbox" checked={bot.sources} onChange={(event) => setBot({ ...bot, sources: event.target.checked })} aria-label="Tampilkan sumber referensi" />
                       <span className="toggle-slider"></span>
                     </label>
                   </div>
                   <div className="settings-toggle-item">
                     <div><strong>Mode saran otomatis</strong><small>Tampilkan pertanyaan terkait setelah respons</small></div>
                     <label className="toggle-switch">
-                      <input type="checkbox" defaultChecked />
+                      <input type="checkbox" checked={bot.suggestions} onChange={(event) => setBot({ ...bot, suggestions: event.target.checked })} aria-label="Mode saran otomatis" />
                       <span className="toggle-slider"></span>
                     </label>
                   </div>
                 </div>
-                <div className="settings-actions"><button className="btn btn-primary btn-sm">Simpan Konfigurasi</button></div>
+                <div className="settings-actions"><button className="btn btn-primary btn-sm" onClick={saveBot}>Simpan Konfigurasi</button></div>
               </div>
             </div>
           </div>

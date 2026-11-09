@@ -581,6 +581,14 @@ body.dark-theme .trend.up { color: #4ade80; }
 .topic-blue { color: var(--navy); background: var(--navy-tint); }
 .topic-orange { color: #ea580c; background: #ffedd5; }
 .topic-purple { color: #7c3aed; background: #ede9fe; }
+.topic-teal { color: #0d9488; background: #ccfbf1; }
+body.dark-theme .topic-green { background: rgba(22,163,74,.18); color: #4ade80; }
+body.dark-theme .topic-blue { background: rgba(99,102,241,.18); color: #a5b4fc; }
+body.dark-theme .topic-orange { background: rgba(234,88,12,.18); color: #fb923c; }
+body.dark-theme .topic-purple { background: rgba(124,58,237,.2); color: #c4b5fd; }
+body.dark-theme .topic-teal { background: rgba(13,148,136,.2); color: #5eead4; }
+/* Aksi di kepala chat: status online + tombol percakapan baru */
+.chat-head-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .topic-btn > span:nth-child(2) { flex: 1; }
 .topic-btn strong, .topic-btn small { display: block; }
 .topic-btn strong { font-size: 12px; color: var(--ink-2); }
@@ -712,7 +720,14 @@ body.dark-theme .knowledge-stat-icon.slate { background: #21262d; color: #8b949e
 
 .document-panel { overflow: hidden; }
 .document-toolbar { min-height: 58px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; padding: 0 18px; gap: 14px; }
-.filter-tabs { display: flex; align-items: center; gap: 4px; height: 58px; }
+.filter-tabs {
+  display: flex; align-items: center; gap: 4px; height: 58px;
+  overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; min-width: 0;
+  /* Fade di tepi kanan sebagai petunjuk masih ada tab tersembunyi */
+  mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+}
+.filter-tabs::-webkit-scrollbar { display: none; }
 .filter-tab { height: 100%; background: none; border: 0; border-bottom: 2px solid transparent; color: var(--muted); font-size: 13px; padding: 0 12px; white-space: nowrap; font-weight: 500; transition: var(--transition); }
 .filter-tab:hover { color: var(--ink-2); }
 .filter-tab.selected {
@@ -794,10 +809,15 @@ body.dark-theme .data-table tbody tr:hover { background: #21262d; }
 .history-toolbar { display: flex; align-items: center; justify-content: space-between; padding: 16px 18px; gap: 12px; border-bottom: 1px solid var(--line); }
 .history-toolbar h2 { font-family: var(--display); font-size: 15px; font-weight: 700; }
 .history-toolbar p { font-size: 12px; color: var(--muted); margin-top: 2px; }
-.history-filters { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-.history-filters .search-box { flex: 1 1 220px; }
+.history-filters { display: flex; gap: 8px; align-items: center; flex: 1 1 auto; justify-content: flex-end; flex-wrap: nowrap; min-width: 0; }
+.history-filters .search-box { flex: 1 1 160px; min-width: 110px; }
 .history-filters .search-box input { width: 100%; min-width: 0; }
 .history-filters .select-btn { flex: none; }
+.history-filters .settings-select.compact { flex: 0 0 auto; }
+@media (max-width: 900px) {
+  .history-filters { flex-wrap: wrap; justify-content: flex-start; }
+  .history-filters .search-box { flex: 1 1 100%; }
+}
 .history-filters .select-btn:hover { border-color: var(--green); background: var(--green-subtle); color: var(--green-dark); }
 .history-filters .select-btn:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
 .history-table td { height: 65px; }
@@ -956,6 +976,23 @@ body.dark-theme .role-badge { color: #4ade80; }
 .settings-edit-cta { flex: none; }
 .settings-select { width: 100%; padding: 10px 14px; border: 1.5px solid var(--line); border-radius: var(--radius); background: var(--canvas); color: var(--ink); font-size: 13.5px; outline: none; cursor: pointer; transition: var(--transition); margin-bottom: 8px; }
 .settings-select:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(15,116,64,.1); }
+/* Varian ringkas untuk toolbar filter (lebar mengikuti isi, bukan 100%).
+   Tanpa ini, `.settings-select { width:100% }` memaksa setiap dropdown
+   memakan satu baris penuh di dalam .history-filters. */
+.settings-select.compact {
+  width: auto;
+  flex: none;
+  height: 36px;
+  padding: 0 30px 0 12px;
+  margin-bottom: 0;
+  font-size: 12.5px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%236b7280' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 12px;
+  appearance: none;
+  -webkit-appearance: none;
+}
 .settings-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
 .settings-textarea { width: 100%; padding: 10px 14px; border: 1.5px solid var(--line); border-radius: var(--radius); background: var(--canvas); color: var(--ink); font-size: 13.5px; outline: none; resize: vertical; transition: var(--transition); }
 .resize-y { resize: vertical !important; max-width: 100%; }

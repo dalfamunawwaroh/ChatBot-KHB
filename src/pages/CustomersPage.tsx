@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { api } from '../services/api';
 import { formatDateTime, initials, useResource } from '../hooks/useApi';
+import { Icon, PageHead, Stat, StatsGrid } from '../components/ui/PageKit';
 
 export default function CustomersPage() {
   const [query, setQuery] = useState('');
@@ -22,37 +23,39 @@ export default function CustomersPage() {
 
   return (
     <section className="view active" id="view-customers">
-      <div className="page-title-row">
-        <div>
-          <div className="eyebrow"><span className="eyebrow-dot"></span> DATA UMKM</div>
-          <h1>Pelanggan</h1>
-          <p className="subheading">Pelaku usaha yang berinteraksi dengan asisten halal (dari tabel customers).</p>
-        </div>
+      <PageHead
+        eyebrow="DATA UMKM"
+        title="Pelanggan"
+        subtitle="Pelaku usaha yang berinteraksi dengan asisten halal (dari tabel customers)."
+      >
         <button className="btn btn-secondary" onClick={() => void reload()}>Muat ulang</button>
-      </div>
+      </PageHead>
 
-      <div className="stats-grid">
-        <article className="stat-card">
-          <div className="stat-top"><span>Total UMKM</span><span className="stat-icon green">◍</span></div>
-          <div className="stat-value">{stats?.customers ?? 0}</div>
-          <div className="stat-foot"><span className="stat-muted">tercatat dari percakapan</span></div>
-        </article>
-        <article className="stat-card">
-          <div className="stat-top"><span>Percakapan 30 hari</span><span className="stat-icon blue">▤</span></div>
-          <div className="stat-value">{(stats?.conversations30d ?? 0).toLocaleString('id-ID')}</div>
-          <div className="stat-foot"><span className="stat-muted">{stats?.messages30d ?? 0} pesan</span></div>
-        </article>
-        <article className="stat-card">
-          <div className="stat-top"><span>Dijawab dari dokumen</span><span className="stat-icon orange">✓</span></div>
-          <div className="stat-value">{stats?.accuracy ?? 0}<span className="stat-unit">%</span></div>
-          <div className="stat-foot"><span className="stat-muted">sisanya jawaban umum</span></div>
-        </article>
-        <article className="stat-card">
-          <div className="stat-top"><span>Produk terdaftar</span><span className="stat-icon purple">▣</span></div>
-          <div className="stat-value">{stats?.products ?? 0}</div>
-          <div className="stat-foot"><span className="stat-muted">{stats?.productsCertified ?? 0} tersertifikasi</span></div>
-        </article>
-      </div>
+      <StatsGrid>
+        <Stat label="Total UMKM" value={stats?.customers ?? 0} icon={Icon.store} tone="green" foot={<span className="stat-muted">tercatat dari percakapan</span>} />
+        <Stat
+          label="Percakapan 30 hari"
+          value={(stats?.conversations30d ?? 0).toLocaleString('id-ID')}
+          icon={Icon.chat}
+          tone="blue"
+          foot={<span className="stat-muted">{stats?.messages30d ?? 0} pesan</span>}
+        />
+        <Stat
+          label="Dijawab dari dokumen"
+          value={stats?.accuracy ?? 0}
+          unit="%"
+          icon={Icon.check}
+          tone="orange"
+          foot={<span className="stat-muted">sisanya jawaban umum</span>}
+        />
+        <Stat
+          label="Produk terdaftar"
+          value={stats?.products ?? 0}
+          icon={Icon.doc}
+          tone="purple"
+          foot={<span className="stat-muted">{stats?.productsCertified ?? 0} tersertifikasi</span>}
+        />
+      </StatsGrid>
 
       <div className="panel" style={{ padding: 0 }}>
         <div className="history-toolbar">
@@ -61,7 +64,7 @@ export default function CustomersPage() {
             <p>{rows.length} dari {data?.total ?? 0} UMKM</p>
           </div>
           <div className="history-filters">
-            <select className="settings-select" style={{ height: 36, fontSize: 12 }} value={status} onChange={(event) => setStatus(event.target.value)}>
+            <select className="settings-select compact" value={status} onChange={(event) => setStatus(event.target.value)}>
               <option value="">Semua status</option>
               <option value="Aktif">Aktif</option>
               <option value="Baru">Baru</option>
@@ -81,10 +84,10 @@ export default function CustomersPage() {
                 <tr key={row.id}>
                   <td>
                     <div className="user-cell">
-                      <span className="avatar avatar-soft-green" style={{ width: 30, height: 30, fontSize: 11 }}>{initials(row.name)}</span>
+                      <span className="avatar avatar-soft-green">{initials(row.name)}</span>
                       <div>
                         <strong>{row.name}</strong>
-                        <small>{row.city ?? '—'}</small>
+                        <small>{row.business ?? '—'}</small>
                       </div>
                     </div>
                   </td>

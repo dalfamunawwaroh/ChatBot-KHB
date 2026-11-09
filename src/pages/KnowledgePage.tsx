@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { api, type DocumentRow } from '../services/api';
 import { formatDateTime, useResource } from '../hooks/useApi';
 import { useToast } from '../components/Toast';
+import { Icon } from '../components/ui/PageKit';
 
 const EMPTY_FORM = { title: '', category: 'Panduan', content: '' };
 
@@ -176,28 +177,47 @@ export default function KnowledgePage() {
           </div>
           <button className="btn btn-secondary btn-sm" onClick={() => void ragState.reload()}>Muat ulang</button>
         </div>
-        <div className="kv">
-          <div className="kv-row"><span>Knowledge base</span><strong>{rag?.knowledgeBaseId ?? '—'}</strong></div>
-          <div className="kv-row"><span>Project KMS</span><strong>{rag?.organizationId ?? '—'}</strong></div>
-          <div className="kv-row">
-            <span>Jalur unggahan</span>
-            <strong>{rag?.backend === 'kms' ? 'KMS (ragkms.aiones.app)' : rag?.backend === 'rag-chat' ? 'Layanan RAG' : '—'}</strong>
-          </div>
-          <div className="kv-row"><span>Dokumen terindeks di RAG</span><strong>{rag?.documents.filter((doc) => doc.status === 'completed').length ?? 0}</strong></div>
-        </div>
-        {ragState.error ? <p className="knowledge-note" style={{ color: '#b91c1c' }}>{ragState.error}</p> : null}
-        <div className="flat-list" style={{ marginTop: 10 }}>
-          {(rag?.documents ?? []).slice(0, 8).map((doc) => (
-            <div className="flat-row" key={doc.id}>
-              <span className="row-icon">{doc.status === 'completed' ? '✓' : doc.status === 'failed' ? '!' : '…'}</span>
-              <span className="row-copy">
-                <strong>{doc.title}</strong>
-                <span>{doc.status}{doc.chunks ? ` · ${doc.chunks} chunk` : ''}</span>
-              </span>
-              <span className="row-meta">{doc.id.slice(0, 14)}</span>
+        {rag?.knowledgeBaseId ? (
+          <>
+            <div className="kv">
+              <div className="kv-row"><span>Knowledge base</span><strong>{rag.knowledgeBaseId}</strong></div>
+              <div className="kv-row"><span>Project KMS</span><strong>{rag.organizationId ?? '—'}</strong></div>
+              <div className="kv-row">
+                <span>Jalur unggahan</span>
+                <strong>{rag.backend === 'kms' ? 'KMS (ragkms.aiones.app)' : rag.backend === 'rag-chat' ? 'Layanan RAG' : '—'}</strong>
+              </div>
+              <div className="kv-row">
+                <span>Dokumen terindeks di RAG</span>
+                <strong>{rag.documents.filter((doc) => doc.status === 'completed').length}</strong>
+              </div>
             </div>
-          ))}
-        </div>
+            <div className="flat-list" style={{ marginTop: 10 }}>
+              {(rag.documents ?? []).slice(0, 8).map((doc) => (
+                <div className="flat-row" key={doc.id}>
+                  <span className="row-icon">{doc.status === 'completed' ? '✓' : doc.status === 'failed' ? '!' : '…'}</span>
+                  <span className="row-copy">
+                    <strong>{doc.title}</strong>
+                    <span>{doc.status}{doc.chunks ? ` · ${doc.chunks} chunk` : ''}</span>
+                  </span>
+                  <span className="row-meta">{doc.id.slice(0, 14)}</span>
+                </div>
+              ))}
+            </div>
+          </>
+        ) : (
+          <div className="rag-empty">
+            <span className="rag-empty-icon">{Icon.bolt}</span>
+            <div>
+              <strong>RAG belum terhubung</strong>
+              <p>
+                Isi <code>RAG_CHAT_API_KEY</code> dan <code>RAG_CHAT_KNOWLEDGE_BASE_ID</code> di
+                <code> server/.env</code>, lalu jalankan <code>npm run api:db:seed</code> untuk mengunggah dokumen.
+                Selama belum terhubung, asisten menjawab dari teks dokumen yang tersimpan lokal.
+              </p>
+            </div>
+          </div>
+        )}
+        {ragState.error ? <p className="knowledge-note" style={{ color: '#b91c1c' }}>{ragState.error}</p> : null}
       </div>
 
       <div className="panel document-panel">
@@ -226,7 +246,7 @@ export default function KnowledgePage() {
 
         <div className="table-wrap">
           <table className="data-table">
-            <thead><tr><th>NAMA DOKUMEN</th><th>KATEGORI</th><th>SUMBER</th><th>STATUS</th><th>TERINDEKS</th><th></th></tr></thead>
+            <thead><tr><th>NAMA DOKUMEN</th><th>KATEGORI</th><th>ISI</th><th>STATUS</th><th>DIPERBARUI</th><th></th></tr></thead>
             <tbody>
               {rows.map((doc) => (
                 <tr key={doc.id}>
@@ -235,22 +255,22 @@ export default function KnowledgePage() {
                       <span className={`file-icon ${doc.kind === 'pdf' ? 'pdf' : 'web'}`}>{doc.kind === 'pdf' ? 'PDF' : 'TXT'}</span>
                       <div>
                         <strong>{doc.title}</strong>
-                        <small>{doc.fileName ?? `${doc.sizeKb} KB · ${doc.chunkCount} chunk`}</small>
+                        <small>{doc.fileName ?? `${doc.sizeKb} KB`}</small>
                       </div>
                     </div>
                   </td>
                   <td><span className="category-label">{doc.category}</span></td>
-                  <td>{doc.pages ? `${doc.pages} hlm` : 'Teks'}</td>
+                  <td>{doc.chunkCount > 0 ? `${doc.chunkCount} chunk` : '—'}</td>
                   <td>
-                    <span className={`badge-pill ${doc.status === 'indexed' ? 'badge-green' : 'badge-amber'}`}>
+                    <span className={`badge-pill ${doc.status === 'indexed' ? 'badge-green' : doc.status === 'failed' ? 'badge-red' : 'badge-amber'}`}>
                       <i></i>{doc.status === 'indexed' ? 'Aktif' : doc.status === 'processing' ? 'Diproses' : 'Gagal'}
                     </span>
                   </td>
-                  <td>{formatDateTime(doc.indexedAt)}</td>
+                  <td>{formatDateTime(doc.indexedAt ?? doc.createdAt)}</td>
                   <td>
                     <div className="row-actions">
-                      <button className="icon-action" aria-label="Unggah ulang ke RAG" onClick={() => void reindex(doc)}>↻</button>
-                      <button className="icon-action danger" aria-label="Hapus dokumen" onClick={() => void remove(doc)}>×</button>
+                      <button className="icon-action" aria-label="Unggah ulang ke RAG" title="Unggah ulang ke RAG" onClick={() => void reindex(doc)}>↻</button>
+                      <button className="icon-action danger" aria-label="Hapus dokumen" title="Hapus dokumen" onClick={() => void remove(doc)}>×</button>
                     </div>
                   </td>
                 </tr>

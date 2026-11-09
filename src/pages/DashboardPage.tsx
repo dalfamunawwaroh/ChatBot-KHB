@@ -117,7 +117,14 @@ export default function DashboardPage() {
             </span>
           </div>
           <div className="stat-value">{stats.customers.toLocaleString('id-ID')}</div>
-          <div className="stat-foot"><span className="stat-muted">dari percakapan widget</span></div>
+          <div className="stat-foot">
+            <span className="stat-muted">dari percakapan widget</span>
+            <span className="stat-muted">{stats.conversations30d} chat / 30 hari</span>
+          </div>
+          <div className="progress-track" style={{ marginTop: 'auto' }}>
+            <span style={{ width: `${Math.min(100, Math.round((stats.customers / Math.max(1, stats.customers + 5)) * 100))}%` }}></span>
+          </div>
+          <small className="progress-caption">Rasio UMKM aktif bulan ini</small>
         </article>
       </div>
 
@@ -131,23 +138,17 @@ export default function DashboardPage() {
             <span className="chart-total">{chartTotal} <small>total</small></span>
           </div>
           <div className="chart-legend"><span><i></i>Percakapan</span></div>
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 14, height: 200, padding: '10px 4px 0' }}>
+          <div className="bar-chart">
             {chart.map((point) => (
-              <div key={point.date} style={{ flex: 1, display: 'grid', justifyItems: 'center', gap: 6 }}>
-                <span style={{ fontSize: 11, color: 'var(--muted-2)' }}>{point.conversations}</span>
-                <div style={{ width: '100%', display: 'flex', alignItems: 'flex-end', height: 140 }}>
+              <div className="bar-col" key={point.date} title={`${point.conversations} percakapan · ${point.date}`}>
+                <span className={`bar-value${point.conversations === 0 ? ' is-zero' : ''}`}>{point.conversations}</span>
+                <div className="bar-track">
                   <div
-                    title={`${point.conversations} percakapan · ${point.date}`}
-                    style={{
-                      width: '100%',
-                      height: `${Math.max(4, (point.conversations / chartMax) * 100)}%`,
-                      background: 'linear-gradient(180deg, #22c55e, #16a34a)',
-                      borderRadius: '6px 6px 3px 3px',
-                      opacity: 0.9,
-                    }}
+                    className="bar-fill"
+                    style={{ height: `${Math.max(3, (point.conversations / chartMax) * 100)}%` }}
                   ></div>
                 </div>
-                <span style={{ fontSize: 11, color: 'var(--muted)' }}>{point.day}</span>
+                <span className="bar-day">{point.day}</span>
               </div>
             ))}
           </div>

@@ -11,6 +11,13 @@ export interface CurrentUser {
   initials: string;
   /** Data URL foto profil. Kosong = tampilkan inisial. */
   avatar?: string;
+  /* Preferensi yang disimpan dari halaman Pengaturan. */
+  timezone?: string;
+  language?: string;
+  botLanguage?: string;
+  botStyle?: string;
+  botSources?: boolean;
+  botSuggestions?: boolean;
 }
 
 export const currentUser: CurrentUser = {
