@@ -1,9 +1,8 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { api, SOURCE_LABEL } from '../services/api';
 import { formatDateTime, initials, timeAgo, useResource } from '../hooks/useApi';
 
 export default function DashboardPage() {
-  const navigate = useNavigate();
   const { data, loading, error, reload } = useResource(() => api.dashboard.summary(), []);
 
   if (loading && !data) {
@@ -40,10 +39,6 @@ export default function DashboardPage() {
           <h1>Halo, <span id="welcome-name">Admin</span> 👋</h1>
           <p className="subheading">Pantau edukasi halal dan aktivitas chatbot Anda hari ini.</p>
         </div>
-        <button className="btn btn-primary" onClick={() => navigate('/chat')}>
-          <svg viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"/></svg>
-          Mulai Percakapan
-        </button>
       </div>
 
       <div className="notice-banner">
@@ -182,7 +177,6 @@ export default function DashboardPage() {
               ))
             )}
           </div>
-          <Link className="view-all-btn" to="/history">Lihat semua riwayat <span>→</span></Link>
         </article>
       </div>
 

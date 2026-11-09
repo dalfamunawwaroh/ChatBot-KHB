@@ -1,22 +1,85 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useToast } from '../components/Toast';
-import { currentUser } from '../data/khb';
+import { useApp } from '../context/AppContext';
+
+const MAX_BYTES = 2 * 1024 * 1024;
+const ALLOWED = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'];
+
+/** Baca file gambar jadi data URL, sekaligus turunkan ukurannya agar muat localStorage. */
+const fileToAvatar = (file: File): Promise<string> =>
+  new Promise((resolve, reject) => {
+    if (!ALLOWED.includes(file.type)) {
+      reject(new Error('Format harus JPG, PNG, WEBP, atau GIF'));
+      return;
+    }
+    if (file.size > MAX_BYTES) {
+      reject(new Error('Ukuran foto maksimal 2MB'));
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error('Gagal membaca file'));
+    reader.onload = () => {
+      const src = String(reader.result);
+      // Perkecil ke 320×320 (cover) supaya data URL tidak membengkak.
+      const img = new Image();
+      img.onerror = () => reject(new Error('File bukan gambar yang valid'));
+      img.onload = () => {
+        const size = 320;
+        const canvas = document.createElement('canvas');
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          resolve(src);
+          return;
+        }
+        const scale = Math.max(size / img.width, size / img.height);
+        const w = img.width * scale;
+        const h = img.height * scale;
+        ctx.drawImage(img, (size - w) / 2, (size - h) / 2, w, h);
+        resolve(canvas.toDataURL('image/jpeg', 0.85));
+      };
+      img.src = src;
+    };
+    reader.readAsDataURL(file);
+  });
 
 export default function EditProfilePage() {
   const notify = useToast();
+  const { user, saveUser, avatar, setAvatar } = useApp();
   const [form, setForm] = useState({
-    first: currentUser.firstName,
-    last: currentUser.lastName,
-    email: currentUser.email,
-    phone: currentUser.phone,
-    org: currentUser.org,
-    bio: 'Administrator Komunitas Halal Bandung. Mendukung UMKM dalam proses sertifikasi halal.',
+    first: user.firstName,
+    last: user.lastName,
+    email: user.email,
+    phone: user.phone,
+    org: user.org,
+    bio: user.bio,
   });
+  const [busy, setBusy] = useState(false);
+  const [dragging, setDragging] = useState(false);
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   const set = (key: keyof typeof form) => (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setForm({ ...form, [key]: event.target.value });
 
   const fullName = `${form.first} ${form.last}`.trim();
+  const initial = (form.first.charAt(0) || 'A').toUpperCase();
+
+  const handleFile = async (file: File | undefined) => {
+    if (!file) return;
+    setBusy(true);
+    try {
+      const dataUrl = await fileToAvatar(file);
+      setAvatar(dataUrl);
+      notify('Foto profil diperbarui');
+    } catch (error) {
+      notify(error instanceof Error ? error.message : 'Gagal mengunggah foto');
+    } finally {
+      setBusy(false);
+      if (inputRef.current) inputRef.current.value = '';
+    }
+  };
 
   const submit = (event: React.FormEvent) => {
     event.preventDefault();
@@ -24,7 +87,28 @@ export default function EditProfilePage() {
       notify('Nama dan email wajib diisi');
       return;
     }
+    saveUser({
+      firstName: form.first.trim(),
+      lastName: form.last.trim(),
+      email: form.email.trim(),
+      phone: form.phone.trim(),
+      org: form.org.trim(),
+      bio: form.bio.trim(),
+      initials: initial,
+    });
     notify('Profil berhasil disimpan');
+  };
+
+  const reset = () => {
+    setForm({
+      first: user.firstName,
+      last: user.lastName,
+      email: user.email,
+      phone: user.phone,
+      org: user.org,
+      bio: user.bio,
+    });
+    notify('Perubahan dibatalkan');
   };
 
   return (
@@ -41,19 +125,61 @@ export default function EditProfilePage() {
         <div className="profile-edit-layout">
           <div className="profile-avatar-card panel">
             <div className="profile-avatar-section">
-              <div className="profile-avatar-large" id="profile-avatar-large">{form.first.charAt(0) || 'A'}</div>
+              <div
+                className={`profile-avatar-large${dragging ? ' is-dragging' : ''}${avatar ? ' has-photo' : ''}`}
+                id="profile-avatar-large"
+                onDragOver={(event) => {
+                  event.preventDefault();
+                  setDragging(true);
+                }}
+                onDragLeave={() => setDragging(false)}
+                onDrop={(event) => {
+                  event.preventDefault();
+                  setDragging(false);
+                  void handleFile(event.dataTransfer.files?.[0]);
+                }}
+                aria-label="Foto profil"
+              >
+                {avatar ? <img src={avatar} alt={`Foto profil ${fullName}`} /> : initial}
+              </div>
               <div className="profile-avatar-actions">
-                <button className="btn btn-secondary btn-sm" id="change-avatar-btn" type="button" onClick={() => notify('Unggah foto belum tersedia pada prototipe')}>
+                <input
+                  ref={inputRef}
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp,image/gif"
+                  id="avatar-input"
+                  className="visually-hidden"
+                  onChange={(event) => void handleFile(event.target.files?.[0])}
+                />
+                <button
+                  className="btn btn-secondary btn-sm"
+                  id="change-avatar-btn"
+                  type="button"
+                  disabled={busy}
+                  onClick={() => inputRef.current?.click()}
+                >
                   <svg viewBox="0 0 20 20" fill="none"><path d="M4 14l4-4 3 3 4-5 4 5H4z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" /><circle cx="14" cy="7" r="1.5" stroke="currentColor" strokeWidth="1.4" /><rect x="2" y="3" width="16" height="14" rx="2" stroke="currentColor" strokeWidth="1.4" /></svg>
-                  Ubah Foto
+                  {busy ? 'Memproses…' : avatar ? 'Ganti Foto' : 'Ubah Foto'}
                 </button>
-                <p className="avatar-hint">JPG, PNG maks. 2MB</p>
+                {avatar ? (
+                  <button
+                    className="btn btn-danger-outline btn-sm"
+                    type="button"
+                    onClick={() => {
+                      setAvatar('');
+                      notify('Foto profil dihapus');
+                    }}
+                  >
+                    Hapus Foto
+                  </button>
+                ) : null}
+                <p className="avatar-hint">JPG, PNG, WEBP maks. 2MB · bisa juga seret file ke foto</p>
               </div>
             </div>
             <div className="profile-info-summary">
               <strong id="profile-card-name">{fullName}</strong>
               <span id="profile-card-email">{form.email}</span>
-              <span className="role-badge" id="profile-card-role">{currentUser.role}</span>
+              <span className="role-badge" id="profile-card-role">{user.role}</span>
             </div>
             <div className="profile-meta">
               <div className="profile-meta-item">
@@ -113,7 +239,7 @@ export default function EditProfilePage() {
                 <textarea id="ep-bio" rows={3} className="settings-textarea resize-y" placeholder="Ceritakan sedikit tentang Anda..." value={form.bio} onChange={set('bio')}></textarea>
               </div>
               <div className="settings-actions">
-                <button type="button" className="btn btn-secondary btn-sm" onClick={() => notify('Perubahan dibatalkan')}>Batal</button>
+                <button type="button" className="btn btn-secondary btn-sm" onClick={reset}>Batal</button>
                 <button type="submit" className="btn btn-primary btn-sm" id="save-profile-btn">
                   <svg viewBox="0 0 20 20" fill="none"><path d="M5 10l4 4 6-7" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" /></svg>
                   Simpan Profil

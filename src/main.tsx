@@ -3,6 +3,7 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import { ToastProvider } from './components/Toast';
 import { AppProvider } from './context/AppContext';
+import { PrefsProvider } from './context/PrefsContext';
 import './index.css';
 import './assets/css/base.css';
 import './assets/css/auth.css';
@@ -16,10 +17,12 @@ import './assets/css/extras.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <BrowserRouter>
-    <AppProvider>
-      <ToastProvider>
-        <App />
-      </ToastProvider>
-    </AppProvider>
+    <PrefsProvider>
+      <AppProvider>
+        <ToastProvider>
+          <App />
+        </ToastProvider>
+      </AppProvider>
+    </PrefsProvider>
   </BrowserRouter>
 );

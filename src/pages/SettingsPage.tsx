@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { usePrefs } from '../context/PrefsContext';
+import type { TextSize, ThemeMode } from '../context/PrefsContext';
+import { useToast } from '../components/Toast';
 
 const TABS = [
   {
@@ -29,10 +32,29 @@ const TABS = [
   },
 ];
 
+const TEXT_SIZES: Array<{ id: TextSize; label: string }> = [
+  { id: 'small', label: 'Kecil' },
+  { id: 'medium', label: 'Sedang' },
+  { id: 'large', label: 'Besar' },
+];
+
 export default function SettingsPage() {
   const [tab, setTab] = useState('account');
-  const [theme, setTheme] = useState('light');
+  const { theme, textSize, setTheme, setTextSize } = usePrefs();
+  const notify = useToast();
   const navigate = useNavigate();
+
+  const pickTheme = (mode: ThemeMode) => {
+    setTheme(mode);
+    const label = mode === 'dark' ? 'Gelap' : mode === 'system' ? 'Ikuti sistem' : 'Terang';
+    notify(`Tema ${label} diterapkan`);
+  };
+
+  const pickTextSize = (size: TextSize) => {
+    setTextSize(size);
+    const label = TEXT_SIZES.find((item) => item.id === size)?.label ?? size;
+    notify(`Ukuran teks: ${label}`);
+  };
 
   return (
     <>
@@ -110,7 +132,14 @@ export default function SettingsPage() {
                     ['system', 'Ikuti sistem', 'theme-preview-system'],
                   ].map(([val, label, preview]) => (
                     <label className={`theme-option${theme === val ? ' selected' : ''}`} key={val} id={`theme-${val}-label`}>
-                      <input type="radio" name="theme" value={val} id={`theme-${val}`} checked={theme === val} onChange={() => setTheme(val)} />
+                      <input
+                        type="radio"
+                        name="theme"
+                        value={val}
+                        id={`theme-${val}`}
+                        checked={theme === val}
+                        onChange={() => pickTheme(val as ThemeMode)}
+                      />
                       <div className={`theme-preview ${preview}`}>
                         <div className="tp-sidebar"></div>
                         <div className="tp-content"><div className="tp-bar"></div><div className="tp-card"></div></div>
@@ -123,9 +152,17 @@ export default function SettingsPage() {
               <div className="settings-card panel">
                 <div className="settings-card-header"><h3>Ukuran Teks</h3><p>Sesuaikan keterbacaan</p></div>
                 <div className="font-size-options">
-                  <button className="font-size-opt">Kecil</button>
-                  <button className="font-size-opt active">Sedang</button>
-                  <button className="font-size-opt">Besar</button>
+                  {TEXT_SIZES.map((size) => (
+                    <button
+                      key={size.id}
+                      type="button"
+                      className={`font-size-opt${textSize === size.id ? ' active' : ''}`}
+                      aria-pressed={textSize === size.id}
+                      onClick={() => pickTextSize(size.id)}
+                    >
+                      {size.label}
+                    </button>
+                  ))}
                 </div>
               </div>
             </div>

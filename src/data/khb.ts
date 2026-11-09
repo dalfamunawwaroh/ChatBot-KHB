@@ -9,6 +9,8 @@ export interface CurrentUser {
   bio: string;
   role: string;
   initials: string;
+  /** Data URL foto profil. Kosong = tampilkan inisial. */
+  avatar?: string;
 }
 
 export const currentUser: CurrentUser = {
@@ -20,6 +22,7 @@ export const currentUser: CurrentUser = {
   bio: 'Administrator Komunitas Halal Bandung.',
   role: 'Administrator',
   initials: 'A',
+  avatar: '',
 };
 
 export const labels: Record<string, string> = {

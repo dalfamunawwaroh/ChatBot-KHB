@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { labels } from '../data/khb';
 import { api } from '../services/api';
+import { useApp } from '../context/AppContext';
 
 const pathKey = (p: string): string => p.replace('/', '') || 'dashboard';
 
@@ -45,6 +46,7 @@ interface TopbarProps {
 export default function Topbar({ onMenu, onToggleSidebar, sidebarCollapsed = false }: TopbarProps) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
+  const { user, avatar } = useApp();
   const title = resolveLabel(pathKey(pathname));
   const [open, setOpen] = useState(false);
   const [unread, setUnread] = useState(0);
@@ -111,7 +113,9 @@ export default function Topbar({ onMenu, onToggleSidebar, sidebarCollapsed = fal
             aria-expanded={open}
             onClick={() => setOpen((prev) => !prev)}
           >
-            <div className="avatar avatar-admin" id="topbar-avatar">A</div>
+            <div className={`avatar avatar-admin${avatar ? ' has-photo' : ''}`} id="topbar-avatar">
+              {avatar ? <img src={avatar} alt={`Foto profil ${user.firstName}`} /> : (user.initials || 'A')}
+            </div>
           </button>
           <div className={`topbar-pop${open ? '' : ' hidden'}`} id="profile-pop" role="menu" aria-label="Menu profil">
             {MENU.map((item) => (

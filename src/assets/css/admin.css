@@ -251,6 +251,29 @@
 .avatar-soft-blue { background: var(--navy-tint); color: var(--navy); }
 .avatar-soft-peach { background: #ffedd5; color: #c2410c; }
 
+/* Foto profil: isi lingkaran penuh, tanpa distorsi */
+.avatar.has-photo,
+.profile-avatar-large.has-photo { overflow: hidden; background: var(--line-2); }
+.avatar.has-photo img,
+.profile-avatar-large.has-photo img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 50%;
+}
+.profile-avatar-large { transition: box-shadow .18s ease, border-color .18s ease; }
+.profile-avatar-large.is-dragging {
+  box-shadow: 0 0 0 4px rgba(22,163,74,.25);
+  border: 2px dashed var(--green);
+}
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0);
+  white-space: nowrap; border: 0;
+}
+
 .eyebrow {
   display: flex; align-items: center; gap: 8px;
   color: var(--muted-2);
@@ -503,27 +526,6 @@ body.dark-theme .trend.up { color: #4ade80; }
 .recent-copy strong { font-size: 12.5px; display: block; margin-bottom: 3px; }
 .recent-copy p { font-size: 11.5px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .recent-time { font-size: 10px; color: var(--muted-2); align-self: flex-start; white-space: nowrap; }
-.view-all-btn {
-  width: 100%;
-  border: 0;
-  border-top: 1px solid var(--line-2);
-  background: none;
-  text-align: center;
-  color: var(--green);
-  font-size: 12px;
-  font-weight: 600;
-  padding-top: 12px;
-  margin-top: 4px;
-  cursor: pointer;
-  transition: var(--transition);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-}
-.view-all-btn:hover { color: var(--green-dark); background: var(--green-subtle); border-radius: var(--radius-sm); }
-.view-all-btn:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
-.view-all-btn span { font-size: 14px; }
 
 /* Page footer */
 .page-footer { display: flex; justify-content: space-between; color: var(--muted-2); font-size: 11px; padding-top: 20px; border-top: 1px solid var(--line-2); margin-top: 8px; }
@@ -1140,6 +1142,59 @@ body.dark-theme .input-wrap input { background: #21262d; border-color: #30363d; 
 body.dark-theme .settings-section { background: transparent; }
 body.dark-theme .settings-card { background: #161b22; border-color: #30363d; }
 body.dark-theme .settings-select, body.dark-theme .settings-textarea { background: #21262d; border-color: #30363d; color: #f0f6fc; }
+
+/* ── Dark theme: elemen yang masih memakai #fff hardcoded ──
+   Ditambahkan agar mode Gelap benar-benar mengubah seluruh permukaan UI,
+   bukan hanya panel dan topbar. */
+body.dark-theme .topbar,
+body.dark-theme .chart-legend,
+body.dark-theme .data-table th,
+body.dark-theme .suggested-prompts button,
+body.dark-theme .search-box,
+body.dark-theme .pagination button,
+body.dark-theme .notif-item,
+body.dark-theme .knowledge-stat,
+body.dark-theme .font-size-opt,
+body.dark-theme .topbar-pop,
+body.dark-theme .message-bubble,
+body.dark-theme .chat-window,
+body.dark-theme .chat-topics,
+body.dark-theme .settings-nav,
+body.dark-theme .profile-form-card,
+body.dark-theme .profile-avatar-card,
+body.dark-theme .history-stat,
+body.dark-theme .activity-panel,
+body.dark-theme .recent-panel {
+  background: #161b22;
+  border-color: #30363d;
+  color: #e6edf3;
+}
+body.dark-theme .search-box input,
+body.dark-theme .chat-input-row textarea,
+body.dark-theme .settings-textarea { background: transparent; color: #f0f6fc; }
+body.dark-theme .data-table tbody tr { border-color: #21262d; }
+body.dark-theme .recent-item,
+body.dark-theme .notif-item,
+body.dark-theme .settings-toggle-item,
+body.dark-theme .session-item { border-color: #21262d; }
+body.dark-theme .recent-item:hover,
+body.dark-theme .notif-item:hover { background: #21262d; }
+body.dark-theme .notif-item.unread { background: linear-gradient(135deg, #0d2a1a, #161b22); border-color: #1a4d2e; }
+body.dark-theme .settings-nav-item:hover { background: #21262d; color: #e6edf3; }
+body.dark-theme .settings-nav-item.active { background: rgba(22,163,74,.18); color: #4ade80; }
+body.dark-theme .theme-option.selected span,
+body.dark-theme .theme-option.selected .theme-preview { border-color: #4ade80; }
+body.dark-theme .font-size-opt.active { background: rgba(22,163,74,.18); color: #4ade80; border-color: #4ade80; }
+body.dark-theme .settings-value,
+body.dark-theme .subheading,
+body.dark-theme .page-footer { color: #8b949e; }
+body.dark-theme .welcome-row h1,
+body.dark-theme .page-title-row h1,
+body.dark-theme .panel-heading h2,
+body.dark-theme .section-heading h2 { color: #f0f6fc; }
+body.dark-theme .toggle-slider { background: #30363d; }
+body.dark-theme .role-badge { background: rgba(22,163,74,.16); border-color: #1a4d2e; }
+body.dark-theme .avatar-admin { background: linear-gradient(135deg, #16A34A, #22C55E); color: #fff; }
 
 /* ══════════════════════════════════════════════
    RESPONSIVE

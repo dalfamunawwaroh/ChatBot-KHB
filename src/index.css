@@ -2,7 +2,16 @@
 :root {
   font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, 'Segoe UI', sans-serif;
   color-scheme: light;
+  /* Skala antarmuka: --ts = faktor pembesaran. Dikontrol dari
+     Pengaturan → Tampilan (html[data-text-size]). */
+  --ts: 1;
 }
+/* Ukuran teks antarmuka (Pengaturan → Tampilan).
+   Dipakai lewat `zoom` pada #root, bukan font-size bersarang, supaya tidak
+   berlipat ganda pada elemen bertingkat (1.12em × 1.12em × …). */
+html[data-text-size='small'] { --ts: 0.92; }
+html[data-text-size='medium'] { --ts: 1; }
+html[data-text-size='large'] { --ts: 1.12; }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 body {
@@ -11,5 +20,6 @@ body {
   background: #f8fafc;
   -webkit-font-smoothing: antialiased;
 }
-#root { min-height: 100vh; }
+body.dark-theme { background: #1E1B4B; }
+#root { min-height: 100vh; zoom: var(--ts); }
 img { max-width: 100%; }
